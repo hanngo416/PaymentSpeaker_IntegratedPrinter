@@ -1,256 +1,181 @@
+-- =====================================================================================
+-- HỆ THỐNG LOA THÔNG BÁO CHUYỂN TIỀN THÔNG MINH TÍCH HỢP IN HÓA ĐƠN
+-- Database Setup Script (SQL Server 2019)
+-- Đồ án PRJ301 - Chuẩn hóa 3NF, Idempotency & Audit Hash Chain
+-- =====================================================================================
 
 USE master;
 GO
 
-IF DB_ID('PaymentSpeakerDB') IS NOT NULL
+-- 1. TẠO DATABASE NẾU CHƯA CÓ
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'PaymentSpeaker')
 BEGIN
-    ALTER DATABASE PaymentSpeakerDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE PaymentSpeakerDB;
-END;
+    CREATE DATABASE PaymentSpeaker;
+    PRINT N'>>> Đã tạo database PaymentSpeaker thành công!';
+END
 GO
 
-CREATE DATABASE PaymentSpeakerDB;
+USE PaymentSpeaker;
 GO
 
-USE PaymentSpeakerDB;
+-- Xóa các bảng cũ nếu đã tồn tại (thứ tự xóa từ bảng con đến bảng cha)
+IF OBJECT_ID('AuditLogs', 'U') IS NOT NULL DROP TABLE AuditLogs;
+IF OBJECT_ID('FraudAlerts', 'U') IS NOT NULL DROP TABLE FraudAlerts;
+IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
+IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
+IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
+IF OBJECT_ID('Devices', 'U') IS NOT NULL DROP TABLE Devices;
+IF OBJECT_ID('Users', 'U') IS NOT NULL DROP TABLE Users;
+IF OBJECT_ID('Roles', 'U') IS NOT NULL DROP TABLE Roles;
+IF OBJECT_ID('Stores', 'U') IS NOT NULL DROP TABLE Stores;
 GO
 
-CREATE TABLE Users (
-    user_id       INT IDENTITY PRIMARY KEY,
-    username      NVARCHAR(50) UNIQUE NOT NULL,
-    password_hash NVARCHAR(200) NOT NULL,
-    full_name     NVARCHAR(80),
-    status        NVARCHAR(20) DEFAULT 'ACTIVE',
-    created_at    DATETIME2 DEFAULT SYSUTCDATETIME()
+-- =====================================================================================
+-- 2. ĐỊNH NGHĨA CÁC BẢNG (DDL)
+-- =====================================================================================
+
+-- BẢNG 1: STORES (Quản lý chi nhánh)
+CREATE TABLE Stores (
+    store_id INT IDENTITY(1,1) PRIMARY KEY,
+    store_code NVARCHAR(50) NOT NULL UNIQUE,     -- Ví dụ: STORE_HN01, STORE_SG01
+    store_name NVARCHAR(150) NOT NULL,           -- Tên cửa hàng / chi nhánh
+    address NVARCHAR(255) NOT NULL,              -- Địa chỉ
+    phone NVARCHAR(20) NULL,                     -- Số điện thoại liên hệ
+    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- ACTIVE (Mở), INACTIVE (Đóng)
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
+-- BẢNG 2: ROLES (Phân quyền RBAC)
 CREATE TABLE Roles (
-    role_id   INT IDENTITY PRIMARY KEY,
-    role_name NVARCHAR(30) UNIQUE NOT NULL
+    role_id INT PRIMARY KEY,
+    role_name NVARCHAR(50) NOT NULL UNIQUE,      -- ADMIN, STORE_MANAGER, CASHIER, AUDITOR, TECHNICIAN
+    description NVARCHAR(255) NULL
 );
 GO
 
-CREATE TABLE UserRole (
-    user_id INT REFERENCES Users,
-    role_id INT REFERENCES Roles,
-    PRIMARY KEY (user_id, role_id)
+-- BẢNG 3: USERS (Tài khoản nhân sự)
+CREATE TABLE Users (
+    user_id INT IDENTITY(1,1) PRIMARY KEY,
+    username NVARCHAR(50) NOT NULL UNIQUE,
+    password_hash NVARCHAR(256) NOT NULL,        -- Chuỗi băm mật khẩu (PBKDF2 / SHA-256)
+    salt NVARCHAR(64) NOT NULL,                  -- Salt riêng cho từng user để chống Rainbow Table
+    full_name NVARCHAR(100) NOT NULL,
+    role_id INT NOT NULL,
+    store_id INT NULL,                           -- Thu ngân/Quản lý gắn với Store; Admin/Auditor = NULL
+    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- ACTIVE, LOCKED
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Users_Roles FOREIGN KEY (role_id) REFERENCES Roles(role_id),
+    CONSTRAINT FK_Users_Stores FOREIGN KEY (store_id) REFERENCES Stores(store_id)
 );
 GO
 
-CREATE TABLE Permissions (
-    perm_id  INT IDENTITY PRIMARY KEY,
-    resource NVARCHAR(40),
-    action   NVARCHAR(10),
-    UNIQUE (resource, action)
+-- BẢNG 4: DEVICES (Thiết bị Loa & Máy in tại quầy)
+CREATE TABLE Devices (
+    device_id INT IDENTITY(1,1) PRIMARY KEY,
+    device_code NVARCHAR(50) NOT NULL UNIQUE,    -- SPK_HN01, PRN_HN01
+    device_type NVARCHAR(20) NOT NULL,           -- SPEAKER, PRINTER
+    model_name NVARCHAR(100) NOT NULL,           -- "Aiyin A70", "Smart Speaker V2"
+    store_id INT NOT NULL,
+    api_key NVARCHAR(100) NOT NULL UNIQUE,       -- Khóa bí mật định danh thiết bị / cửa hàng
+    status NVARCHAR(20) NOT NULL DEFAULT 'ONLINE', -- ONLINE, OFFLINE, MAINTENANCE
+    last_ping DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Devices_Stores FOREIGN KEY (store_id) REFERENCES Stores(store_id),
+    CONSTRAINT CHK_Device_Type CHECK (device_type IN ('SPEAKER', 'PRINTER'))
 );
 GO
 
-CREATE TABLE RolePerm (
-    role_id INT REFERENCES Roles,
-    perm_id INT REFERENCES Permissions,
-    PRIMARY KEY (role_id, perm_id)
+-- BẢNG 5: MAINTENANCE_TICKETS (Phiếu sự cố & Bảo trì phần cứng)
+CREATE TABLE MaintenanceTickets (
+    ticket_id INT IDENTITY(1,1) PRIMARY KEY,
+    device_id INT NOT NULL,
+    reported_by INT NOT NULL,                    -- Thu ngân / Quản lý tạo phiếu
+    issue_description NVARCHAR(500) NOT NULL,    -- Ví dụ: "Máy in kẹt dao cắt", "Loa mất tiếng"
+    status NVARCHAR(20) NOT NULL DEFAULT 'OPEN', -- OPEN, IN_PROGRESS, RESOLVED
+    tech_notes NVARCHAR(500) NULL,               -- Ghi chú kỹ thuật viên
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    resolved_at DATETIME2(3) NULL,
+    CONSTRAINT FK_Tickets_Devices FOREIGN KEY (device_id) REFERENCES Devices(device_id),
+    CONSTRAINT FK_Tickets_Users FOREIGN KEY (reported_by) REFERENCES Users(user_id)
 );
 GO
 
-CREATE TABLE Device (
-    device_id     INT IDENTITY PRIMARY KEY,
-    device_code   NVARCHAR(30) UNIQUE,
-    location      NVARCHAR(80),
-    firmware      NVARCHAR(20),
-    status        NVARCHAR(20) DEFAULT 'ACTIVE',
-    control_owner INT NULL REFERENCES Users,
-    last_seen     DATETIME2 NULL,
-    api_key_hash  CHAR(64) NOT NULL
+-- BẢNG 6: ORDERS (Yêu cầu thanh toán đơn hàng & VietQR)
+CREATE TABLE Orders (
+    order_id INT IDENTITY(1,1) PRIMARY KEY,
+    order_code NVARCHAR(50) NOT NULL UNIQUE,     -- Mã tham chiếu VietQR, ví dụ: TINKY10234
+    store_id INT NOT NULL,
+    created_by INT NOT NULL,                     -- Thu ngân tạo đơn
+    amount DECIMAL(18,2) NOT NULL,               -- Số tiền yêu cầu thanh toán
+    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, PAID, EXPIRED, CANCELLED
+    qr_content NVARCHAR(500) NULL,               -- Chuỗi payload tạo mã QR VietQR
+    expires_at DATETIME2(3) NOT NULL,                -- Thời hạn quét (thường 10-15 phút)
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Orders_Stores FOREIGN KEY (store_id) REFERENCES Stores(store_id),
+    CONSTRAINT FK_Orders_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_Order_Status CHECK (status IN ('PENDING', 'PAID', 'EXPIRED', 'CANCELLED'))
 );
 GO
 
-CREATE TABLE SensorType (
-    sensor_type_id INT IDENTITY PRIMARY KEY,
-    name           NVARCHAR(40),
-    unit           NVARCHAR(20),
-    min_valid      FLOAT,
-    max_valid      FLOAT
+-- BẢNG 7: TRANSACTIONS (Biến động số dư nhận từ Webhook Ngân hàng / SePay)
+CREATE TABLE Transactions (
+    trans_id INT IDENTITY(1,1) PRIMARY KEY,
+    bank_trans_id NVARCHAR(100) NOT NULL UNIQUE, -- ID giao dịch của Ngân hàng (Idempotency Key chống trùng lặp Webhook)
+    order_id INT NULL,                           -- Đơn hàng được khớp (nếu tìm thấy mã TINKY...)
+    store_id INT NULL,                           -- Cửa hàng thụ hưởng
+    amount DECIMAL(18,2) NOT NULL,               -- Số tiền thực tế nhận được
+    content NVARCHAR(500) NOT NULL,              -- Nội dung chuyển khoản khách nhập
+    bank_account NVARCHAR(50) NULL,              -- Số tài khoản nhận
+    gateway NVARCHAR(50) NOT NULL DEFAULT 'SEPAY',
+    status NVARCHAR(50) NOT NULL DEFAULT 'LEGIT',-- LEGIT, DUPLICATE, AMOUNT_MISMATCH, SUSPECTED_FRAUD, DEVICE_OFFLINE
+    trans_time DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Thời gian ngân hàng ghi nhận
+    received_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Thời điểm server nhận webhook
+    announced BIT NOT NULL DEFAULT 0,            -- 0: Chưa đọc loa, 1: Đã đọc (chống đọc lại)
+    printed BIT NOT NULL DEFAULT 0,              -- 0: Chưa in bill, 1: Đã in bill
+    CONSTRAINT FK_Transactions_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    CONSTRAINT FK_Transactions_Stores FOREIGN KEY (store_id) REFERENCES Stores(store_id),
+    CONSTRAINT CHK_Trans_Status CHECK (status IN ('LEGIT', 'DUPLICATE', 'AMOUNT_MISMATCH', 'SUSPECTED_FRAUD', 'DEVICE_OFFLINE'))
 );
 GO
 
-CREATE TABLE Calibration (
-    calib_id       INT IDENTITY PRIMARY KEY,
-    device_id      INT REFERENCES Device,
-    sensor_type_id INT REFERENCES SensorType,
-    offset_val     FLOAT,
-    scale_val      FLOAT,
-    version        INT,
-    valid_until    DATE,
-    created_by     INT REFERENCES Users
+-- BẢNG 8: FRAUD_ALERTS (Cảnh báo gian lận & Tra soát từ Rules Engine)
+CREATE TABLE FraudAlerts (
+    alert_id INT IDENTITY(1,1) PRIMARY KEY,
+    trans_id INT NOT NULL,
+    rule_code NVARCHAR(50) NOT NULL,             -- DUP_TRANS, AMOUNT_MISMATCH, HIGH_AMOUNT, BURST_RATE
+    reason NVARCHAR(500) NOT NULL,               -- Lý do cảnh báo chi tiết
+    severity NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM', -- LOW, MEDIUM, HIGH
+    status NVARCHAR(20) NOT NULL DEFAULT 'NEW',  -- NEW, IN_PROGRESS, RESOLVED, DISMISSED
+    resolved_by INT NULL,                        -- Auditor xử lý
+    resolved_notes NVARCHAR(500) NULL,           -- Ghi chú cách giải quyết
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Alerts_Transactions FOREIGN KEY (trans_id) REFERENCES Transactions(trans_id),
+    CONSTRAINT FK_Alerts_Users FOREIGN KEY (resolved_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_Alert_Severity CHECK (severity IN ('LOW', 'MEDIUM', 'HIGH')),
+    CONSTRAINT CHK_Alert_Status CHECK (status IN ('NEW', 'IN_PROGRESS', 'RESOLVED', 'DISMISSED'))
 );
 GO
 
-CREATE TABLE OperatingProfile (
-    profile_id  INT IDENTITY PRIMARY KEY,
-    device_id   INT REFERENCES Device,
-    params_json NVARCHAR(MAX),
-    updated_by  INT REFERENCES Users,
-    updated_at  DATETIME2 DEFAULT SYSUTCDATETIME()
+-- BẢNG 9: AUDIT_LOGS (Nhật ký kiểm toán toàn vẹn - Hash Chain / Mini-Blockchain)
+CREATE TABLE AuditLogs (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    actor_username NVARCHAR(50) NOT NULL,
+    action NVARCHAR(50) NOT NULL,                -- LOGIN, LOGOUT, CREATE_ORDER, WEBHOOK_INGEST, UPDATE_STATUS
+    target_entity NVARCHAR(50) NOT NULL,         -- USER, ORDER, TRANSACTION, STORE, DEVICE
+    entity_id NVARCHAR(50) NOT NULL,
+    detail_json NVARCHAR(MAX) NULL,              -- Nội dung thay đổi dạng JSON diff
+    prev_hash CHAR(64) NOT NULL,                 -- SHA-256 của bản ghi liền trước (chuỗi băm bảo vệ)
+    curr_hash CHAR(64) NOT NULL,                 -- SHA-256(prev_hash + log_id + actor + action + entity + detail + created_at)
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
-CREATE TABLE Alert (
-    alert_id   INT IDENTITY PRIMARY KEY,
-    device_id  INT REFERENCES Device,
-    session_id BIGINT,
-    source     NVARCHAR(10),
-    label      NVARCHAR(40),
-    risk_score FLOAT NULL,
-    status     NVARCHAR(20) DEFAULT 'OPEN',
-    created_at DATETIME2 DEFAULT SYSUTCDATETIME()
-);
+-- =====================================================================================
+-- 3. TẠO INDEXES TỐI ƯU HIỆU NĂNG CHO CÁC TÁC VỤ THƯỜNG XUYÊN
+-- =====================================================================================
+CREATE INDEX IX_Transactions_BankTransId ON Transactions(bank_trans_id);
+CREATE INDEX IX_Transactions_Announced ON Transactions(announced, status, store_id);
+CREATE INDEX IX_Orders_OrderCode ON Orders(order_code);
+CREATE INDEX IX_AuditLogs_PrevHash ON AuditLogs(prev_hash);
 GO
 
-CREATE TABLE AlertEvidence (
-    evidence_id INT IDENTITY PRIMARY KEY,
-    alert_id    INT REFERENCES Alert,
-    item        NVARCHAR(60),
-    value_text  NVARCHAR(200)
-);
-GO
-
-CREATE TABLE MaintenanceTicket (
-    ticket_id   INT IDENTITY PRIMARY KEY,
-    alert_id    INT NULL REFERENCES Alert,
-    device_id   INT REFERENCES Device,
-    assigned_to INT REFERENCES Users,
-    note        NVARCHAR(400),
-    status      NVARCHAR(20) DEFAULT 'OPEN',
-    opened_at   DATETIME2 DEFAULT SYSUTCDATETIME(),
-    closed_at   DATETIME2 NULL
-);
-GO
-
-CREATE TABLE AuditLog (
-    audit_id      BIGINT IDENTITY PRIMARY KEY,
-    actor_user_id INT,
-    action        NVARCHAR(50),
-    object_type   NVARCHAR(50),
-    object_id     BIGINT,
-    diff_json     NVARCHAR(MAX),
-    ts            DATETIME2(7) DEFAULT SYSUTCDATETIME(),
-    row_hash      CHAR(64) NULL
-);
-GO
-
-CREATE TABLE HashChain (
-    anchor_id  BIGINT IDENTITY PRIMARY KEY,
-    audit_id   BIGINT REFERENCES AuditLog,
-    prev_hash  CHAR(64),
-    chain_hash CHAR(64)
-);
-GO
-
-CREATE TABLE Store (
-    store_id     INT IDENTITY PRIMARY KEY,
-    store_code   NVARCHAR(20)  NOT NULL UNIQUE,
-    store_name   NVARCHAR(100) NOT NULL,
-    address      NVARCHAR(200) NULL,
-    phone        NVARCHAR(20)  NULL,
-    bank_account NVARCHAR(30)  NULL,
-    status       NVARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
-    created_at   DATETIME2 DEFAULT SYSUTCDATETIME()
-);
-GO
-
-CREATE TABLE PaymentTransaction (
-    txn_id           BIGINT IDENTITY PRIMARY KEY,
-    store_id         INT NOT NULL REFERENCES Store,
-    device_id        INT NOT NULL REFERENCES Device,
-    sepay_txn_id     BIGINT NOT NULL,
-    gateway          NVARCHAR(30) NULL,
-    account_number   NVARCHAR(30) NULL,
-    amount           DECIMAL(18,0) NOT NULL,
-    transfer_content NVARCHAR(255) NULL,
-    reference_code   NVARCHAR(60) NULL,
-    measured_at      DATETIME2 NOT NULL,
-    ingested_at      DATETIME2 DEFAULT SYSUTCDATETIME(),
-    txn_min_of_day   INT NULL,
-    expected_amount  DECIMAL(18,0) NULL,
-    gap_seconds_prev FLOAT NULL,
-    UNIQUE (device_id, sepay_txn_id)
-);
-GO
-
-CREATE TABLE TransactionLabel (
-    txn_id     BIGINT PRIMARY KEY REFERENCES PaymentTransaction,
-    label      NVARCHAR(40) NOT NULL
-               CONSTRAINT CK_TransactionLabel_label CHECK
-               (label IN ('LEGIT', 'SUSPECTED_FRAUD', 'DUPLICATE', 'AMOUNT_MISMATCH', 'DEVICE_OFFLINE')),
-    labeled_by INT NULL REFERENCES Users,
-    labeled_at DATETIME2 DEFAULT SYSUTCDATETIME()
-);
-GO
-
-CREATE TABLE NotificationLog (
-    notify_id    BIGINT IDENTITY PRIMARY KEY,
-    txn_id       BIGINT NOT NULL REFERENCES PaymentTransaction,
-    device_id    INT NOT NULL REFERENCES Device,
-    channel      NVARCHAR(10) NOT NULL
-                 CONSTRAINT CK_NotificationLog_channel CHECK (channel IN ('SPEAKER', 'PRINTER')),
-    message_text NVARCHAR(300) NULL,
-    status       NVARCHAR(20) NOT NULL DEFAULT 'PENDING'
-                 CONSTRAINT CK_NotificationLog_status CHECK (status IN ('PENDING', 'DONE', 'FAILED')),
-    error_text   NVARCHAR(200) NULL,
-    created_at   DATETIME2 DEFAULT SYSUTCDATETIME(),
-    completed_at DATETIME2 NULL
-);
-GO
-
-ALTER TABLE Users  ADD store_id INT NULL CONSTRAINT FK_Users_Store  REFERENCES Store;
-ALTER TABLE Device ADD store_id INT NULL CONSTRAINT FK_Device_Store REFERENCES Store;
-GO
-
-CREATE TRIGGER trg_PaymentTransaction_AppendOnly ON PaymentTransaction
-INSTEAD OF UPDATE, DELETE AS
-BEGIN
-    RAISERROR(N'Payment transaction records are append-only', 16, 1);
-END;
-GO
-
-CREATE VIEW v_PaymentTransaction_Features AS
-SELECT t.txn_id, t.store_id, t.device_id, t.amount, t.txn_min_of_day,
-       t.expected_amount, t.gap_seconds_prev, l.label
-FROM PaymentTransaction t
-JOIN TransactionLabel l ON l.txn_id = t.txn_id;
-GO
-
-CREATE INDEX IX_Users_store       ON Users(store_id);
-CREATE INDEX IX_UserRole_role     ON UserRole(role_id);
-CREATE INDEX IX_Device_store      ON Device(store_id);
-CREATE INDEX IX_AuditLog_ts       ON AuditLog(ts DESC);
-CREATE INDEX IX_AuditLog_action   ON AuditLog(action);
-CREATE INDEX IX_Txn_store_time    ON PaymentTransaction(store_id, measured_at DESC);
-GO
-
-CREATE OR ALTER PROCEDURE Audit_Append
-    @actor INT, @action NVARCHAR(50), @objectType NVARCHAR(50), @objectId BIGINT, @diff NVARCHAR(MAX)
-AS
-BEGIN
-    SET XACT_ABORT ON;
-    BEGIN TRAN;
-    DECLARE @id BIGINT, @ts DATETIME2(7), @prev CHAR(64), @row NVARCHAR(MAX), @hash CHAR(64);
-
-    INSERT INTO AuditLog (actor_user_id, action, object_type, object_id, diff_json)
-    VALUES (@actor, @action, @objectType, @objectId, @diff);
-    SET @id = SCOPE_IDENTITY();
-    SELECT @ts = ts FROM AuditLog WHERE audit_id = @id;
-
-    SELECT TOP 1 @prev = chain_hash FROM HashChain WITH (UPDLOCK, HOLDLOCK) ORDER BY anchor_id DESC;
-    SET @prev = ISNULL(@prev, REPLICATE('0', 64));
-
-    SET @row = CONCAT(@id, '|', CONVERT(NVARCHAR(33), @ts, 126), '|', @actor, '|', @action, '|',
-                      @objectType, '|', @objectId, '|', ISNULL(@diff, ''), '|', @prev);
-    SET @hash = LOWER(CONVERT(CHAR(64), HASHBYTES('SHA2_256', @row), 2));
-
-    UPDATE AuditLog SET row_hash = @hash WHERE audit_id = @id;
-    INSERT INTO HashChain (audit_id, prev_hash, chain_hash) VALUES (@id, @prev, @hash);
-    COMMIT;
-END;
-GO
