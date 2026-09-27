@@ -7,6 +7,7 @@
 *.class
 *.log
 *.jar
+!web/WEB-INF/lib/*.jar
 *.war
 *.ear
 target/
@@ -33,3 +34,6 @@ Thumbs.db
 # Secrets / env
 .env
 *.env
+src/java/mail.properties
+src/java/google-oauth.properties
+src/java/sepay.properties

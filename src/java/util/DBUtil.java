@@ -9,7 +9,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-public class DBContext {
+public class DBUtil {
    private static final String URL =
         "jdbc:sqlserver://localhost:1433;databaseName=PaymentSpeaker";
     private static final String USER = "sa";

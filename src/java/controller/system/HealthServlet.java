@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller;
+package controller.system;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,13 +17,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.DBContext;
+import util.DBUtil;
 
 /**
  *
  * @author PC
  */
-@WebServlet(name = "HealthServlet", urlPatterns = {"/HealthServlet"})
+@WebServlet(name = "HealthServlet", urlPatterns = {"/health"})
 public class HealthServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -42,15 +42,15 @@ public class HealthServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            try (Connection con = DBContext.getConnection();
+            try (Connection con = DBUtil.getConnection();
                  Statement st = con.createStatement();
                  ResultSet rs = st.executeQuery("SELECT 1")) {
                 rs.next();
                 out.println("OK - DB tra ve: " + rs.getInt(1));
             } catch (SQLException e) {
-                LOG.log(Level.SEVERE, "Khong ket noi duoc DB", e);
+                LOG.log(Level.SEVERE, "Cannot connect to the database", e);
                 response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                out.println("DB loi, xem log server.");
+                out.println("Database error, see the server log.");
             }
         }
     }
