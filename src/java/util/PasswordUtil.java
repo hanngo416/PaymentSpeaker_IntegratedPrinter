@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package util;
 
 import java.security.GeneralSecurityException;
@@ -7,43 +11,45 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 /**
- * Băm và kiểm tra mật khẩu bằng PBKDF2 (có sẵn trong JDK, không cần thư viện ngoài).
- * Mật khẩu KHÔNG BAO GIỜ được lưu dạng thô; DB chỉ lưu (salt, hash).
+ * Hashes and verifies passwords with PBKDF2 (built into the JDK, no external library).
+ * A password is NEVER stored as plain text; the DB only stores (salt, hash).
+ *
+ * @author PC
  */
 public final class PasswordUtil {
 
     private static final String ALGORITHM = "PBKDF2WithHmacSHA256";
-    private static final int ITERATIONS = 65536;   // càng lớn càng chậm với kẻ tấn công dò mật khẩu
-    private static final int KEY_BITS = 256;       // 256 bit = 32 byte = 64 ký tự hex
-    private static final int SALT_BYTES = 16;      // 16 byte = 32 ký tự hex
+    private static final int ITERATIONS = 65536;   // more iterations = slower for an attacker guessing passwords
+    private static final int KEY_BITS = 256;       // 256 bits = 32 bytes = 64 hex characters
+    private static final int SALT_BYTES = 16;      // 16 bytes = 32 hex characters
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private PasswordUtil() {
     }
 
-    /** Sinh salt ngẫu nhiên, trả về dạng chuỗi hex. */
+    /** Generates a random salt and returns it as a hex string. */
     public static String newSalt() {
         byte[] salt = new byte[SALT_BYTES];
         RANDOM.nextBytes(salt);
         return toHex(salt);
     }
 
-    /** Băm mật khẩu với salt cho trước, trả về chuỗi hex. */
+    /** Hashes a password with the given salt and returns the result as a hex string. */
     public static String hash(String password, String saltHex) {
         try {
             PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), fromHex(saltHex), ITERATIONS, KEY_BITS);
             SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
             return toHex(factory.generateSecret(spec).getEncoded());
         } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("Khong the bam mat khau", e);
+            throw new IllegalStateException("Cannot hash password", e);
         }
     }
 
-    /** So khớp mật khẩu người dùng nhập với hash đã lưu. */
+    /** Checks the password the user typed against the stored hash. */
     public static boolean verify(String password, String saltHex, String expectedHashHex) {
         String actual = hash(password, saltHex);
-        // isEqual so sánh thời gian cố định, không lộ thông tin qua độ dài thời gian so sánh
+        // isEqual compares in constant time, so the comparison time leaks nothing about the hash
         return MessageDigest.isEqual(actual.getBytes(), expectedHashHex.getBytes());
     }
 
