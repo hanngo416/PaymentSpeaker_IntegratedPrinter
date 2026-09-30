@@ -1,0 +1,54 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<c:set var="me" value="${sessionScope.loginUser}"/>
+<c:set var="role" value="${me.role}"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${pageTitle}"/></title>
+    <link rel="stylesheet" href="${ctx}/assets/css/app.css">
+</head>
+<body>
+<div class="shell">
+    <aside class="sidebar">
+        <div>
+            <div class="brand">
+                <div class="brand-mark">T</div>
+                <span class="brand-name">Tinky</span>
+            </div>
+            <nav class="nav">
+                <a href="${ctx}/dashboard" class="${nav == 'home' ? 'active' : ''}">Home</a>
+                <c:if test="${role == 'CASHIER'}">
+                    <a href="${ctx}/orders/new" class="${nav == 'orders' ? 'active' : ''}">Create payment order</a>
+                </c:if>
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                    <a href="${ctx}/admin/users" class="${nav == 'users' ? 'active' : ''}">Users</a>
+                </c:if>
+                <c:if test="${role != 'TECHNICIAN'}">
+                    <a href="${ctx}/transactions" class="${nav == 'transactions' ? 'active' : ''}">Transactions</a>
+                </c:if>
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
+                    <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
+                </c:if>
+                <c:if test="${role == 'ADMIN'}">
+                    <a href="${ctx}/admin/simulate" class="${nav == 'simulate' ? 'active' : ''}">Simulate transactions</a>
+                </c:if>
+                <a href="${ctx}/profile" class="${nav == 'profile' ? 'active' : ''}">Profile</a>
+            </nav>
+        </div>
+        <form method="post" action="${ctx}/logout" class="sidebar-foot">
+            <button type="submit">Logout</button>
+        </form>
+    </aside>
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title"><c:out value="${pageTitle}"/></div>
+            <div class="user-chip">
+                <span class="avatar"><c:out value="${fn:toUpperCase(fn:substring(me.fullName, 0, 1))}"/></span>
+                <span class="user-name"><c:out value="${me.fullName}"/> (<c:out value="${me.userCode}"/>)</span>
+                <span class="pill"><c:out value="${role}"/></span>
+            </div>
+        </header>
+        <main class="content">
