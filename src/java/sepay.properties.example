@@ -1,0 +1,4 @@
+# FILE: src/java/sepay.properties.example   (copy to sepay.properties and fill in)
+api.token=xxxxxxxxxxxxxxxx
+account.number=0987654321
+window.minutes=30
