@@ -4,6 +4,24 @@
 <c:set var="pageTitle" value="Transactions"/>
 <c:set var="nav" value="transactions"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
+<div class="kpis">
+    <div class="card">
+        <span class="kpi-label">Valid amount in this range</span>
+        <div class="kpi-value accent">${sumValid} <span class="kpi-unit">VND</span></div>
+        <p class="kpi-sub">LEGIT transactions</p>
+    </div>
+    <div class="card">
+        <span class="kpi-label">Flagged amount in this range</span>
+        <div class="kpi-value ${sumFlagged == '0' ? '' : 'bad'}">${sumFlagged} <span class="kpi-unit">VND</span></div>
+        <p class="kpi-sub">any label other than LEGIT</p>
+    </div>
+    <div class="card">
+        <span class="kpi-label">Transactions</span>
+        <div class="kpi-value">${result.total}</div>
+        <p class="kpi-sub">matching the filter</p>
+    </div>
+</div>
+
 <div class="card">
     <h1>Transactions</h1>
     <form method="get" action="${ctx}/transactions" class="filters">
@@ -73,11 +91,20 @@
         </thead>
         <tbody>
         <c:forEach var="t" items="${result.items}">
-            <tr>
-                <td><fmt:formatDate value="${t.transTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+            <fmt:formatDate var="when" value="${t.transTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+            <fmt:formatNumber var="amt" value="${t.amount}" pattern="#,##0"/>
+            <tr class="tx-row" tabindex="0"
+                data-amount="<c:out value='${amt}'/>"
+                data-bank-id="<c:out value='${t.bankTransId}'/>"
+                data-time="<c:out value='${when}'/>"
+                data-device="<c:out value='${empty t.deviceCode ? "-" : t.deviceCode}'/>"
+                data-order="<c:out value='${empty t.orderCode ? "-" : t.orderCode}'/>"
+                data-content="<c:out value='${t.content}'/>"
+                data-label="<c:out value='${t.status}'/>">
+                <td><c:out value="${when}"/></td>
                 <td><c:out value="${empty t.deviceCode ? '-' : t.deviceCode}"/></td>
                 <td><c:out value="${empty t.orderCode ? '-' : t.orderCode}"/></td>
-                <td class="num"><fmt:formatNumber value="${t.amount}" pattern="#,##0"/></td>
+                <td class="amount-cell"><c:out value="${amt}"/></td>
                 <td><c:out value="${t.content}"/></td>
                 <td><span class="pill ${t.status}"><c:out value="${t.status}"/></span></td>
                 <td><c:out value="${t.bankTransId}"/></td>
@@ -98,21 +125,24 @@
         </c:forEach>
     </div>
 </div>
+
+<div class="modal-backdrop" id="txModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+        <button type="button" class="modal-close" id="txModalClose" aria-label="Close">&times;</button>
+        <p class="modal-kicker" id="mTitle">Transaction details</p>
+        <div class="modal-amount" id="mAmount"></div>
+        <p><span id="mLabel" class="pill"></span></p>
+        <dl>
+            <dt>Bank ID</dt><dd id="mBankId"></dd>
+            <dt>Time</dt><dd id="mTime"></dd>
+            <dt>Device</dt><dd id="mDevice"></dd>
+            <dt>Order</dt><dd id="mOrder"></dd>
+            <dt>Content</dt><dd id="mContent"></dd>
+        </dl>
+    </div>
+</div>
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
-<script>
-    (function () {
-        var tip = document.getElementById('tip');
-        if (!tip) { return; }
-        document.querySelectorAll('.bar').forEach(function (g) {
-            g.addEventListener('mousemove', function (e) {
-                tip.textContent = g.getAttribute('data-tip');
-                tip.style.display = 'block';
-                tip.style.left = (e.clientX + 14) + 'px';
-                tip.style.top = (e.clientY + 14) + 'px';
-            });
-            g.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
-        });
-    })();
-</script>
+<script src="${ctx}/assets/js/chart-tip.js"></script>
+<script src="${ctx}/assets/js/tx-detail.js"></script>
 </body>
 </html>
