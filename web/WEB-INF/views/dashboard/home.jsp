@@ -103,27 +103,6 @@
     </div>
 </c:if>
 
-<div class="card">
-    <h2>Shortcuts</h2>
-    <div class="tiles">
-        <c:if test="${role == 'CASHIER'}">
-            <a class="tile" href="${ctx}/orders/new">Create payment order</a>
-        </c:if>
-        <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
-            <a class="tile" href="${ctx}/admin/users">Users</a>
-        </c:if>
-        <c:if test="${role != 'TECHNICIAN'}">
-            <a class="tile" href="${ctx}/transactions">Transactions</a>
-        </c:if>
-        <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
-            <a class="tile" href="${ctx}/alerts">Alert center</a>
-        </c:if>
-        <c:if test="${role == 'ADMIN'}">
-            <a class="tile" href="${ctx}/admin/simulate">Simulate transactions</a>
-        </c:if>
-        <a class="tile" href="${ctx}/profile">Profile</a>
-    </div>
-</div>
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
 <script src="${ctx}/assets/js/chart-tip.js"></script>
 </body>
