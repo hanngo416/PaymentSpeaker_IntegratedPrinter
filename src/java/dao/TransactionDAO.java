@@ -16,6 +16,7 @@ import model.Transaction;
 import model.TxFilter;
 import model.enums.TxLabel;
 import model.view.DayTotal;
+import model.view.SpeakItem;
 import model.view.TxRow;
 import rules.Verdict;
 import util.DBUtil;
@@ -44,6 +45,16 @@ public class TransactionDAO {
 
     private static final String EXISTS_BANK_ID
             = "SELECT 1 FROM Transactions WHERE bank_trans_id = ?";
+
+    // The speaker only reads valid, not yet announced and recently received transactions (so old payments are not read out when the page is opened late)
+    private static final String SELECT_TO_ANNOUNCE
+            = "SELECT TOP (?) trans_id, amount FROM Transactions "
+            + "WHERE status = N'LEGIT' AND announced = 0 "
+            + "AND received_at >= DATEADD(MINUTE, -?, SYSDATETIME()) "
+            + "ORDER BY trans_id";
+
+    private static final String MARK_ANNOUNCED
+            = "UPDATE Transactions SET announced = 1 WHERE trans_id = ? AND announced = 0";
 
     private static final String FROM
             = " FROM Transactions t "
@@ -116,6 +127,29 @@ public class TransactionDAO {
                 con.rollback();
                 throw e;
             }
+        }
+    }
+
+    public List<SpeakItem> findToAnnounce(int limit, int maxAgeMinutes) throws SQLException {
+        List<SpeakItem> list = new ArrayList<>();
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(SELECT_TO_ANNOUNCE)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, maxAgeMinutes);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new SpeakItem(rs.getInt("trans_id"), rs.getBigDecimal("amount").longValue()));
+                }
+            }
+        }
+        return list;
+    }
+
+    public boolean markAnnounced(int transId) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(MARK_ANNOUNCED)) {
+            ps.setInt(1, transId);
+            return ps.executeUpdate() > 0;
         }
     }
 

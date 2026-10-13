@@ -151,7 +151,8 @@ public class OrderServlet extends HttpServlet {
         }
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("{\"status\":\"" + order.getStatus().name()
-                + "\",\"remaining\":" + order.getRemainingSeconds() + "}");
+                + "\",\"amount\":" + order.getAmount().longValue()
+                + ",\"remaining\":" + order.getRemainingSeconds() + "}");
     }
 
     private Order findOrder(HttpServletRequest request, User user) throws SQLException {

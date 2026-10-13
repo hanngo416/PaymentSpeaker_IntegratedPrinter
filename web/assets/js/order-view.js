@@ -1,10 +1,37 @@
 (function () {
     var box = document.getElementById('box');
-    if (!box || box.dataset.status !== 'PENDING') {
+    if (!box) {
         return;
     }
 
     var code = box.dataset.code;
+    var paidKey = 'paid-amount-' + code;
+
+    function speak(text) {
+        if (!window.speechSynthesis) { return; }
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = 'vi-VN';
+        var voices = window.speechSynthesis.getVoices();
+        for (var i = 0; i < voices.length; i++) {
+            if (/^vi/i.test(voices[i].lang.replace('_', '-'))) { u.voice = voices[i]; break; }
+        }
+        window.speechSynthesis.speak(u);
+    }
+
+    if (box.dataset.status === 'PAID') {
+        try {
+            var amount = sessionStorage.getItem(paidKey);
+            if (amount) {
+                sessionStorage.removeItem(paidKey);
+                speak('\u0110\u00e3 nh\u1eadn ' + amount + ' \u0111\u1ed3ng');
+            }
+        } catch (e) { }
+        return;
+    }
+    if (box.dataset.status !== 'PENDING') {
+        return;
+    }
+
     var statusUrl = box.dataset.statusUrl;
     var endAt = Date.now() + parseInt(box.dataset.remaining, 10) * 1000;
     var countdown = document.getElementById('countdown');
@@ -27,6 +54,9 @@
             })
             .then(function (data) {
                 if (data && data.status !== 'PENDING') {
+                    if (data.status === 'PAID') {
+                        try { sessionStorage.setItem(paidKey, data.amount); } catch (e) { }
+                    }
                     location.reload();
                 }
             })

@@ -29,11 +29,11 @@
                 <c:if test="${role != 'TECHNICIAN'}">
                     <a href="${ctx}/transactions" class="${nav == 'transactions' ? 'active' : ''}">Transactions</a>
                 </c:if>
+                <c:if test="${role == 'CASHIER'}">
+                    <a href="${ctx}/speaker" class="${nav == 'speaker' ? 'active' : ''}">Speaker</a>
+                </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
                     <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
-                </c:if>
-                <c:if test="${role == 'ADMIN'}">
-                    <a href="${ctx}/admin/simulate" class="${nav == 'simulate' ? 'active' : ''}">Simulate transactions</a>
                 </c:if>
                 <a href="${ctx}/profile" class="${nav == 'profile' ? 'active' : ''}">Profile</a>
             </nav>

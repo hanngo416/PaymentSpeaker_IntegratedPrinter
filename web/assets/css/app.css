@@ -418,3 +418,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     button, .btn { min-height: 44px; }
     dl { grid-template-columns: 110px 1fr; }
 }
+
+.speaker-log { margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.speaker-log li { padding: 8px 0; border-bottom: 1px solid var(--line); }

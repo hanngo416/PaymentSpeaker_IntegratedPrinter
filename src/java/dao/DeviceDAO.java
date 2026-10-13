@@ -18,6 +18,18 @@ public class DeviceDAO {
             = "SELECT TOP 1 device_id FROM Devices "
             + "WHERE device_type = N'SPEAKER' ORDER BY device_id";
 
+    private static final String PING_SPEAKER
+            = "UPDATE Devices SET last_ping = SYSDATETIME(), status = N'ONLINE' "
+            + "WHERE device_type = N'SPEAKER' AND status <> N'MAINTENANCE'";
+
+    // Each time the speaker page polls, it counts as a heartbeat
+    public void pingSpeaker() throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(PING_SPEAKER)) {
+            ps.executeUpdate();
+        }
+    }
+
     public List<Device> findAll() throws SQLException {
         List<Device> list = new ArrayList<>();
         try (Connection con = DBUtil.getConnection();
