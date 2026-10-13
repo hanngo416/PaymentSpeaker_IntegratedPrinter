@@ -17,17 +17,12 @@ GO
 
 USE PaymentSpeaker;
 GO
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
 
--- Drop existing tables (children first, then parents)
-IF OBJECT_ID('AuditLogs', 'U') IS NOT NULL DROP TABLE AuditLogs;
-IF OBJECT_ID('FraudAlerts', 'U') IS NOT NULL DROP TABLE FraudAlerts;
-IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
-IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
-IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
-IF OBJECT_ID('Devices', 'U') IS NOT NULL DROP TABLE Devices;
-IF OBJECT_ID('LoginOtps', 'U') IS NOT NULL DROP TABLE LoginOtps;
-IF OBJECT_ID('Users', 'U') IS NOT NULL DROP TABLE Users;
-IF OBJECT_ID('Roles', 'U') IS NOT NULL DROP TABLE Roles;
+-- Tables are only created when they do not exist yet, so re-running this script keeps real data.
+-- To wipe everything (demo reset), run 99_reset_demo.sql first.
 GO
 
 -- =====================================================================================
@@ -35,6 +30,7 @@ GO
 -- =====================================================================================
 
 -- TABLE 1: ROLES (RBAC)
+IF OBJECT_ID('Roles', 'U') IS NULL
 CREATE TABLE Roles (
     role_id INT PRIMARY KEY,
     role_name NVARCHAR(50) NOT NULL UNIQUE,      -- ADMIN, STORE_MANAGER, CASHIER, AUDITOR, TECHNICIAN
@@ -43,6 +39,7 @@ CREATE TABLE Roles (
 GO
 
 -- TABLE 2: USERS (staff accounts)
+IF OBJECT_ID('Users', 'U') IS NULL
 CREATE TABLE Users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
     user_code NVARCHAR(50) NOT NULL UNIQUE,       -- Staff code for display and logs, unique to guarantee audit trail integrity
@@ -56,10 +53,12 @@ CREATE TABLE Users (
 );
 GO
 
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UX_Users_google_id' AND object_id = OBJECT_ID('Users'))
 CREATE UNIQUE INDEX UX_Users_google_id ON Users(google_id) WHERE google_id IS NOT NULL;
 GO
 
 -- TABLE 2B: LOGIN_OTPS (one-time login codes sent by email)
+IF OBJECT_ID('LoginOtps', 'U') IS NULL
 CREATE TABLE LoginOtps (
     otp_id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL,
@@ -74,6 +73,7 @@ CREATE TABLE LoginOtps (
 GO
 
 -- TABLE 3: DEVICES (speakers and printers at the counter)
+IF OBJECT_ID('Devices', 'U') IS NULL
 CREATE TABLE Devices (
     device_id INT IDENTITY(1,1) PRIMARY KEY,
     device_code NVARCHAR(50) NOT NULL UNIQUE,    -- SPK_01, PRN_01
@@ -87,6 +87,7 @@ CREATE TABLE Devices (
 GO
 
 -- TABLE 4: MAINTENANCE_TICKETS (hardware incident and maintenance tickets)
+IF OBJECT_ID('MaintenanceTickets', 'U') IS NULL
 CREATE TABLE MaintenanceTickets (
     ticket_id INT IDENTITY(1,1) PRIMARY KEY,
     device_id INT NOT NULL,
@@ -102,6 +103,7 @@ CREATE TABLE MaintenanceTickets (
 GO
 
 -- TABLE 5: ORDERS (payment requests and VietQR)
+IF OBJECT_ID('Orders', 'U') IS NULL
 CREATE TABLE Orders (
     order_id INT IDENTITY(1,1) PRIMARY KEY,
     order_code NVARCHAR(50) NOT NULL UNIQUE,     -- VietQR reference code, for example TINKY10234
@@ -118,6 +120,7 @@ CREATE TABLE Orders (
 GO
 
 -- TABLE 6: TRANSACTIONS (balance changes pulled from the SePay API by the polling job)
+IF OBJECT_ID('Transactions', 'U') IS NULL
 CREATE TABLE Transactions (
     trans_id INT IDENTITY(1,1) PRIMARY KEY,
     bank_trans_id NVARCHAR(100) NOT NULL UNIQUE, -- Bank transaction id (idempotency key against the same transaction pulled again)
@@ -139,6 +142,7 @@ CREATE TABLE Transactions (
 GO
 
 -- TABLE 7: FRAUD_ALERTS (fraud alerts raised by the rules engine)
+IF OBJECT_ID('FraudAlerts', 'U') IS NULL
 CREATE TABLE FraudAlerts (
     alert_id INT IDENTITY(1,1) PRIMARY KEY,
     trans_id INT NOT NULL,
@@ -157,6 +161,7 @@ CREATE TABLE FraudAlerts (
 GO
 
 -- TABLE 8: AUDIT_LOGS (tamper-evident audit trail - hash chain / mini blockchain)
+IF OBJECT_ID('AuditLogs', 'U') IS NULL
 CREATE TABLE AuditLogs (
     log_id INT IDENTITY(1,1) PRIMARY KEY,
     actor_username NVARCHAR(50) NOT NULL,
@@ -173,9 +178,14 @@ GO
 -- =====================================================================================
 -- 3. INDEXES FOR FREQUENT OPERATIONS
 -- =====================================================================================
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_BankTransId' AND object_id = OBJECT_ID('Transactions'))
 CREATE INDEX IX_Transactions_BankTransId ON Transactions(bank_trans_id);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Announced' AND object_id = OBJECT_ID('Transactions'))
 CREATE INDEX IX_Transactions_Announced ON Transactions(announced, status);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Device_Time' AND object_id = OBJECT_ID('Transactions'))
 CREATE INDEX IX_Transactions_Device_Time ON Transactions(device_id, trans_time);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Orders_OrderCode' AND object_id = OBJECT_ID('Orders'))
 CREATE INDEX IX_Orders_OrderCode ON Orders(order_code);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_AuditLogs_PrevHash' AND object_id = OBJECT_ID('AuditLogs'))
 CREATE INDEX IX_AuditLogs_PrevHash ON AuditLogs(prev_hash);
 GO

@@ -1,6 +1,9 @@
 -- Check queries. Run AFTER 01_schema.sql and 02_seed.sql
 USE PaymentSpeaker;
 GO
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
 
 -- CHECK 1: every table has sample data (no table should be empty except Transactions, FraudAlerts and LoginOtps)
 SELECT 'Roles' AS table_name, COUNT(*) AS row_count FROM Roles
@@ -28,7 +31,8 @@ DELETE FROM Transactions WHERE bank_trans_id = N'MB_TEST_99999';
 GO
 
 -- CHECK 4: a user that still has orders cannot be deleted (expect a foreign key error)
-DELETE FROM Users WHERE user_id = 3;
+DECLARE @cashier_uid INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
+DELETE FROM Users WHERE user_id = @cashier_uid;
 GO
 
 -- CHECK 5: the genesis block of the audit chain exists (prev_hash is 64 zeros)
