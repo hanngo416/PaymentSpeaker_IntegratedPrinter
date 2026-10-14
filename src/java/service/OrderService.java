@@ -5,15 +5,12 @@
 package service;
 
 import dao.OrderDAO;
-import dao.RefundDAO;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.List;
 import model.Order;
 import model.User;
-import model.view.RefundRow;
-import model.enums.OrderStatus;
 import model.enums.Role;
 import util.AppConfig;
 import util.SqlErrors;
@@ -29,7 +26,6 @@ public class OrderService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final OrderDAO orderDAO = new OrderDAO();
-    private final RefundDAO refundDAO = new RefundDAO();
 
     public Order create(User user, String rawAmount) throws SQLException {
         return create(user, rawAmount, null);
@@ -55,7 +51,6 @@ public class OrderService {
             order.setCreatedBy(user.getUserId());
             order.setAmount(BigDecimal.valueOf(amount));
             order.setCashAmount(BigDecimal.valueOf(cash));
-            order.setPaidAmount(BigDecimal.valueOf(cash));
             order.setQrContent(VietQrUtil.buildImageUrl(transfer, code));
             try {
                 orderDAO.insert(order, AppConfig.ORDER_MINUTES);
@@ -80,23 +75,14 @@ public class OrderService {
         if (order != null && !isOwnerOrAdmin(user, order)) {
             return null;
         }
-        // After a part payment the QR asks for what is still missing, so the customer does not pay the full price again
-        if (order != null && order.getStatus() == OrderStatus.PENDING && order.getPaidAmount().signum() > 0) {
-            order.setQrContent(VietQrUtil.buildImageUrl(order.getAmountDue().longValue(), order.getOrderCode()));
-        }
         return order;
-    }
-
-    // Money sent back (or waiting to be sent back) to the customer of this order
-    public List<RefundRow> refunds(Order order) throws SQLException {
-        return refundDAO.findByOrder(order.getOrderId());
     }
 
     public boolean cancel(User user, String code) throws SQLException {
         Order order = findForUser(user, code);
         boolean cancelled = order != null && orderDAO.cancel(code);
         if (cancelled) {
-            AuditService.log(user, "CANCEL_ORDER", "ORDER", code, "paidSoFar", order.getPaidAmount().toPlainString());
+            AuditService.log(user, "CANCEL_ORDER", "ORDER", code, "cash", order.getCashAmount().toPlainString());
         }
         return cancelled;
     }

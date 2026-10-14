@@ -33,14 +33,6 @@ public class RuleTest {
         System.out.println((ok ? "OK   " : "FAIL ") + name + " -> " + got + (ok ? "" : " (expected " + expected + ")"));
     }
 
-    private static void checkRefund(String name, Verdict v, String expected) {
-        boolean ok = v.getRefund().compareTo(new BigDecimal(expected)) == 0;
-        if (!ok) {
-            failures++;
-        }
-        System.out.println((ok ? "OK   " : "FAIL ") + name + " -> " + v.getRefund().toPlainString() + (ok ? "" : " (expected " + expected + ")"));
-    }
-
     private static void checkExtra(String name, Verdict v, String expected) {
         String got = v.getExtras().isEmpty() ? "none" : v.getExtras().get(0).getRuleCode();
         boolean ok = got.equals(expected);
@@ -55,7 +47,8 @@ public class RuleTest {
 
         // Amount against the order: QR code has fixed amount, transfer completes the order
         check("exact amount", engine.evaluate(new RuleContext(tx("50000.00"), order("50000", OrderStatus.PENDING), 0, 0)), "LEGIT");
-        check("transfer for order is accepted as legit", engine.evaluate(new RuleContext(tx("40000"), order("50000", OrderStatus.PENDING), 0, 0)), "LEGIT");
+        check("less than the QR amount is not a payment of the order", engine.evaluate(new RuleContext(tx("40000"), order("50000", OrderStatus.PENDING), 0, 0)), "AMOUNT_MISMATCH");
+        check("more than the QR amount is not a payment of the order", engine.evaluate(new RuleContext(tx("60000"), order("50000", OrderStatus.PENDING), 0, 0)), "AMOUNT_MISMATCH");
 
         // Order missing or closed
         check("no order", engine.evaluate(new RuleContext(tx("40000"), null, 0, 0)), "NO_ORDER");
@@ -73,14 +66,11 @@ public class RuleTest {
         check("paid after the deadline", engine.evaluate(new RuleContext(tooLate, expired, 0, 0)), "ORDER_NOT_PENDING");
         check("cancelled order never accepted", engine.evaluate(new RuleContext(inTime, order("50000", OrderStatus.CANCELLED), 0, 0)), "ORDER_NOT_PENDING");
 
-        // Split payments: order has cash portion, bank transfer completes it
+        // Cash and transfer: the customer paid 40k in cash, the QR asks for the remaining 60k
         Order splitOrder = order("100000", OrderStatus.PENDING);
-        splitOrder.setPaidAmount(new BigDecimal("40000")); // Cash collected: 40k, remaining QR: 60k
-        check("transfer completes the order", engine.evaluate(new RuleContext(tx("60000"), splitOrder, 0, 0)), "LEGIT");
-
-        // Money to send back
-        checkRefund("closed order refunds everything", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.PAID), 0, 0)), "50000");
-        checkRefund("no order, nobody to refund", engine.evaluate(new RuleContext(tx("40000"), null, 0, 0)), "0");
+        splitOrder.setCashAmount(new BigDecimal("40000"));
+        check("transfer of the QR amount completes the order", engine.evaluate(new RuleContext(tx("60000"), splitOrder, 0, 0)), "LEGIT");
+        check("transfer of the full price is not the QR amount", engine.evaluate(new RuleContext(tx("100000"), splitOrder, 0, 0)), "AMOUNT_MISMATCH");
 
         // The watcher adds its alert on top of the main result
         Verdict bigNoOrder = engine.evaluate(new RuleContext(tx("6000000"), null, 0, 0));
@@ -91,6 +81,7 @@ public class RuleTest {
         // Rule precedence
         check("duplicate wins first", engine.evaluate(new RuleContext(tx("50000"), null, 1, 0)), "DUP_TRANS");
         check("duplicate beats closed order", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.PAID), 1, 0)), "DUP_TRANS");
+        check("second equal transfer of an order is a duplicate", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.PENDING), 1, 0)), "DUP_TRANS");
 
         // High amount boundary (threshold is 5,000,000 and it is inclusive)
         check("4,999,999 is allowed", engine.evaluate(new RuleContext(tx("4999999"), order("4999999", OrderStatus.PENDING), 0, 0)), "LEGIT");

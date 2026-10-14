@@ -40,7 +40,6 @@ public final class AccessPolicy {
             new Rule("/printer", SPEAKER_USE, SPEAKER_USE),
             new Rule("/transactions", TRANSACTION_READ, TRANSACTION_READ),
             new Rule("/alerts", ALERT_READ, ALERT_WRITE),
-            new Rule("/refunds", REFUND_HANDLE, REFUND_HANDLE),
             new Rule("/tickets", TICKET_WRITE, TICKET_WRITE),
             new Rule("/dashboard", DASHBOARD_READ, DASHBOARD_READ)
     );

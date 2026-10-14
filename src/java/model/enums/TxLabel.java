@@ -10,7 +10,6 @@ package model.enums;
  */
 public enum TxLabel {
     LEGIT,
-    PARTIAL,
     DUPLICATE,
     NO_ORDER,
     ORDER_CLOSED

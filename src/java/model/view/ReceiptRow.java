@@ -11,7 +11,6 @@ public class ReceiptRow {
     private String cashierCode;
     private BigDecimal amount;
     private BigDecimal orderAmount;
-    private BigDecimal orderPaid;
     private Timestamp transTime;
     private boolean printed;
 
@@ -37,12 +36,6 @@ public class ReceiptRow {
     private BigDecimal cashAmount = BigDecimal.ZERO;
     public BigDecimal getCashAmount() { return cashAmount != null ? cashAmount : BigDecimal.ZERO; }
     public void setCashAmount(BigDecimal cashAmount) { this.cashAmount = cashAmount != null ? cashAmount : BigDecimal.ZERO; }
-
-    // What the order has received so far, all transfers together
-    public BigDecimal getOrderPaid() { return orderPaid; }
-    public void setOrderPaid(BigDecimal orderPaid) { this.orderPaid = orderPaid; }
-
-    public BigDecimal getOrderDue() { return orderAmount.subtract(orderPaid); }
 
     public Timestamp getTransTime() { return transTime; }
     public void setTransTime(Timestamp transTime) { this.transTime = transTime; }
