@@ -5,15 +5,28 @@ SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
--- CHECK 1: every table has sample data (no table should be empty except Transactions, FraudAlerts and LoginOtps)
-SELECT 'Roles' AS table_name, COUNT(*) AS row_count FROM Roles
-UNION ALL SELECT 'Users', COUNT(*) FROM Users
-UNION ALL SELECT 'LoginOtps', COUNT(*) FROM LoginOtps
-UNION ALL SELECT 'Devices', COUNT(*) FROM Devices
-UNION ALL SELECT 'Orders', COUNT(*) FROM Orders
-UNION ALL SELECT 'Transactions', COUNT(*) FROM Transactions
-UNION ALL SELECT 'FraudAlerts', COUNT(*) FROM FraudAlerts
-UNION ALL SELECT 'AuditLogs', COUNT(*) FROM AuditLogs;
+-- CHECK 1: row count of every table after a clean 01 + 02 run. Compare row_count with expected
+SELECT 'Roles' AS table_name, COUNT(*) AS row_count, 5 AS expected FROM Roles
+UNION ALL SELECT 'Users', COUNT(*), 6 FROM Users
+UNION ALL SELECT 'LoginOtps', COUNT(*), 0 FROM LoginOtps
+UNION ALL SELECT 'Devices', COUNT(*), 1 FROM Devices
+UNION ALL SELECT 'MaintenanceTickets', COUNT(*), 1 FROM MaintenanceTickets
+UNION ALL SELECT 'Orders', COUNT(*), 37 FROM Orders
+UNION ALL SELECT 'Transactions', COUNT(*), 38 FROM Transactions
+UNION ALL SELECT 'Refunds', COUNT(*), 2 FROM Refunds
+UNION ALL SELECT 'FraudAlerts', COUNT(*), 7 FROM FraudAlerts
+UNION ALL SELECT 'AuditLogs', COUNT(*), 1 FROM AuditLogs;
+GO
+
+-- CHECK 1b: the eleven foreign keys, child table first
+SELECT fk.name AS foreign_key, OBJECT_NAME(fk.parent_object_id) AS child_table, OBJECT_NAME(fk.referenced_object_id) AS parent_table
+FROM sys.foreign_keys fk ORDER BY child_table, foreign_key;
+GO
+
+-- CHECK 1c: the time columns are real date-time types
+SELECT COUNT(*) AS transactions, MIN(trans_time) AS first_time, MAX(trans_time) AS last_time FROM Transactions;
+SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Transactions' AND COLUMN_NAME IN ('trans_time', 'received_at');
 GO
 
 -- CHECK 2: no password is stored; staff log in by email OTP or Google. Expect 6 accounts

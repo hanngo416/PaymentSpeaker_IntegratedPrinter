@@ -9,6 +9,7 @@ GO
 
 -- Drop existing tables (children first, then parents)
 IF OBJECT_ID('AuditLogs', 'U') IS NOT NULL DROP TABLE AuditLogs;
+IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 IF OBJECT_ID('FraudAlerts', 'U') IS NOT NULL DROP TABLE FraudAlerts;
 IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
 IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
