@@ -65,7 +65,7 @@ public class GoogleCallbackServlet extends HttpServlet {
         try {
             GoogleOAuthService.GoogleProfile profile = googleService.fetchProfile(code);
             result = authService.loginWithGoogle(
-                    profile.getEmail(), profile.isEmailVerified(), profile.getGoogleId());
+                    profile.getEmail(), profile.getName(), profile.isEmailVerified(), profile.getGoogleId());
         } catch (IOException | SQLException e) {
             LOG.log(Level.SEVERE, "Google login failed", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -80,8 +80,8 @@ public class GoogleCallbackServlet extends HttpServlet {
                 LoginServlet.startSession(request, result.getUser());
                 response.sendRedirect(request.getContextPath() + "/dashboard");
                 return;
-            case NOT_REGISTERED:
-                showLogin(request, response, "This Google account is not registered. Please contact an administrator.");
+            case PENDING:
+                showLogin(request, response, "Your account is waiting for an administrator to approve it and give it a role. Please try again later.");
                 return;
             case LOCKED:
                 showLogin(request, response, "This account is locked. Please contact an administrator.");

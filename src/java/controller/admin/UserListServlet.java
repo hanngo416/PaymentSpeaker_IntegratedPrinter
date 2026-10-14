@@ -36,6 +36,8 @@ public class UserListServlet extends HttpServlet {
         MESSAGES.put("locked", "Account locked. The user is signed out on the next request.");
         MESSAGES.put("unlocked", "Account unlocked.");
         MESSAGES.put("deleted", "User deleted.");
+        MESSAGES.put("approved", "Account approved. The user can sign in now.");
+        MESSAGES.put("pending", "This account is waiting for approval. Approve or delete it instead.");
         MESSAGES.put("unlinked", "Google account unlinked. The user can link again at the next Google login.");
         MESSAGES.put("self", "You cannot lock, delete or change the role of your own account.");
         MESSAGES.put("lastadmin", "The last active administrator cannot be locked or deleted.");
@@ -77,6 +79,14 @@ public class UserListServlet extends HttpServlet {
             request.setAttribute("canWrite", RolePermissions.has(actor.getRole(), Permission.USER_WRITE));
             request.setAttribute("isAdmin", actor.getRole() == Role.ADMIN);
             request.setAttribute("filterQuery", filterQuery(f));
+            if (actor.getRole() == Role.ADMIN) {
+                UserFilter waiting = new UserFilter();
+                waiting.setStatus(UserStatus.PENDING.name());
+                waiting.setSort("usercode");
+                waiting.setDir("asc");
+                waiting.setPage(1);
+                request.setAttribute("pendingCount", userService.search(waiting).getTotal());
+            }
             request.setAttribute("message", MESSAGES.get(request.getParameter("msg")));
         } catch (SQLException e) {
             throw new ServletException("Cannot load users", e);

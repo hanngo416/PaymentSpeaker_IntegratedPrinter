@@ -22,7 +22,6 @@ public class LoginServlet extends HttpServlet {
 
     public static final String SESSION_USER = "loginUser";
     private static final String VIEW = "/WEB-INF/views/auth/login.jsp";
-    private static final int SESSION_TIMEOUT_SECONDS = 30 * 60;
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -61,6 +60,6 @@ public class LoginServlet extends HttpServlet {
         }
         HttpSession session = request.getSession(true);
         session.setAttribute(SESSION_USER, user);
-        session.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
+        service.AuditService.log(user, "LOGIN", "USER", user.getUserCode(), "ip", request.getRemoteAddr());
     }
 }

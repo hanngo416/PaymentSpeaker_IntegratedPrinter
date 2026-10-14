@@ -22,8 +22,9 @@
     </filter-mapping>
 
     <session-config>
-        <session-timeout>30</session-timeout>
+        <session-timeout>480</session-timeout>
         <cookie-config>
+            <name>TINKYSESSION</name>
             <http-only>true</http-only>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>

@@ -31,14 +31,6 @@
         <label>To
             <input type="date" name="to" value="${toText}">
         </label>
-        <label>Device
-            <select name="device">
-                <option value="">All</option>
-                <c:forEach var="dv" items="${devices}">
-                    <option value="${dv.deviceId}" ${f.deviceId == dv.deviceId ? 'selected' : ''}><c:out value="${dv.deviceCode}"/></option>
-                </c:forEach>
-            </select>
-        </label>
         <label>Label
             <select name="label">
                 <option value="">All</option>
@@ -86,7 +78,7 @@
     <table>
         <thead>
         <tr>
-            <th>Time</th><th>Device</th><th>Order</th><th>Amount (VND)</th><th>Content</th><th>Label</th><th>Bank ID</th>
+            <th>Time</th><th>Order</th><th>Amount (VND)</th><th>Content</th><th>Label</th><th>Bank ID</th>
         </tr>
         </thead>
         <tbody>
@@ -97,12 +89,10 @@
                 data-amount="<c:out value='${amt}'/>"
                 data-bank-id="<c:out value='${t.bankTransId}'/>"
                 data-time="<c:out value='${when}'/>"
-                data-device="<c:out value='${empty t.deviceCode ? "-" : t.deviceCode}'/>"
                 data-order="<c:out value='${empty t.orderCode ? "-" : t.orderCode}'/>"
                 data-content="<c:out value='${t.content}'/>"
                 data-label="<c:out value='${t.status}'/>">
                 <td><c:out value="${when}"/></td>
-                <td><c:out value="${empty t.deviceCode ? '-' : t.deviceCode}"/></td>
                 <td><c:out value="${empty t.orderCode ? '-' : t.orderCode}"/></td>
                 <td class="amount-cell"><c:out value="${amt}"/></td>
                 <td><c:out value="${t.content}"/></td>
@@ -111,7 +101,7 @@
             </tr>
         </c:forEach>
         <c:if test="${empty result.items}">
-            <tr><td colspan="7">No transactions match the filter.</td></tr>
+            <tr><td colspan="6">No transactions match the filter.</td></tr>
         </c:if>
         </tbody>
     </table>
@@ -135,7 +125,6 @@
         <dl>
             <dt>Bank ID</dt><dd id="mBankId"></dd>
             <dt>Time</dt><dd id="mTime"></dd>
-            <dt>Device</dt><dd id="mDevice"></dd>
             <dt>Order</dt><dd id="mOrder"></dd>
             <dt>Content</dt><dd id="mContent"></dd>
         </dl>

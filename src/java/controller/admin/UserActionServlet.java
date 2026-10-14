@@ -51,6 +51,18 @@ public class UserActionServlet extends HttpServlet {
                     return;
                 }
                 msg = result == UserService.Result.OK ? "unlocked" : failure(result);
+            } else if ("approve".equals(action)) {
+                Role role = parseRole(request.getParameter("role"));
+                if (role == null) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+                result = userService.approve(id, role, actor);
+                if (result == UserService.Result.FORBIDDEN) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+                msg = result == UserService.Result.OK ? "approved" : failure(result);
             } else if ("delete".equals(action)) {
                 result = userService.delete(id, actor);
                 if (result == UserService.Result.FORBIDDEN) {
@@ -59,7 +71,7 @@ public class UserActionServlet extends HttpServlet {
                 }
                 msg = result == UserService.Result.OK ? "deleted" : failure(result);
             } else if ("unlink".equals(action)) {
-                result = userService.unlinkGoogle(id);
+                result = userService.unlinkGoogle(id, actor);
                 msg = result == UserService.Result.OK ? "unlinked" : failure(result);
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -71,6 +83,14 @@ public class UserActionServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin/users?msg=" + msg);
     }
 
+    private static Role parseRole(String s) {
+        try {
+            return s == null ? null : Role.valueOf(s);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
     private static String failure(UserService.Result result) {
         switch (result) {
             case SELF:
@@ -79,6 +99,8 @@ public class UserActionServlet extends HttpServlet {
                 return "lastadmin";
             case HAS_HISTORY:
                 return "history";
+            case PENDING:
+                return "pending";
             default:
                 return "notfound";
         }

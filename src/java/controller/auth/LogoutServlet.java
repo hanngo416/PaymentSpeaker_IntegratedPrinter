@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.User;
+import service.AuditService;
 
 /**
  *
@@ -33,10 +35,14 @@ public class LogoutServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute(LoginServlet.SESSION_USER) != null) {
+            User who = (User) session.getAttribute(LoginServlet.SESSION_USER);
+            AuditService.log(who, "LOGOUT", "USER", who.getUserCode());
+        }
         if (session != null) {
             session.invalidate();
         }
-        Cookie cookie = new Cookie("JSESSIONID", "");
+        Cookie cookie = new Cookie(request.getServletContext().getSessionCookieConfig().getName(), "");
         cookie.setMaxAge(0);
         String path = request.getContextPath();
         cookie.setPath(path.isEmpty() ? "/" : path);

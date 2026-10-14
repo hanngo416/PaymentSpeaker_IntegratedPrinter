@@ -81,14 +81,13 @@
         <table>
             <thead>
             <tr>
-                <th>Time</th><th>Device</th><th>Order</th><th>Amount (VND)</th><th>Content</th><th>Label</th>
+                <th>Time</th><th>Order</th><th>Amount (VND)</th><th>Content</th><th>Label</th>
             </tr>
             </thead>
             <tbody>
             <c:forEach var="t" items="${recent}">
                 <tr>
                     <td><fmt:formatDate value="${t.transTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                    <td><c:out value="${empty t.deviceCode ? '-' : t.deviceCode}"/></td>
                     <td><c:out value="${empty t.orderCode ? '-' : t.orderCode}"/></td>
                     <td class="num"><fmt:formatNumber value="${t.amount}" pattern="#,##0"/></td>
                     <td><c:out value="${t.content}"/></td>
@@ -96,7 +95,7 @@
                 </tr>
             </c:forEach>
             <c:if test="${empty recent}">
-                <tr><td colspan="6">No transactions in the last 7 days.</td></tr>
+                <tr><td colspan="5">No transactions in the last 7 days.</td></tr>
             </c:if>
             </tbody>
         </table>

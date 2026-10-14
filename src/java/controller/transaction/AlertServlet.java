@@ -19,6 +19,7 @@ import model.Page;
 import model.User;
 import model.enums.Permission;
 import model.view.AlertRow;
+import service.AuditService;
 
 @WebServlet(name = "AlertServlet", urlPatterns = {"/alerts"})
 public class AlertServlet extends HttpServlet {
@@ -32,6 +33,8 @@ public class AlertServlet extends HttpServlet {
         MESSAGES.put("resolved", "Alert marked as resolved.");
         MESSAGES.put("dismissed", "Alert dismissed.");
         MESSAGES.put("stale", "This alert was already handled.");
+        MESSAGES.put("started", "Alert is now in progress.");
+        MESSAGES.put("note", "Enter the reason for dismissing the alert.");
         MESSAGES.put("bad", "Invalid request.");
     }
 
@@ -82,11 +85,26 @@ public class AlertServlet extends HttpServlet {
         }
 
         String msg;
-        if (id == null || !("RESOLVED".equals(decision) || "DISMISSED".equals(decision))) {
+        if (id == null || !("RESOLVED".equals(decision) || "DISMISSED".equals(decision) || "IN_PROGRESS".equals(decision))) {
             msg = "bad";
+        } else if ("DISMISSED".equals(decision) && notes.isEmpty()) {
+            msg = "note";
+        } else if ("IN_PROGRESS".equals(decision)) {
+            try {
+                boolean started = alertDAO.startReview(id, actor.getUserId());
+                if (started) {
+                    AuditService.log(actor, "ALERT_START_REVIEW", "ALERT", id);
+                }
+                msg = started ? "started" : "stale";
+            } catch (SQLException e) {
+                throw new ServletException("Cannot update alert", e);
+            }
         } else {
             try {
                 boolean changed = alertDAO.updateStatus(id, decision, actor.getUserId(), notes);
+                if (changed) {
+                    AuditService.log(actor, "RESOLVED".equals(decision) ? "ALERT_RESOLVE" : "ALERT_DISMISS", "ALERT", id, "notes", notes);
+                }
                 msg = !changed ? "stale" : "RESOLVED".equals(decision) ? "resolved" : "dismissed";
             } catch (SQLException e) {
                 throw new ServletException("Cannot update alert", e);

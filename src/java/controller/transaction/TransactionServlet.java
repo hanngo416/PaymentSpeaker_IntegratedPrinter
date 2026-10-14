@@ -1,6 +1,5 @@
 package controller.transaction;
 
-import dao.DeviceDAO;
 import dao.TransactionDAO;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -14,7 +13,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import model.Device;
 import model.Page;
 import model.TxFilter;
 import model.enums.TxLabel;
@@ -29,7 +27,6 @@ public class TransactionServlet extends HttpServlet {
     private static final long DEFAULT_RANGE_DAYS = 30;
 
     private final TransactionDAO transactionDAO = new TransactionDAO();
-    private final DeviceDAO deviceDAO = new DeviceDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -46,7 +43,6 @@ public class TransactionServlet extends HttpServlet {
         TxFilter f = new TxFilter();
         f.setFrom(from);
         f.setTo(to);
-        f.setDeviceId(parseInt(request.getParameter("device")));
         f.setLabel(oneOfLabels(request.getParameter("label")));
         Integer page = parseInt(request.getParameter("page"));
         f.setPage(page == null || page < 1 ? 1 : page);
@@ -58,11 +54,9 @@ public class TransactionServlet extends HttpServlet {
                 result = transactionDAO.search(f);
             }
             List<DayTotal> days = transactionDAO.dailyTotals(f);
-            List<Device> devices = deviceDAO.findAll();
 
             request.setAttribute("result", result);
             request.setAttribute("f", f);
-            request.setAttribute("devices", devices);
             request.setAttribute("labels", TxLabel.values());
             request.setAttribute("fromText", from == null ? "" : from.toString());
             request.setAttribute("toText", to == null ? "" : to.toString());
@@ -88,7 +82,6 @@ public class TransactionServlet extends HttpServlet {
 
     private static String filterQuery(TxFilter f, Date from, Date to) {
         StringBuilder q = new StringBuilder();
-        append(q, "device", f.getDeviceId() == null ? null : String.valueOf(f.getDeviceId()));
         append(q, "label", f.getLabel());
         q.append("from=").append(from == null ? "" : from.toString()).append('&');
         append(q, "to", to == null ? null : to.toString());

@@ -29,11 +29,28 @@
                 <c:if test="${role != 'TECHNICIAN'}">
                     <a href="${ctx}/transactions" class="${nav == 'transactions' ? 'active' : ''}">Transactions</a>
                 </c:if>
-                <c:if test="${role == 'CASHIER'}">
-                    <a href="${ctx}/speaker" class="${nav == 'speaker' ? 'active' : ''}">Speaker</a>
+                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                    <a href="${ctx}/speaker" class="${nav == 'speaker' ? 'active' : ''}">Sound</a>
+                </c:if>
+                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                    <a href="${ctx}/printer" class="${nav == 'printer' ? 'active' : ''}">Printer</a>
+                </c:if>
+                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                    <a href="${ctx}/refunds" class="${nav == 'refunds' ? 'active' : ''}">Refunds</a>
                 </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
                     <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
+                </c:if>
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'TECHNICIAN'}">
+                    <a href="${ctx}/admin/devices" class="${nav == 'devices' ? 'active' : ''}">Devices</a>
+                </c:if>
+                <%-- Maintenance tickets are hidden for now; remove this comment to show the menu item again
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'CASHIER' || role == 'TECHNICIAN'}">
+                    <a href="${ctx}/tickets" class="${nav == 'tickets' ? 'active' : ''}">Maintenance tickets</a>
+                </c:if>
+                --%>
+                <c:if test="${role == 'ADMIN' || role == 'AUDITOR'}">
+                    <a href="${ctx}/admin/audit" class="${nav == 'audit' ? 'active' : ''}">Audit log</a>
                 </c:if>
                 <a href="${ctx}/profile" class="${nav == 'profile' ? 'active' : ''}">Profile</a>
             </nav>
@@ -52,3 +69,12 @@
             </div>
         </header>
         <main class="content">
+            <c:if test="${newAlertCount > 0 && (role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'CASHIER')}">
+                <div class="alert-banner">
+                    <span>${newAlertCount} transaction(s) need checking.</span>
+                    <c:choose>
+                        <c:when test="${role == 'CASHIER'}"><a href="${ctx}/transactions">View transactions</a></c:when>
+                        <c:otherwise><a href="${ctx}/alerts">Open alert center</a></c:otherwise>
+                    </c:choose>
+                </div>
+            </c:if>

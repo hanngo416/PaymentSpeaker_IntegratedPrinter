@@ -47,7 +47,7 @@ public class OrderServlet extends HttpServlet {
         try {
             switch (request.getServletPath()) {
                 case "/orders/new":
-                    showNewForm(request, response, user, null, null);
+                    showNewForm(request, response, user, null, null, null);
                     break;
                 case "/orders/view":
                     showOrder(request, response, user);
@@ -102,21 +102,23 @@ public class OrderServlet extends HttpServlet {
     }// </editor-fold>
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response, User user,
-            String error, String amount) throws SQLException, ServletException, IOException {
+            String error, String amount, String cashAmount) throws SQLException, ServletException, IOException {
         request.setAttribute("recentOrders", orderService.recent(user));
         request.setAttribute("error", error);
         request.setAttribute("amount", amount);
+        request.setAttribute("cashAmount", cashAmount);
         request.getRequestDispatcher(VIEW_NEW).forward(request, response);
     }
 
     private void createOrder(HttpServletRequest request, HttpServletResponse response, User user)
             throws SQLException, ServletException, IOException {
         String rawAmount = request.getParameter("amount");
+        String rawCash = request.getParameter("cashAmount");
         try {
-            Order order = orderService.create(user, rawAmount);
+            Order order = orderService.create(user, rawAmount, rawCash);
             response.sendRedirect(request.getContextPath() + "/orders/view?code=" + order.getOrderCode());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            showNewForm(request, response, user, e.getMessage(), rawAmount);
+            showNewForm(request, response, user, e.getMessage(), rawAmount, rawCash);
         }
     }
 
@@ -128,6 +130,7 @@ public class OrderServlet extends HttpServlet {
             return;
         }
         request.setAttribute("order", order);
+        request.setAttribute("refunds", orderService.refunds(order));
         request.getRequestDispatcher(VIEW_ORDER).forward(request, response);
     }
 
@@ -135,8 +138,9 @@ public class OrderServlet extends HttpServlet {
             throws SQLException, IOException {
         String code = request.getParameter("code");
         if (isValidCode(code)) {
-            orderService.cancel(user, code);
-            response.sendRedirect(request.getContextPath() + "/orders/view?code=" + code);
+            boolean cancelled = orderService.cancel(user, code);
+            response.sendRedirect(request.getContextPath() + "/orders/view?code=" + code
+                    + (cancelled ? "" : "&cancel=failed"));
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -152,7 +156,9 @@ public class OrderServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("{\"status\":\"" + order.getStatus().name()
                 + "\",\"amount\":" + order.getAmount().longValue()
-                + ",\"remaining\":" + order.getRemainingSeconds() + "}");
+                + ",\"remaining\":" + order.getRemainingSeconds()
+                + ",\"paid\":" + order.getPaidAmount().longValue()
+                + ",\"refunds\":" + orderService.refunds(order).size() + "}");
     }
 
     private Order findOrder(HttpServletRequest request, User user) throws SQLException {

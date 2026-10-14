@@ -46,7 +46,7 @@ public class HealthServlet extends HttpServlet {
                  Statement st = con.createStatement();
                  ResultSet rs = st.executeQuery("SELECT 1")) {
                 rs.next();
-                out.println("OK - DB tra ve: " + rs.getInt(1));
+                out.println("OK - database returned: " + rs.getInt(1));
             } catch (SQLException e) {
                 LOG.log(Level.SEVERE, "Cannot connect to the database", e);
                 response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
