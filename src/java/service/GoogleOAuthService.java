@@ -34,16 +34,19 @@ public class GoogleOAuthService {
 
         private final String googleId;
         private final String email;
+        private final String name;
         private final boolean emailVerified;
 
-        public GoogleProfile(String googleId, String email, boolean emailVerified) {
+        public GoogleProfile(String googleId, String email, String name, boolean emailVerified) {
             this.googleId = googleId;
             this.email = email;
+            this.name = name;
             this.emailVerified = emailVerified;
         }
 
         public String getGoogleId() { return googleId; }
         public String getEmail() { return email; }
+        public String getName() { return name; }
         public boolean isEmailVerified() { return emailVerified; }
     }
 
@@ -70,7 +73,8 @@ public class GoogleOAuthService {
         boolean verified = info.has("email_verified") && info.get("email_verified").getAsBoolean();
         String googleId = info.get("sub").getAsString();
         String email = info.get("email").getAsString().toLowerCase();
-        return new GoogleProfile(googleId, email, verified);
+        String name = info.has("name") && !info.get("name").isJsonNull() ? info.get("name").getAsString() : "";
+        return new GoogleProfile(googleId, email, name, verified);
     }
 
     private String post(String url, String formBody) throws IOException {

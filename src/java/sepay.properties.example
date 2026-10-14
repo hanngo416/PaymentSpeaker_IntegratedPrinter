@@ -1,4 +1,10 @@
 # FILE: src/java/sepay.properties.example   (copy to sepay.properties and fill in)
 api.token=xxxxxxxxxxxxxxxx
+# The receiving account: the QR code shows it and the polling job reads its transactions, so it is written once here
+bank.id=TPBank
 account.number=0987654321
+account.name=NGUYEN VAN A
+# Only used the very first time, when the database has no transaction yet: how far back to read
 window.minutes=30
+# How often the server asks SePay for new transactions
+poll.seconds=30

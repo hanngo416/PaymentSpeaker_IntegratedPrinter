@@ -19,12 +19,15 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
+
+import util.AppConfig;
 import util.ConfigUtil;
 
 /**
@@ -35,21 +38,24 @@ public class SepayClient {
 
     private static final String LIST_URL = "https://my.sepay.vn/userapi/transactions/list";
 
+    private static final int PAGE_LIMIT = 1000;
+
     private final Properties config = ConfigUtil.load("sepay.properties");
 
     public int getWindowMinutes() {
         return Integer.parseInt(config.getProperty("window.minutes", "30").trim());
     }
 
-    public List<Map<String, String>> fetchRecent() throws IOException {
+    // Everything since the given time, oldest first, so the transactions are stored and announced in the order they happened
+    public List<Map<String, String>> fetchSince(Date since) throws IOException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        format.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-        String from = format.format(new Date(System.currentTimeMillis() - getWindowMinutes() * 60000L));
+        format.setTimeZone(AppConfig.BANK_ZONE);
+        String from = format.format(since);
 
         String url = LIST_URL
                 + "?account_number=" + enc(config.getProperty("account.number").trim())
                 + "&transaction_date_min=" + enc(from)
-                + "&limit=100";
+                + "&limit=" + PAGE_LIMIT;
 
         JsonObject body = new JsonParser().parse(get(url)).getAsJsonObject();
         List<Map<String, String>> result = new ArrayList<>();
@@ -62,7 +68,23 @@ public class SepayClient {
                 result.add(toPayload(element.getAsJsonObject()));
             }
         }
+        // SePay lists the newest first; sort by bank time (ids break ties) so the oldest is stored and announced first
+        Collections.sort(result, new Comparator<Map<String, String>>() {
+            @Override
+            public int compare(Map<String, String> a, Map<String, String> b) {
+                int byTime = String.valueOf(a.get("transactionDate")).compareTo(String.valueOf(b.get("transactionDate")));
+                return byTime != 0 ? byTime : Long.compare(idOf(a), idOf(b));
+            }
+        });
         return result;
+    }
+
+    private static long idOf(Map<String, String> payload) {
+        try {
+            return Long.parseLong(payload.get("id"));
+        } catch (NumberFormatException e) {
+            return 0L;
+        }
     }
 
     private Map<String, String> toPayload(JsonObject t) {

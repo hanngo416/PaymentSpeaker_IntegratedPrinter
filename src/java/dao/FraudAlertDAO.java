@@ -65,6 +65,15 @@ public class FraudAlertDAO {
         return new Page<>(items, total, f.getPage(), f.getPageSize());
     }
 
+    // Alerts nobody has handled yet, shown as a banner on every page
+    public int countNew() throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM FraudAlerts WHERE status = N'NEW'");
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
     public Map<String, Integer> countByStatus() throws SQLException {
         String sql = "SELECT a.status, COUNT(*) AS cnt" + FROM
                 + " GROUP BY a.status";
@@ -87,6 +96,17 @@ public class FraudAlertDAO {
             ps.setInt(2, userId);
             ps.setString(3, notes);
             ps.setInt(4, alertId);
+            return ps.executeUpdate() == 1;
+        }
+    }
+
+    // The auditor takes the alert: it leaves the NEW counter and shows who is looking at it
+    public boolean startReview(int alertId, int userId) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     "UPDATE FraudAlerts SET status = N'IN_PROGRESS', resolved_by = ? WHERE alert_id = ? AND status = N'NEW'")) {
+            ps.setInt(1, userId);
+            ps.setInt(2, alertId);
             return ps.executeUpdate() == 1;
         }
     }

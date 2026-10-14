@@ -17,9 +17,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import dao.FraudAlertDAO;
 import dao.UserDAO;
 import java.sql.SQLException;
 import model.User;
+import model.enums.Role;
 import model.enums.UserStatus;
 import service.AuthService;
 import model.enums.Permission;
@@ -33,6 +35,7 @@ public class AuthFilter implements Filter {
     private static final Logger LOG = Logger.getLogger(AuthFilter.class.getName());
 
     private final UserDAO userDAO = new UserDAO();
+    private final FraudAlertDAO fraudAlertDAO = new FraudAlertDAO();
     private final AuthService authService = new AuthService();
 
     @Override
@@ -95,6 +98,17 @@ public class AuthFilter implements Filter {
             request.setAttribute("denyReason", "You do not have the " + needed.getCode() + " permission to access this page.");
             request.getRequestDispatcher("/WEB-INF/views/common/error403.jsp").forward(request, response);
             return;
+        }
+
+        // Transactions that need checking: a banner for admin, manager and cashier on every normal page
+        Role who = user.getRole();
+        if ((who == Role.ADMIN || who == Role.STORE_MANAGER || who == Role.CASHIER)
+                && "GET".equals(request.getMethod()) && !AccessPolicy.isAjax(path)) {
+            try {
+                request.setAttribute("newAlertCount", fraudAlertDAO.countNew());
+            } catch (SQLException e) {
+                LOG.log(Level.WARNING, "ALERT_COUNT_FAILED {0}", e.getMessage());
+            }
         }
 
         chain.doFilter(request, response);

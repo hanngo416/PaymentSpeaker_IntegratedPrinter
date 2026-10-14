@@ -13,6 +13,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import service.PaymentPollJob;
+import util.ConfigUtil;
 
 /**
  *
@@ -23,7 +24,7 @@ public class PaymentPollListener implements ServletContextListener {
 
     private static final Logger LOG = Logger.getLogger(PaymentPollListener.class.getName());
     private static final int INITIAL_DELAY_SECONDS = 10;
-    private static final int PERIOD_SECONDS = 60;
+    private static final int DEFAULT_PERIOD_SECONDS = 30;
 
     private ScheduledExecutorService scheduler;
 
@@ -36,9 +37,20 @@ public class PaymentPollListener implements ServletContextListener {
             LOG.log(Level.SEVERE, "Payment polling is OFF: {0}", e.getMessage());
             return;
         }
+        int period = periodSeconds();
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(job, INITIAL_DELAY_SECONDS, PERIOD_SECONDS, TimeUnit.SECONDS);
-        LOG.log(Level.INFO, "Payment polling started: every {0} seconds", PERIOD_SECONDS);
+        scheduler.scheduleWithFixedDelay(job, INITIAL_DELAY_SECONDS, period, TimeUnit.SECONDS);
+        LOG.log(Level.INFO, "Payment polling started: every {0} seconds", period);
+    }
+
+    // poll.seconds in sepay.properties; anything missing or below 10 falls back, so SePay is never hammered
+    private static int periodSeconds() {
+        try {
+            int value = Integer.parseInt(ConfigUtil.load("sepay.properties").getProperty("poll.seconds", "").trim());
+            return value >= 10 ? value : DEFAULT_PERIOD_SECONDS;
+        } catch (NumberFormatException e) {
+            return DEFAULT_PERIOD_SECONDS;
+        }
     }
 
     @Override

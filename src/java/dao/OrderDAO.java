@@ -23,22 +23,24 @@ import util.DBUtil;
 public class OrderDAO {
 
     private static final String SELECT_COLUMNS
-            = "SELECT order_id, order_code, created_by, created_by_code, amount, status, qr_content, "
+            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, paid_amount, status, qr_content, "
             + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
             + "FROM Orders ";
 
     public void insert(Order order, int validMinutes) throws SQLException {
-        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at) "
-                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
+        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, paid_amount, status, qr_content, expires_at) "
+                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, order.getOrderCode());
             ps.setInt(2, order.getCreatedBy());
             ps.setInt(3, order.getCreatedBy());
             ps.setBigDecimal(4, order.getAmount());
-            ps.setString(5, OrderStatus.PENDING.name());
-            ps.setString(6, order.getQrContent());
-            ps.setInt(7, validMinutes);
+            ps.setBigDecimal(5, order.getCashAmount());
+            ps.setBigDecimal(6, order.getPaidAmount());
+            ps.setString(7, OrderStatus.PENDING.name());
+            ps.setString(8, order.getQrContent());
+            ps.setInt(9, validMinutes);
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) {
@@ -59,7 +61,7 @@ public class OrderDAO {
     }
 
     public List<Order> findRecent(int limit, Integer createdBy) throws SQLException {
-        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, status, qr_content, "
+        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, paid_amount, status, qr_content, "
                 + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
                 + "FROM Orders " + (createdBy == null ? "" : "WHERE created_by = ? ")
                 + "ORDER BY created_at DESC, order_id DESC";
@@ -79,16 +81,18 @@ public class OrderDAO {
         return list;
     }
 
-    public int expireOverdue() throws SQLException {
-        String sql = "UPDATE Orders SET status = 'EXPIRED' WHERE status = 'PENDING' AND expires_at < GETDATE()";
+    // Mark expired orders
+    public void expireOverdue() throws SQLException {
+        String sql = "UPDATE Orders SET status = N'EXPIRED' WHERE status = N'PENDING' AND expires_at < GETDATE()";
         try (Connection con = DBUtil.getConnection();
              Statement st = con.createStatement()) {
-            return st.executeUpdate(sql);
+            st.execute(sql);
         }
     }
 
+    // Cancel order
     public boolean cancel(String orderCode) throws SQLException {
-        String sql = "UPDATE Orders SET status = 'CANCELLED' WHERE order_code = ? AND status = 'PENDING'";
+        String sql = "UPDATE Orders SET status = N'CANCELLED' WHERE order_code = ? AND status = N'PENDING'";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, orderCode);
@@ -104,6 +108,10 @@ public class OrderDAO {
         o.setCreatedByCode(rs.getString("created_by_code"));
         BigDecimal amount = rs.getBigDecimal("amount");
         o.setAmount(amount);
+        try {
+            o.setCashAmount(rs.getBigDecimal("cash_amount"));
+        } catch (SQLException ignored) { }
+        o.setPaidAmount(rs.getBigDecimal("paid_amount"));
         o.setStatus(OrderStatus.valueOf(rs.getString("status")));
         o.setQrContent(rs.getString("qr_content"));
         o.setExpiresAt(rs.getTimestamp("expires_at"));

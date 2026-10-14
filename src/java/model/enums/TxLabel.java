@@ -10,8 +10,8 @@ package model.enums;
  */
 public enum TxLabel {
     LEGIT,
+    PARTIAL,
     DUPLICATE,
-    AMOUNT_MISMATCH,
-    SUSPECTED_FRAUD,
-    DEVICE_OFFLINE
+    NO_ORDER,
+    ORDER_CLOSED
 }

@@ -19,6 +19,8 @@ public class Order {
     private int createdBy;
     private String createdByCode;
     private BigDecimal amount;
+    private BigDecimal cashAmount = BigDecimal.ZERO;
+    private BigDecimal paidAmount = BigDecimal.ZERO;
     private OrderStatus status;
     private String qrContent;
     private Timestamp expiresAt;
@@ -39,6 +41,19 @@ public class Order {
 
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    public BigDecimal getCashAmount() { return cashAmount != null ? cashAmount : BigDecimal.ZERO; }
+    public void setCashAmount(BigDecimal cashAmount) { this.cashAmount = cashAmount != null ? cashAmount : BigDecimal.ZERO; }
+
+    public BigDecimal getTransferAmount() {
+        return amount != null ? amount.subtract(getCashAmount()) : BigDecimal.ZERO;
+    }
+
+    public BigDecimal getPaidAmount() { return paidAmount; }
+    public void setPaidAmount(BigDecimal paidAmount) { this.paidAmount = paidAmount; }
+
+    // What the customer still has to transfer
+    public BigDecimal getAmountDue() { return amount.subtract(paidAmount); }
 
     public OrderStatus getStatus() { return status; }
     public void setStatus(OrderStatus status) { this.status = status; }

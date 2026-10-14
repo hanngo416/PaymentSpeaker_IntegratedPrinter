@@ -72,6 +72,15 @@ public class UserDAO {
             = "INSERT INTO Users (user_code, full_name, email, role_id, status) "
             + "VALUES (?, ?, ?, (SELECT role_id FROM Roles WHERE role_name = ?), N'ACTIVE')";
 
+    // A self-registered account: the role is only a placeholder (CASHIER) because role_id cannot be empty; it cannot sign in until an admin approves it
+    private static final String INSERT_PENDING
+            = "INSERT INTO Users (user_code, full_name, email, google_id, role_id, status) "
+            + "VALUES (?, ?, ?, ?, (SELECT role_id FROM Roles WHERE role_name = N'CASHIER'), N'PENDING')";
+
+    private static final String APPROVE_USER
+            = "UPDATE Users SET role_id = (SELECT role_id FROM Roles WHERE role_name = ?), status = N'ACTIVE' "
+            + "WHERE user_id = ? AND status = N'PENDING'";
+
     private static final String UPDATE_USER
             = "UPDATE Users SET full_name = ?, email = ?, google_id = ?, "
             + "role_id = (SELECT role_id FROM Roles WHERE role_name = ?) "
@@ -152,6 +161,27 @@ public class UserDAO {
             ps.setString(3, u.getEmail());
             ps.setString(4, u.getRole().name());
             ps.executeUpdate();
+        }
+    }
+
+    public void insertPending(String userCode, String fullName, String email, String googleId) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(INSERT_PENDING)) {
+            ps.setString(1, userCode);
+            ps.setString(2, fullName);
+            ps.setString(3, email);
+            ps.setString(4, googleId);
+            ps.executeUpdate();
+        }
+    }
+
+    // Gives the role and opens the account; false when the account is no longer PENDING
+    public boolean approve(int userId, Role role) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(APPROVE_USER)) {
+            ps.setString(1, role.name());
+            ps.setInt(2, userId);
+            return ps.executeUpdate() == 1;
         }
     }
 

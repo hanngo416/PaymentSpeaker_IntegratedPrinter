@@ -8,25 +8,34 @@ import java.util.List;
 public class RulesEngine {
 
     private final List<Rule> rules;
+    private final Rule watcher;
 
-    public RulesEngine(List<Rule> rules) {
+    // rules decide what happens to the money, the first one that has an opinion wins.
+    // The watcher never changes that result: it only adds its alert on top (high amount, burst).
+    public RulesEngine(List<Rule> rules, Rule watcher) {
         this.rules = Collections.unmodifiableList(new ArrayList<>(rules));
+        this.watcher = watcher;
     }
 
     public static RulesEngine standard() {
         return new RulesEngine(Arrays.<Rule>asList(
                 new DuplicateRule(),
-                new OrderMatchRule(),
-                new FraudRule()));
+                new OrderMatchRule()),
+                new FraudRule());
     }
 
     public Verdict evaluate(RuleContext ctx) {
+        Verdict main = null;
         for (Rule rule : rules) {
-            Verdict verdict = rule.evaluate(ctx);
-            if (verdict != null) {
-                return verdict;
+            main = rule.evaluate(ctx);
+            if (main != null) {
+                break;
             }
         }
-        return Verdict.legit();
+        Verdict watched = watcher.evaluate(ctx);
+        if (main == null) {
+            return watched != null ? watched : Verdict.legit();
+        }
+        return watched == null ? main : main.withExtras(Collections.singletonList(watched));
     }
 }

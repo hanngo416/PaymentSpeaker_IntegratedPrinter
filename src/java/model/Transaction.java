@@ -17,7 +17,6 @@ public class Transaction {
     private int transId;
     private String bankTransId;
     private Integer orderId;
-    private Integer deviceId;
     private BigDecimal amount;
     private String content;
     private String bankAccount;
@@ -34,8 +33,6 @@ public class Transaction {
     public Integer getOrderId() { return orderId; }
     public void setOrderId(Integer orderId) { this.orderId = orderId; }
 
-    public Integer getDeviceId() { return deviceId; }
-    public void setDeviceId(Integer deviceId) { this.deviceId = deviceId; }
 
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }

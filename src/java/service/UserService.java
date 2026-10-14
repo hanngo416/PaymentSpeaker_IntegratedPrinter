@@ -17,7 +17,7 @@ import model.enums.UserStatus;
 
 public class UserService {
 
-    public enum Result { OK, SELF, LAST_ADMIN, NOT_FOUND, HAS_HISTORY, FORBIDDEN }
+    public enum Result { OK, SELF, LAST_ADMIN, NOT_FOUND, HAS_HISTORY, FORBIDDEN, PENDING }
 
     private static final Pattern USER_CODE = Pattern.compile("^[A-Za-z0-9_.]{3,50}$");
     private static final Pattern EMAIL = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -81,6 +81,7 @@ public class UserService {
             return true;
         }
         return actor.getRole() == Role.STORE_MANAGER
+                && target.getStatus() != UserStatus.PENDING
                 && target.getRole() == Role.CASHIER;
     }
 
@@ -94,6 +95,7 @@ public class UserService {
     public void create(User u, User actor) throws SQLException {
         applyScope(actor, u);
         userDAO.insert(u);
+        AuditService.log(actor, "CREATE_USER", "USER", u.getUserCode(), "role", String.valueOf(u.getRole()), "email", u.getEmail());
     }
 
     public Result update(User edited, User actor) throws SQLException {
@@ -111,6 +113,8 @@ public class UserService {
         boolean emailChanged = !current.getEmail().equalsIgnoreCase(edited.getEmail());
         edited.setGoogleId(emailChanged ? null : current.getGoogleId());
         userDAO.update(edited);
+        AuditService.log(actor, "UPDATE_USER", "USER", current.getUserCode(),
+                "role", current.getRole() + " -> " + edited.getRole(), "email", current.getEmail() + " -> " + edited.getEmail());
         notifyEdited(actor, current, edited);
         return Result.OK;
     }
@@ -123,6 +127,9 @@ public class UserService {
         if (!canManage(actor, target)) {
             return Result.FORBIDDEN;
         }
+        if (target.getStatus() == UserStatus.PENDING) {
+            return Result.PENDING;   // approve or delete it instead; unlocking must not skip the approval
+        }
         if (lock) {
             Result blocked = checkProtected(target, actor);
             if (blocked != Result.OK) {
@@ -130,6 +137,7 @@ public class UserService {
             }
         }
         userDAO.setStatus(userId, lock ? UserStatus.LOCKED : UserStatus.ACTIVE);
+        AuditService.log(actor, lock ? "LOCK_USER" : "UNLOCK_USER", "USER", target.getUserCode());
         notifyLocked(actor, target, lock);
         return Result.OK;
     }
@@ -148,6 +156,7 @@ public class UserService {
         }
         try {
             userDAO.delete(userId);
+            AuditService.log(actor, "DELETE_USER", "USER", target.getUserCode(), "email", target.getEmail());
             return Result.OK;
         } catch (SQLException e) {
             if (e.getErrorCode() == SQL_FK_VIOLATION) {
@@ -157,11 +166,32 @@ public class UserService {
         }
     }
 
-    public Result unlinkGoogle(int userId) throws SQLException {
-        if (userDAO.findById(userId) == null) {
+    /** Admin gives the role to a self-registered account and opens it. */
+    public Result approve(int userId, Role role, User actor) throws SQLException {
+        User target = userDAO.findById(userId);
+        if (target == null) {
+            return Result.NOT_FOUND;
+        }
+        if (actor.getRole() != Role.ADMIN) {
+            return Result.FORBIDDEN;
+        }
+        if (target.getStatus() != UserStatus.PENDING || !userDAO.approve(userId, role)) {
+            return Result.NOT_FOUND;
+        }
+        AuditService.log(actor, "APPROVE_USER", "USER", target.getUserCode(), "role", String.valueOf(role), "email", target.getEmail());
+        sendNotice(target.getEmail(), "Your account was approved",
+                "Hello " + target.getFullName() + ",\n\nYour Tinky account (" + target.getUserCode()
+                + ") was approved as " + role + ". You can sign in now.");
+        return Result.OK;
+    }
+
+    public Result unlinkGoogle(int userId, User actor) throws SQLException {
+        User target = userDAO.findById(userId);
+        if (target == null) {
             return Result.NOT_FOUND;
         }
         userDAO.clearGoogleId(userId);
+        AuditService.log(actor, "UNLINK_GOOGLE", "USER", target.getUserCode());
         return Result.OK;
     }
 

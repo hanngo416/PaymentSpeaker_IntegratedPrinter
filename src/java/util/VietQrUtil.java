@@ -6,6 +6,7 @@ package util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Properties;
 
 /**
  *
@@ -13,15 +14,26 @@ import java.net.URLEncoder;
  */
 public final class VietQrUtil {
 
+    // The same sepay.properties the polling job reads, so the QR and the polling can never point at two different accounts
+    private static final Properties CONFIG = ConfigUtil.load("sepay.properties");
+
     private VietQrUtil() {
     }
 
     public static String buildImageUrl(long amount, String transferContent) {
         return "https://img.vietqr.io/image/"
-                + AppConfig.BANK_ID + "-" + AppConfig.ACCOUNT_NO + "-" + AppConfig.QR_TEMPLATE + ".png"
+                + setting("bank.id") + "-" + setting("account.number") + "-" + AppConfig.QR_TEMPLATE + ".png"
                 + "?amount=" + amount
                 + "&addInfo=" + encode(transferContent)
-                + "&accountName=" + encode(AppConfig.ACCOUNT_NAME);
+                + "&accountName=" + encode(setting("account.name"));
+    }
+
+    private static String setting(String key) {
+        String value = CONFIG.getProperty(key);
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalStateException(key + " is missing in sepay.properties");
+        }
+        return value.trim();
     }
 
     private static String encode(String value) {

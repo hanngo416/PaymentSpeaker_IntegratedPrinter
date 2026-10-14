@@ -8,7 +8,6 @@ public class TxRow {
     private int transId;
     private String bankTransId;
     private String orderCode;
-    private String deviceCode;
     private BigDecimal amount;
     private String content;
     private String status;
@@ -38,13 +37,6 @@ public class TxRow {
         this.orderCode = orderCode;
     }
 
-    public String getDeviceCode() {
-        return deviceCode;
-    }
-
-    public void setDeviceCode(String deviceCode) {
-        this.deviceCode = deviceCode;
-    }
 
     public BigDecimal getAmount() {
         return amount;

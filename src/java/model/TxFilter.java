@@ -4,20 +4,12 @@ import java.sql.Date;
 
 public class TxFilter {
 
-    private Integer deviceId;
     private String label;
     private Date from;
     private Date to;
     private int page = 1;
     private int pageSize = 10;
 
-    public Integer getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(Integer deviceId) {
-        this.deviceId = deviceId;
-    }
 
     public String getLabel() {
         return label;

@@ -21,6 +21,8 @@ public enum Permission {
     DEVICE_READ("DEVICE:READ"),
     DEVICE_WRITE("DEVICE:WRITE"),
     TICKET_WRITE("TICKET:WRITE"),
+    TICKET_HANDLE("TICKET:HANDLE"),
+    REFUND_HANDLE("REFUND:HANDLE"),
     SYSTEM_ADMIN("SYSTEM:ADMIN");
 
     private final String code;

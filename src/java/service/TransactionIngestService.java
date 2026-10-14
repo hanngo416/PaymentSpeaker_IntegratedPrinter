@@ -4,13 +4,14 @@
  */
 package service;
 
-import dao.DeviceDAO;
 import dao.OrderDAO;
 import dao.TransactionDAO;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +39,6 @@ public class TransactionIngestService {
 
     private final TransactionDAO transactionDAO = new TransactionDAO();
     private final OrderDAO orderDAO = new OrderDAO();
-    private final DeviceDAO deviceDAO = new DeviceDAO();
     private final RulesEngine engine = RulesEngine.standard();
 
     public Outcome ingest(Map<String, String> payload) throws SQLException {
@@ -67,7 +67,6 @@ public class TransactionIngestService {
         t.setGateway(truncate(gateway == null ? "SEPAY" : gateway, 50));
         t.setTransTime(parseTime(payload.get("transactionDate")));
 
-        t.setDeviceId(deviceDAO.findSpeakerId());
         Order order = findOrder(content);
         if (order != null) {
             t.setOrderId(order.getOrderId());
@@ -75,12 +74,15 @@ public class TransactionIngestService {
 
         Timestamp when = t.getTransTime() != null ? t.getTransTime() : new Timestamp(System.currentTimeMillis());
         int similar = transactionDAO.countSimilarRecent(
-                t.getAmount(), t.getContent(), RuleConfig.DUPLICATE_WINDOW_SECONDS);
+                t.getAmount(), t.getContent(), when, RuleConfig.DUPLICATE_WINDOW_SECONDS);
         int recent = transactionDAO.countRecent(when, RuleConfig.BURST_WINDOW_SECONDS);
         Verdict verdict = engine.evaluate(new RuleContext(t, order, similar, recent));
 
         try {
-            transactionDAO.record(t, verdict);
+            Verdict recorded = transactionDAO.record(t, verdict);
+            AuditService.log(null, "TRANSACTION_INGEST", "TRANSACTION", bankTransId,
+                    "amount", t.getAmount().toPlainString(), "label", recorded.getLabel().name(),
+                    "order", order == null ? "" : order.getOrderCode());
             return Outcome.CREATED;
         } catch (SQLException e) {
             if (SqlErrors.isDuplicateKey(e)) {
@@ -114,13 +116,17 @@ public class TransactionIngestService {
         return amount.setScale(2, RoundingMode.HALF_UP);
     }
 
+    // SePay times are Vietnam time. Turn them into the real instant so they compare correctly with the server clock
     private static Timestamp parseTime(String raw) {
         if (raw == null) {
             return null;
         }
         try {
-            return Timestamp.valueOf(raw.trim());
-        } catch (IllegalArgumentException e) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            format.setLenient(false);
+            format.setTimeZone(AppConfig.BANK_ZONE);
+            return new Timestamp(format.parse(raw.trim()).getTime());
+        } catch (ParseException e) {
             return null;
         }
     }

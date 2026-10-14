@@ -18,8 +18,8 @@ public final class AppConfig {
     public static final long MIN_AMOUNT = 1000L;
     public static final long MAX_AMOUNT = 500000000L;
 
-    public static final String BANK_ID = "TPBank";
-    public static final String ACCOUNT_NO = "77884268888";
-    public static final String ACCOUNT_NAME = "LAM HOANG AN";
     public static final String QR_TEMPLATE = "compact2";
+
+    // SePay writes transaction times in Vietnam time, whatever time zone the server runs in
+    public static final java.util.TimeZone BANK_ZONE = java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
 }

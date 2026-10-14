@@ -37,8 +37,10 @@ public final class AccessPolicy {
             new Rule("/admin", SYSTEM_ADMIN, SYSTEM_ADMIN),
             new Rule("/orders", ORDER_CREATE, ORDER_CREATE),
             new Rule("/speaker", SPEAKER_USE, SPEAKER_USE),
+            new Rule("/printer", SPEAKER_USE, SPEAKER_USE),
             new Rule("/transactions", TRANSACTION_READ, TRANSACTION_READ),
             new Rule("/alerts", ALERT_READ, ALERT_WRITE),
+            new Rule("/refunds", REFUND_HANDLE, REFUND_HANDLE),
             new Rule("/tickets", TICKET_WRITE, TICKET_WRITE),
             new Rule("/dashboard", DASHBOARD_READ, DASHBOARD_READ)
     );
@@ -69,6 +71,12 @@ public final class AccessPolicy {
                 return readOnly ? rule.read : rule.write;
             }
         }
-        return null;
+        // Fail closed: a path nobody listed above is for admins only, until it gets its own rule
+        return isOpenToSignedIn(path) ? null : SYSTEM_ADMIN;
+    }
+
+    // Pages every signed-in user may open whatever the role
+    private static boolean isOpenToSignedIn(String path) {
+        return path.equals("/") || path.equals("/index.html") || path.equals("/profile") || path.equals("/logout");
     }
 }
