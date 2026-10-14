@@ -23,13 +23,13 @@ import util.DBUtil;
 public class OrderDAO {
 
     private static final String SELECT_COLUMNS
-            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, paid_amount, status, qr_content, "
+            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, status, qr_content, "
             + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
             + "FROM Orders ";
 
     public void insert(Order order, int validMinutes) throws SQLException {
-        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, paid_amount, status, qr_content, expires_at) "
-                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
+        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, status, qr_content, expires_at) "
+                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, order.getOrderCode());
@@ -37,10 +37,9 @@ public class OrderDAO {
             ps.setInt(3, order.getCreatedBy());
             ps.setBigDecimal(4, order.getAmount());
             ps.setBigDecimal(5, order.getCashAmount());
-            ps.setBigDecimal(6, order.getPaidAmount());
-            ps.setString(7, OrderStatus.PENDING.name());
-            ps.setString(8, order.getQrContent());
-            ps.setInt(9, validMinutes);
+            ps.setString(6, OrderStatus.PENDING.name());
+            ps.setString(7, order.getQrContent());
+            ps.setInt(8, validMinutes);
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) {
@@ -61,7 +60,7 @@ public class OrderDAO {
     }
 
     public List<Order> findRecent(int limit, Integer createdBy) throws SQLException {
-        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, paid_amount, status, qr_content, "
+        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, status, qr_content, "
                 + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
                 + "FROM Orders " + (createdBy == null ? "" : "WHERE created_by = ? ")
                 + "ORDER BY created_at DESC, order_id DESC";
@@ -111,7 +110,6 @@ public class OrderDAO {
         try {
             o.setCashAmount(rs.getBigDecimal("cash_amount"));
         } catch (SQLException ignored) { }
-        o.setPaidAmount(rs.getBigDecimal("paid_amount"));
         o.setStatus(OrderStatus.valueOf(rs.getString("status")));
         o.setQrContent(rs.getString("qr_content"));
         o.setExpiresAt(rs.getTimestamp("expires_at"));

@@ -31,7 +31,6 @@
         <c:if test="${receipt.cashAmount == 0}">
             <dt>Payment (QR)</dt><dd><fmt:formatNumber value="${receipt.amount}" pattern="#,##0"/> VND</dd>
         </c:if>
-        <dt>Total paid</dt><dd><fmt:formatNumber value="${receipt.orderPaid}" pattern="#,##0"/> VND</dd>
     </dl>
     <hr>
     <p class="receipt-sub">Thank you!</p>

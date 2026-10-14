@@ -29,16 +29,9 @@ public class TransactionDAO {
             + "(bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ISNULL(?, SYSDATETIME()))";
 
-    // Adds the money to the order and closes it as PAID once it is fully covered.
-    // The WHERE part refuses a transfer the order can no longer take (closed in the meantime, or it would overpay).
+    // Closes the order as PAID. The WHERE part refuses a transfer the order can no longer take (closed in the meantime).
     private static final String CREDIT_ORDER
-            = "UPDATE Orders SET paid_amount = paid_amount + ?, "
-            + "status = CASE WHEN paid_amount + ? >= amount THEN N'PAID' ELSE status END "
-            + "WHERE order_id = ? AND amount - paid_amount >= ? "
-            + "AND (status = N'PENDING' OR (status = N'EXPIRED' AND paid_amount = 0))";
-
-    private static final String INSERT_REFUND
-            = "INSERT INTO Refunds (trans_id, order_id, amount, reason) VALUES (?, ?, ?, ?)";
+            = "UPDATE Orders SET status = N'PAID' WHERE order_id = ? AND status IN (N'PENDING', N'EXPIRED')";
 
     private static final String INSERT_ALERT
             = "INSERT INTO FraudAlerts (trans_id, rule_code, reason, severity) VALUES (?, ?, ?, ?)";
@@ -60,7 +53,7 @@ public class TransactionDAO {
     private static final String SELECT_TO_ANNOUNCE
             = "SELECT TOP (?) t.trans_id, t.amount, t.trans_time, o.order_code FROM Transactions t "
             + "LEFT JOIN Orders o ON o.order_id = t.order_id "
-            + "WHERE t.status IN (N'LEGIT', N'PARTIAL') AND t.announced = 0 "
+            + "WHERE t.status = N'LEGIT' AND t.announced = 0 "
             + "AND t.received_at >= DATEADD(MINUTE, -?, SYSDATETIME()) "
             + "AND t.trans_time >= DATEADD(MINUTE, -?, SYSDATETIME()) "
             + "ORDER BY t.trans_id";
@@ -124,18 +117,13 @@ public class TransactionDAO {
             con.setAutoCommit(false);
             try {
                 Verdict finalVerdict = verdict;
-                boolean kept = verdict.getLabel() == TxLabel.LEGIT || verdict.getLabel() == TxLabel.PARTIAL;
-                if (kept && t.getOrderId() != null) {
-                    BigDecimal credit = verdict.getCredit() != null ? verdict.getCredit() : t.getAmount();
+                if (verdict.getLabel() == TxLabel.LEGIT && t.getOrderId() != null) {
                     try (PreparedStatement ps = con.prepareStatement(CREDIT_ORDER)) {
-                        ps.setBigDecimal(1, credit);
-                        ps.setBigDecimal(2, credit);
-                        ps.setInt(3, t.getOrderId());
-                        ps.setBigDecimal(4, credit);
+                        ps.setInt(1, t.getOrderId());
                         if (ps.executeUpdate() == 0) {
-                            finalVerdict = Verdict.flagWithRefund(TxLabel.ORDER_CLOSED, "ORDER_NOT_PENDING",
-                                    "The order changed state before the payment was recorded.", Verdict.MEDIUM,
-                                    t.getAmount(), "ORDER_CLOSED").withExtras(verdict.getExtras());
+                            finalVerdict = Verdict.flag(TxLabel.ORDER_CLOSED, "ORDER_NOT_PENDING",
+                                    "The order changed state before the payment was recorded.", Verdict.MEDIUM)
+                                    .withExtras(verdict.getExtras());
                         }
                     }
                 }
@@ -145,15 +133,6 @@ public class TransactionDAO {
                 }
                 for (Verdict extra : finalVerdict.getExtras()) {
                     insertAlert(con, transId, extra);
-                }
-                if (finalVerdict.getRefund().signum() > 0 && t.getOrderId() != null) {
-                    try (PreparedStatement ps = con.prepareStatement(INSERT_REFUND)) {
-                        ps.setInt(1, transId);
-                        ps.setInt(2, t.getOrderId());
-                        ps.setBigDecimal(3, finalVerdict.getRefund());
-                        ps.setString(4, finalVerdict.getRefundReason());
-                        ps.executeUpdate();
-                    }
                 }
                 con.commit();
                 return finalVerdict;
@@ -191,7 +170,7 @@ public class TransactionDAO {
 
     private static final String RECEIPT_SELECT
             = "SELECT t.trans_id, t.bank_trans_id, o.order_code, o.created_by_code, t.amount, o.amount AS order_amount, "
-            + "ISNULL(o.cash_amount, 0) AS cash_amount, o.paid_amount, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
+            + "ISNULL(o.cash_amount, 0) AS cash_amount, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
             + "WHERE t.status = N'LEGIT' ";
 
     // Money kept for an order, newest first, that can have a receipt. cashierId limits it to that cashier's orders (null = all)
@@ -248,7 +227,6 @@ public class TransactionDAO {
         try {
             r.setCashAmount(rs.getBigDecimal("cash_amount"));
         } catch (SQLException ignored) { }
-        r.setOrderPaid(rs.getBigDecimal("paid_amount"));
         r.setTransTime(rs.getTimestamp("trans_time"));
         r.setPrinted(rs.getBoolean("printed"));
         return r;
@@ -296,8 +274,8 @@ public class TransactionDAO {
         List<Object> params = new ArrayList<>();
         String where = where(f, params);
         String sql = "SELECT CAST(t.trans_time AS DATE) AS day, "
-                + "SUM(CASE WHEN t.status IN (N'LEGIT', N'PARTIAL') THEN t.amount ELSE 0 END) AS legit_total, "
-                + "SUM(CASE WHEN t.status NOT IN (N'LEGIT', N'PARTIAL') THEN t.amount ELSE 0 END) AS flagged_total, "
+                + "SUM(CASE WHEN t.status = N'LEGIT' THEN t.amount ELSE 0 END) AS legit_total, "
+                + "SUM(CASE WHEN t.status <> N'LEGIT' THEN t.amount ELSE 0 END) AS flagged_total, "
                 + "COUNT(*) AS cnt" + FROM + where
                 + " GROUP BY CAST(t.trans_time AS DATE) ORDER BY CAST(t.trans_time AS DATE)";
         List<DayTotal> list = new ArrayList<>();

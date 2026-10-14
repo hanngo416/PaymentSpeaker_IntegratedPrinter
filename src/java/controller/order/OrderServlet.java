@@ -130,7 +130,6 @@ public class OrderServlet extends HttpServlet {
             return;
         }
         request.setAttribute("order", order);
-        request.setAttribute("refunds", orderService.refunds(order));
         request.getRequestDispatcher(VIEW_ORDER).forward(request, response);
     }
 
@@ -156,9 +155,7 @@ public class OrderServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("{\"status\":\"" + order.getStatus().name()
                 + "\",\"amount\":" + order.getAmount().longValue()
-                + ",\"remaining\":" + order.getRemainingSeconds()
-                + ",\"paid\":" + order.getPaidAmount().longValue()
-                + ",\"refunds\":" + orderService.refunds(order).size() + "}");
+                + ",\"remaining\":" + order.getRemainingSeconds() + "}");
     }
 
     private Order findOrder(HttpServletRequest request, User user) throws SQLException {

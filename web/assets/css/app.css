@@ -387,7 +387,7 @@ tbody tr:hover { background: rgba(241, 243, 246, 0.6); }
     color: var(--gray);
     border: 1px solid transparent;
 }
-.pill.LEGIT, .pill.PARTIAL, .pill.ACTIVE, .pill.PAID, .pill.RESOLVED { background: var(--ok-bg); color: var(--ok); border-color: rgba(20, 163, 139, 0.3); }
+.pill.LEGIT, .pill.ACTIVE, .pill.PAID, .pill.RESOLVED { background: var(--ok-bg); color: var(--ok); border-color: rgba(20, 163, 139, 0.3); }
 .pill.IN_PROGRESS { background: rgba(37, 99, 235, 0.12); color: #2563eb; border-color: rgba(37, 99, 235, 0.28); }
 .pill.NEW, .pill.DUPLICATE, .pill.NO_ORDER, .pill.ORDER_CLOSED, .pill.PENDING { background: var(--warn-bg); color: var(--warn); border-color: rgba(217, 150, 60, 0.32); }
 .pill.HIGH, .pill.LOCKED { background: var(--bad-bg); color: var(--bad); border-color: rgba(225, 69, 95, 0.3); }
@@ -613,9 +613,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
 }
 .alert-banner a { color: inherit; }
 
-.refund-box { margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: var(--fs-md); text-align: left; background: var(--warn-bg); color: var(--warn); }
-.refund-box strong { display: block; margin-bottom: 6px; }
-.refund-box ul { margin: 0; padding-left: 18px; }
 
 /* Receipt printed on the 80 mm thermal printer */
 .receipt-page { background: #fff; }

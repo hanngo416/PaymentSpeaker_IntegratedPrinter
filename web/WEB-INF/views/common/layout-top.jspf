@@ -35,9 +35,6 @@
                 <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
                     <a href="${ctx}/printer" class="${nav == 'printer' ? 'active' : ''}">Printer</a>
                 </c:if>
-                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
-                    <a href="${ctx}/refunds" class="${nav == 'refunds' ? 'active' : ''}">Refunds</a>
-                </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
                     <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
                 </c:if>

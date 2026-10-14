@@ -5,8 +5,6 @@
     }
 
     var code = box.dataset.code;
-    var paid = parseInt(box.dataset.paid, 10) || 0;
-    var refunds = parseInt(box.dataset.refunds, 10) || 0;
 
     if (box.dataset.status !== 'PENDING') {
         return;
@@ -33,10 +31,6 @@
                 return res.ok ? res.json() : null;
             })
             .then(function (data) {
-                if (data && data.status === 'PENDING' && (data.paid !== paid || data.refunds !== refunds)) {
-                    location.reload();
-                    return;
-                }
                 if (data && data.status !== 'PENDING') {
                     location.reload();
                 }
