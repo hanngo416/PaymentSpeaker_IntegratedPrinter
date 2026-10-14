@@ -110,8 +110,7 @@ CREATE TABLE Orders (
     created_by INT NOT NULL,                     -- Cashier who created the order
     created_by_code NVARCHAR(50) NOT NULL,       -- Copy of that cashier user_code at creation time, so a plain SELECT on Orders shows who made it
     amount DECIMAL(18,2) NOT NULL,               -- Amount requested (total order amount)
-    cash_amount DECIMAL(18,2) NOT NULL DEFAULT 0, -- Portion paid in cash at counter
-    paid_amount DECIMAL(18,2) NOT NULL DEFAULT 0, -- Money accepted so far
+    cash_amount DECIMAL(18,2) NOT NULL DEFAULT 0, -- Portion paid in cash at counter; the VietQR asks for amount - cash_amount
     status NVARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, PAID, EXPIRED, CANCELLED
     qr_content NVARCHAR(500) NULL,               -- Payload string used to build the VietQR code
     expires_at DATETIME2(3) NOT NULL,            -- Scan deadline (usually 10-15 minutes)
@@ -121,16 +120,21 @@ CREATE TABLE Orders (
 );
 GO
 
--- Databases created before partial/split payments existed: add paid_amount, cash_amount
-IF COL_LENGTH('Orders', 'paid_amount') IS NULL
-BEGIN
-    ALTER TABLE Orders ADD paid_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_paid_amount DEFAULT 0;
-    EXEC(N'UPDATE Orders SET paid_amount = amount WHERE status = N''PAID''');
-END
-GO
+-- Databases created before the cash portion existed: add cash_amount
 IF COL_LENGTH('Orders', 'cash_amount') IS NULL
 BEGIN
     ALTER TABLE Orders ADD cash_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_cash_amount DEFAULT 0;
+END
+GO
+
+-- Databases that still have paid_amount (part payments were removed: the QR amount is fixed, a customer pays the rest in cash)
+IF COL_LENGTH('Orders', 'paid_amount') IS NOT NULL
+BEGIN
+    DECLARE @df NVARCHAR(200) = (SELECT dc.name FROM sys.default_constraints dc
+        JOIN sys.columns c ON c.object_id = dc.parent_object_id AND c.column_id = dc.parent_column_id
+        WHERE dc.parent_object_id = OBJECT_ID('Orders') AND c.name = 'paid_amount');
+    IF @df IS NOT NULL EXEC(N'ALTER TABLE Orders DROP CONSTRAINT ' + @df);
+    ALTER TABLE Orders DROP COLUMN paid_amount;
 END
 GO
 
@@ -144,24 +148,25 @@ CREATE TABLE Transactions (
     content NVARCHAR(500) NOT NULL,              -- Transfer note typed by the customer
     bank_account NVARCHAR(50) NULL,              -- Receiving account number
     gateway NVARCHAR(50) NOT NULL DEFAULT 'SEPAY',
-    status NVARCHAR(50) NOT NULL DEFAULT 'LEGIT',-- LEGIT, PARTIAL, DUPLICATE, NO_ORDER (no order for the code), ORDER_CLOSED (order not waiting for payment)
+    status NVARCHAR(50) NOT NULL DEFAULT 'LEGIT',-- LEGIT, DUPLICATE, NO_ORDER (no order for the code, or the amount is not the QR amount), ORDER_CLOSED (order not waiting for payment)
     trans_time DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Time recorded by the bank
     received_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Time the server received the transaction
     announced BIT NOT NULL DEFAULT 0,            -- 0: payment popup not yet confirmed by the cashier, 1: confirmed (prevents repeats)
     printed BIT NOT NULL DEFAULT 0,              -- 0: receipt not printed, 1: receipt printed
     CONSTRAINT FK_Transactions_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    CONSTRAINT CHK_Trans_Status CHECK (status IN ('LEGIT', 'PARTIAL', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'))
+    CONSTRAINT CHK_Trans_Status CHECK (status IN ('LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'))
 );
 GO
 
--- Databases created with older status names: switch to PARTIAL / NO_ORDER / ORDER_CLOSED
-IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Trans_Status' AND definition NOT LIKE '%ORDER_CLOSED%')
+-- Databases created with older status names (AMOUNT_MISMATCH, DEVICE_OFFLINE, PARTIAL): switch to NO_ORDER / ORDER_CLOSED
+IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Trans_Status'
+           AND (definition NOT LIKE '%ORDER_CLOSED%' OR definition LIKE '%PARTIAL%'))
 BEGIN
     ALTER TABLE Transactions DROP CONSTRAINT CHK_Trans_Status;
     EXEC(N'UPDATE Transactions SET status = CASE WHEN order_id IS NULL THEN N''NO_ORDER'' ELSE N''ORDER_CLOSED'' END
-           WHERE status IN (N''AMOUNT_MISMATCH'', N''DEVICE_OFFLINE'')');
+           WHERE status IN (N''AMOUNT_MISMATCH'', N''DEVICE_OFFLINE'', N''PARTIAL'')');
     ALTER TABLE Transactions ADD CONSTRAINT CHK_Trans_Status
-        CHECK (status IN ('LEGIT', 'PARTIAL', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'));
+        CHECK (status IN ('LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'));
 END
 GO
 
@@ -192,7 +197,7 @@ IF OBJECT_ID('FraudAlerts', 'U') IS NULL
 CREATE TABLE FraudAlerts (
     alert_id INT IDENTITY(1,1) PRIMARY KEY,
     trans_id INT NOT NULL,
-    rule_code NVARCHAR(50) NOT NULL,             -- DUP_TRANS, NO_ORDER, ORDER_NOT_PENDING, OVERPAID, HIGH_AMOUNT, BURST_RATE
+    rule_code NVARCHAR(50) NOT NULL,             -- DUP_TRANS, NO_ORDER, AMOUNT_MISMATCH, ORDER_NOT_PENDING, HIGH_AMOUNT, BURST_RATE
     reason NVARCHAR(500) NOT NULL,               -- Detailed reason for the alert
     severity NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM', -- LOW, MEDIUM, HIGH
     status NVARCHAR(20) NOT NULL DEFAULT 'NEW',  -- NEW, IN_PROGRESS, RESOLVED, DISMISSED
@@ -206,25 +211,8 @@ CREATE TABLE FraudAlerts (
 );
 GO
 
--- TABLE 7B: REFUNDS (money that reached the account but is not kept for an order; the cashier sends it back by bank transfer)
-IF OBJECT_ID('Refunds', 'U') IS NULL
-CREATE TABLE Refunds (
-    refund_id INT IDENTITY(1,1) PRIMARY KEY,
-    trans_id INT NULL,                           -- The transfer to send back; NULL when it is the sum of several partial transfers of one order
-    order_id INT NOT NULL,
-    amount DECIMAL(18,2) NOT NULL,               -- Amount to send back
-    reason NVARCHAR(30) NOT NULL,                -- OVERPAID, DUPLICATE, ORDER_CLOSED, EXPIRED_PARTIAL, CANCELLED_PARTIAL
-    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, DONE
-    handled_by INT NULL,                         -- Who sent the money back
-    note NVARCHAR(500) NULL,                     -- Bank reference of the refund transfer
-    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
-    done_at DATETIME2(3) NULL,
-    CONSTRAINT FK_Refunds_Transactions FOREIGN KEY (trans_id) REFERENCES Transactions(trans_id),
-    CONSTRAINT FK_Refunds_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    CONSTRAINT FK_Refunds_Users FOREIGN KEY (handled_by) REFERENCES Users(user_id),
-    CONSTRAINT CHK_Refund_Amount CHECK (amount > 0),
-    CONSTRAINT CHK_Refund_Status CHECK (status IN ('PENDING', 'DONE'))
-);
+-- Databases that still have Refunds: money that does not match an order is only flagged now, nothing is sent back from the system
+IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 GO
 
 -- TABLE 8: AUDIT_LOGS (tamper-evident audit trail - hash chain / mini blockchain)
@@ -253,8 +241,6 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Time' AND
 CREATE INDEX IX_Transactions_Time ON Transactions(trans_time);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Orders_OrderCode' AND object_id = OBJECT_ID('Orders'))
 CREATE INDEX IX_Orders_OrderCode ON Orders(order_code);
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Refunds_Status' AND object_id = OBJECT_ID('Refunds'))
-CREATE INDEX IX_Refunds_Status ON Refunds(status, created_at);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_AuditLogs_PrevHash' AND object_id = OBJECT_ID('AuditLogs'))
 CREATE INDEX IX_AuditLogs_PrevHash ON AuditLogs(prev_hash);
 GO

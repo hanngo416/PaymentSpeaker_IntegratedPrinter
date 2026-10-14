@@ -73,13 +73,13 @@ INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_
 GO
 
 -- 4.6. Demo data: transfers, their orders and the alerts the rules engine would raise
--- 32 transfers over the last 7 days (today included), 7 alerts (5 NEW, 1 RESOLVED, 1 DISMISSED), 2 refunds (1 PENDING, 1 DONE).
+-- 32 transfers over the last 7 days (today included), 6 alerts (4 NEW, 1 RESOLVED, 1 DISMISSED).
 DECLARE @demo TABLE (
     n INT, days_ago INT, hh INT, mm INT, ss INT, amount DECIMAL(18,2), kind NVARCHAR(30),
     order_amount DECIMAL(18,2), cname NVARCHAR(60), content NVARCHAR(200)
 );
 
--- kind: LEGIT, NO_ORDER (no TINKY code in the note), DUP_TRANS, PARTIAL (paid less, order expired, refund waiting), OVERPAID (paid more, extra refunded), HIGH_AMOUNT, BURST_RATE
+-- kind: LEGIT, NO_ORDER (no TINKY code in the note), DUP_TRANS, HIGH_AMOUNT, BURST_RATE
 -- content NULL = "<customer name> chuyen tien <order code>", like a real bank note.
 INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, content) VALUES
 (1,  6,  8, 12, 41,   45000, N'LEGIT',           45000, N'NGUYEN VAN BINH',   NULL),
@@ -92,7 +92,7 @@ INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, c
 (8,  4, 10,  2, 14,   97000, N'LEGIT',           97000, N'HOANG THI MY',      NULL),
 (9,  4, 12, 19, 45,  312000, N'LEGIT',          312000, N'NGO DUC ANH',       NULL),
 (10, 4, 14, 41,  3,   76000, N'LEGIT',           76000, N'DO KIM NGAN',       NULL),
-(11, 4, 15, 56, 38,   75000, N'PARTIAL',         80000, N'LY GIA BAO',        NULL),
+(11, 4, 15, 56, 38,   80000, N'LEGIT',           80000, N'LY GIA BAO',        NULL),
 (12, 3,  9, 16, 20,  118000, N'LEGIT',          118000, N'TRUONG MY LINH',    NULL),
 (13, 3, 11, 44, 51,   62000, N'LEGIT',           62000, N'PHAN VAN DUNG',     NULL),
 (14, 3, 12, 33,  9,   60000, N'NO_ORDER',          NULL, N'CAO THI THAO',     N'CAO THI THAO ca phe'),
@@ -106,7 +106,7 @@ INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, c
 (22, 1, 11, 52, 22,  146000, N'LEGIT',          146000, N'TRINH CONG HAU',    NULL),
 (23, 1, 13, 17, 58,   58000, N'LEGIT',           58000, N'MAI PHUONG ANH',    NULL),
 (24, 1, 15, 46,  1, 7200000, N'HIGH_AMOUNT',  7200000, N'CONG TY CP AN KHANG', NULL),
-(25, 1, 18,  9, 36,   50000, N'OVERPAID',        45000, N'HUYNH NGOC TRAN',   NULL),
+(25, 1, 18,  9, 36,   45000, N'LEGIT',           45000, N'HUYNH NGOC TRAN',   NULL),
 (26, 0,  8, 35, 11,  105000, N'LEGIT',          105000, N'LAM GIA KIET',      NULL),
 (27, 0,  9, 20, 48,  122000, N'LEGIT',          122000, N'TO THI BICH',       NULL),
 -- Rush hour: 5 transfers inside one minute, the 5th one triggers BURST_RATE
@@ -120,13 +120,12 @@ DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cas
 DECLARE @auditor_id INT = (SELECT user_id FROM Users WHERE user_code = N'dung_auditor');
 
 -- The cashier creates each order about 3 minutes before the customer pays; the QR lives 15 minutes.
-INSERT INTO Orders (order_code, created_by, created_by_code, amount, paid_amount, status, qr_content, expires_at, created_at)
+INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at)
 SELECT N'TINKY' + CAST(20100 + n AS NVARCHAR(10)),
        @cashier_id,
        N'nam_cashier',
        order_amount,
-       CASE WHEN kind = N'PARTIAL' THEN amount ELSE order_amount END,
-       CASE WHEN kind = N'PARTIAL' THEN N'EXPIRED' ELSE N'PAID' END,
+       N'PAID',
        N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount='
          + CAST(CAST(order_amount AS BIGINT) AS NVARCHAR(20))
          + N'&addInfo=TINKY' + CAST(20100 + n AS NVARCHAR(10))
@@ -145,8 +144,7 @@ SELECT N'FT26' + CAST(10200000 + d.n * 3917 AS NVARCHAR(12)),
        N'SEPAY',
        CASE WHEN d.kind IN (N'LEGIT') THEN N'LEGIT'
             WHEN d.kind = N'DUP_TRANS' THEN N'DUPLICATE'
-            WHEN d.kind = N'PARTIAL' THEN N'PARTIAL'
-            WHEN d.kind IN (N'HIGH_AMOUNT', N'BURST_RATE', N'OVERPAID') THEN N'LEGIT'
+            WHEN d.kind IN (N'HIGH_AMOUNT', N'BURST_RATE') THEN N'LEGIT'
             ELSE N'NO_ORDER' END,
        DATEADD(SECOND, d.hh * 3600 + d.mm * 60 + d.ss, CAST(CAST(DATEADD(DAY, -d.days_ago, SYSDATETIME()) AS DATE) AS DATETIME2)),
        DATEADD(SECOND, d.hh * 3600 + d.mm * 60 + d.ss + 6, CAST(CAST(DATEADD(DAY, -d.days_ago, SYSDATETIME()) AS DATE) AS DATETIME2)),
@@ -157,51 +155,34 @@ LEFT JOIN Orders o ON o.order_code = N'TINKY' + CAST(20100 + d.n AS NVARCHAR(10)
 INSERT INTO FraudAlerts (trans_id, rule_code, reason, severity, status, resolved_by, resolved_notes, created_at)
 SELECT t.trans_id,
        CASE d.kind WHEN N'NO_ORDER' THEN N'NO_ORDER' WHEN N'DUP_TRANS' THEN N'DUP_TRANS'
-                   WHEN N'OVERPAID' THEN N'OVERPAID' WHEN N'HIGH_AMOUNT' THEN N'HIGH_AMOUNT'
+                   WHEN N'HIGH_AMOUNT' THEN N'HIGH_AMOUNT'
                    ELSE N'BURST_RATE' END,
        CASE d.kind
             WHEN N'NO_ORDER' THEN N'No order matches the code in the transfer content.'
             WHEN N'DUP_TRANS' THEN N'A transaction with the same amount and content arrived within the last 60 seconds.'
-            WHEN N'OVERPAID' THEN
-                 N'Order TINKY' + CAST(20100 + d.n AS NVARCHAR(10)) + N' needed ' + CAST(CAST(d.order_amount AS BIGINT) AS NVARCHAR(20))
-                 + N' VND but ' + CAST(CAST(d.amount AS BIGINT) AS NVARCHAR(20)) + N' VND was received; the extra '
-                 + CAST(CAST(d.amount - d.order_amount AS BIGINT) AS NVARCHAR(20)) + N' VND must be refunded.'
             WHEN N'HIGH_AMOUNT' THEN N'Amount is 5000000 VND or more and needs a manual check.'
             ELSE N'5 or more transactions within 60 seconds.' END,
        CASE WHEN d.kind IN (N'HIGH_AMOUNT', N'BURST_RATE') THEN N'HIGH' ELSE N'MEDIUM' END,
-       CASE d.n WHEN 14 THEN N'DISMISSED' WHEN 25 THEN N'RESOLVED' ELSE N'NEW' END,
-       CASE WHEN d.n IN (14, 25) THEN @auditor_id ELSE NULL END,
+       CASE d.n WHEN 14 THEN N'DISMISSED' WHEN 7 THEN N'RESOLVED' ELSE N'NEW' END,
+       CASE WHEN d.n IN (7, 14) THEN @auditor_id ELSE NULL END,
        CASE d.n WHEN 14 THEN N'Customer sent it twice by mistake, no fraud.'
-                WHEN 25 THEN N'Extra money refunded to the customer.' ELSE NULL END,
+                WHEN 7 THEN N'Customer forgot the order code; confirmed by phone and handled outside the system.' ELSE NULL END,
        t.received_at
 FROM @demo d
 JOIN Transactions t ON t.bank_trans_id = N'FT26' + CAST(10200000 + d.n * 3917 AS NVARCHAR(12))
-WHERE d.kind NOT IN (N'LEGIT', N'PARTIAL');
-
--- Refunds: order 11 expired with only a part paid (waiting), order 25 was paid 5000 too much (already sent back)
-INSERT INTO Refunds (trans_id, order_id, amount, reason, status, handled_by, note, created_at, done_at)
-SELECT NULL, o.order_id, d.amount, N'EXPIRED_PARTIAL', N'PENDING', NULL, NULL, o.expires_at, NULL
-FROM @demo d JOIN Orders o ON o.order_code = N'TINKY' + CAST(20100 + d.n AS NVARCHAR(10))
-WHERE d.kind = N'PARTIAL'
-UNION ALL
-SELECT t.trans_id, o.order_id, d.amount - d.order_amount, N'OVERPAID', N'DONE', @cashier_id, N'Refund transfer FT26-REFUND-25',
-       t.received_at, DATEADD(MINUTE, 20, t.received_at)
-FROM @demo d
-JOIN Orders o ON o.order_code = N'TINKY' + CAST(20100 + d.n AS NVARCHAR(10))
-JOIN Transactions t ON t.bank_trans_id = N'FT26' + CAST(10200000 + d.n * 3917 AS NVARCHAR(12))
-WHERE d.kind = N'OVERPAID';
+WHERE d.kind <> N'LEGIT';
 GO
 
 -- 4.6. Real SePay transactions (2026-10-12)
 DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
 
-INSERT INTO Orders (order_code, created_by, created_by_code, amount, paid_amount, status, qr_content, expires_at, created_at) VALUES
-(N'TINKY84305', @cashier_id, N'nam_cashier', 2000.00, 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY84305&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:45:00'),
-(N'TINKY78040', @cashier_id, N'nam_cashier', 2000.00, 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY78040&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:46:00'),
-(N'TINKY47407', @cashier_id, N'nam_cashier', 2000.00, 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY47407&accountName=LAM%20HOANG%20AN', '2026-10-12 15:35:00', '2026-10-12 15:20:00'),
-(N'TINKY98430', @cashier_id, N'nam_cashier', 2000.00, 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY98430&accountName=LAM%20HOANG%20AN', '2026-10-12 15:40:00', '2026-10-12 15:25:00'),
-(N'TINKY27104', @cashier_id, N'nam_cashier', 2000.00, 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY27104&accountName=LAM%20HOANG%20AN', '2026-10-12 16:45:00', '2026-10-12 16:28:00'),
-(N'TINKY16282', @cashier_id, N'nam_cashier', 2000.00, 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY16282&accountName=LAM%20HOANG%20AN', '2026-10-12 16:50:00', '2026-10-12 16:32:00');
+INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at) VALUES
+(N'TINKY84305', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY84305&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:45:00'),
+(N'TINKY78040', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY78040&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:46:00'),
+(N'TINKY47407', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY47407&accountName=LAM%20HOANG%20AN', '2026-10-12 15:35:00', '2026-10-12 15:20:00'),
+(N'TINKY98430', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY98430&accountName=LAM%20HOANG%20AN', '2026-10-12 15:40:00', '2026-10-12 15:25:00'),
+(N'TINKY27104', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY27104&accountName=LAM%20HOANG%20AN', '2026-10-12 16:45:00', '2026-10-12 16:28:00'),
+(N'TINKY16282', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY16282&accountName=LAM%20HOANG%20AN', '2026-10-12 16:50:00', '2026-10-12 16:32:00');
 
 INSERT INTO Transactions (bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time, received_at, announced, printed) VALUES
 (N'89245446', (SELECT order_id FROM Orders WHERE order_code = N'TINKY84305'), 2000.00, N'151314413497-0901675018-TINKY84305', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 14:47:16', '2026-10-12 14:47:20', 1, 0),

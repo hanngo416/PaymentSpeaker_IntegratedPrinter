@@ -13,12 +13,11 @@ UNION ALL SELECT 'Devices', COUNT(*), 1 FROM Devices
 UNION ALL SELECT 'MaintenanceTickets', COUNT(*), 1 FROM MaintenanceTickets
 UNION ALL SELECT 'Orders', COUNT(*), 37 FROM Orders
 UNION ALL SELECT 'Transactions', COUNT(*), 38 FROM Transactions
-UNION ALL SELECT 'Refunds', COUNT(*), 2 FROM Refunds
-UNION ALL SELECT 'FraudAlerts', COUNT(*), 7 FROM FraudAlerts
+UNION ALL SELECT 'FraudAlerts', COUNT(*), 6 FROM FraudAlerts
 UNION ALL SELECT 'AuditLogs', COUNT(*), 1 FROM AuditLogs;
 GO
 
--- CHECK 1b: the eleven foreign keys, child table first
+-- CHECK 1b: the eight foreign keys, child table first
 SELECT fk.name AS foreign_key, OBJECT_NAME(fk.parent_object_id) AS child_table, OBJECT_NAME(fk.referenced_object_id) AS parent_table
 FROM sys.foreign_keys fk ORDER BY child_table, foreign_key;
 GO
