@@ -5,29 +5,9 @@
     }
 
     var code = box.dataset.code;
-    var paidKey = 'paid-amount-' + code;
+    var paid = parseInt(box.dataset.paid, 10) || 0;
+    var refunds = parseInt(box.dataset.refunds, 10) || 0;
 
-    function speak(text) {
-        if (!window.speechSynthesis) { return; }
-        var u = new SpeechSynthesisUtterance(text);
-        u.lang = 'vi-VN';
-        var voices = window.speechSynthesis.getVoices();
-        for (var i = 0; i < voices.length; i++) {
-            if (/^vi/i.test(voices[i].lang.replace('_', '-'))) { u.voice = voices[i]; break; }
-        }
-        window.speechSynthesis.speak(u);
-    }
-
-    if (box.dataset.status === 'PAID') {
-        try {
-            var amount = sessionStorage.getItem(paidKey);
-            if (amount) {
-                sessionStorage.removeItem(paidKey);
-                speak('\u0110\u00e3 nh\u1eadn ' + amount + ' \u0111\u1ed3ng');
-            }
-        } catch (e) { }
-        return;
-    }
     if (box.dataset.status !== 'PENDING') {
         return;
     }
@@ -53,10 +33,11 @@
                 return res.ok ? res.json() : null;
             })
             .then(function (data) {
+                if (data && data.status === 'PENDING' && (data.paid !== paid || data.refunds !== refunds)) {
+                    location.reload();
+                    return;
+                }
                 if (data && data.status !== 'PENDING') {
-                    if (data.status === 'PAID') {
-                        try { sessionStorage.setItem(paidKey, data.amount); } catch (e) { }
-                    }
                     location.reload();
                 }
             })

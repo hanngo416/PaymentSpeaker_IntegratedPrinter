@@ -14,7 +14,6 @@
         field('mAmount', d.amount + ' VND');
         field('mBankId', d.bankId);
         field('mTime', d.time);
-        field('mDevice', d.device);
         field('mOrder', d.order);
         field('mContent', d.content);
         var label = document.getElementById('mLabel');
