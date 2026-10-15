@@ -57,7 +57,7 @@ INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_
 (N'TINKY10234', @cashier_id, N'nam_cashier', 50000.00, N'PENDING',
  N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=50000&addInfo=TINKY10234&accountName=LAM%20HOANG%20AN',
  DATEADD(MINUTE, 60, SYSDATETIME())),
--- Order 2: pending payment used to test a partial payment (transfer less than the order, then the rest)
+-- Order 2: a second pending payment
 (N'TINKY10235', @cashier_id, N'nam_cashier', 120000.00, N'PENDING',
  N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=120000&addInfo=TINKY10235&accountName=LAM%20HOANG%20AN',
  DATEADD(MINUTE, 60, SYSDATETIME()));
@@ -68,19 +68,27 @@ GO
 INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, prev_hash, curr_hash, created_at) VALUES
 (N'SYSTEM', N'INIT_SYSTEM', N'SYSTEM', N'0', N'{"message": "Genesis block created. System initialized."}',
  '0000000000000000000000000000000000000000000000000000000000000000',
- 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
- SYSDATETIME());
+ '0000000000000000000000000000000000000000000000000000000000000000',
+ CAST(CAST(DATEADD(DAY, -6, SYSDATETIME()) AS DATE) AS DATETIME2(3)));
+
+-- Same formula as util.AuditHash: SHA-256 of prev_hash|log_id|actor|action|entity|entity_id|detail|time
+UPDATE AuditLogs
+SET curr_hash = LOWER(CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONVERT(VARCHAR(MAX),
+        prev_hash + '|' + CAST(log_id AS VARCHAR(10)) + '|' + actor_username + '|' + action + '|' + target_entity
+        + '|' + entity_id + '|' + ISNULL(detail_json, '') + '|' + CONVERT(VARCHAR(23), created_at, 121))), 2))
+WHERE log_id = 1;
 GO
 
 -- 4.6. Demo data: transfers, their orders and the alerts the rules engine would raise
--- 32 transfers over the last 7 days (today included), 6 alerts (4 NEW, 1 RESOLVED, 1 DISMISSED).
+-- 34 transfers over the last 7 days (today included), 8 alerts (6 NEW, 1 RESOLVED, 1 DISMISSED).
 DECLARE @demo TABLE (
     n INT, days_ago INT, hh INT, mm INT, ss INT, amount DECIMAL(18,2), kind NVARCHAR(30),
     order_amount DECIMAL(18,2), cname NVARCHAR(60), content NVARCHAR(200)
 );
 
--- kind: LEGIT, NO_ORDER (no TINKY code in the note), DUP_TRANS, HIGH_AMOUNT, BURST_RATE
--- content NULL = "<customer name> chuyen tien <order code>", like a real bank note.
+-- kind: LEGIT, NO_ORDER (no TINKY code in the note), DUP_TRANS, HIGH_AMOUNT, BURST_RATE,
+--       AMOUNT_MISMATCH (order exists, other amount than the QR), ORDER_CLOSED (paid after the order expired)
+-- content NULL = the order code alone, as typed from the QR.
 INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, content) VALUES
 (1,  6,  8, 12, 41,   45000, N'LEGIT',           45000, N'NGUYEN VAN BINH',   NULL),
 (2,  6, 10, 37, 18,  128000, N'LEGIT',          128000, N'TRAN THI LAN',      NULL),
@@ -88,15 +96,15 @@ INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, c
 (4,  5,  9, 23,  7,   89000, N'LEGIT',           89000, N'PHAM THU HA',       NULL),
 (5,  5, 12, 48, 33,  215000, N'LEGIT',          215000, N'VO HOANG LONG',     NULL),
 (6,  5, 16, 14, 26,   38000, N'LEGIT',           38000, N'DANG QUOC VIET',    NULL),
-(7,  5, 17, 31, 59,  150000, N'NO_ORDER',          NULL, N'BUI THANH TUNG',   N'BUI THANH TUNG chuyen tien'),
+(7,  5, 17, 31, 59,  150000, N'NO_ORDER',          NULL, N'BUI THANH TUNG',   N'payment for coffee'),
 (8,  4, 10,  2, 14,   97000, N'LEGIT',           97000, N'HOANG THI MY',      NULL),
 (9,  4, 12, 19, 45,  312000, N'LEGIT',          312000, N'NGO DUC ANH',       NULL),
 (10, 4, 14, 41,  3,   76000, N'LEGIT',           76000, N'DO KIM NGAN',       NULL),
 (11, 4, 15, 56, 38,   80000, N'LEGIT',           80000, N'LY GIA BAO',        NULL),
 (12, 3,  9, 16, 20,  118000, N'LEGIT',          118000, N'TRUONG MY LINH',    NULL),
 (13, 3, 11, 44, 51,   62000, N'LEGIT',           62000, N'PHAN VAN DUNG',     NULL),
-(14, 3, 12, 33,  9,   60000, N'NO_ORDER',          NULL, N'CAO THI THAO',     N'CAO THI THAO ca phe'),
-(15, 3, 12, 33, 40,   60000, N'DUP_TRANS',         NULL, N'CAO THI THAO',     N'CAO THI THAO ca phe'),
+(14, 3, 12, 33,  9,   60000, N'NO_ORDER',          NULL, N'CAO THI THAO',     N'coffee payment'),
+(15, 3, 12, 33, 40,   60000, N'DUP_TRANS',         NULL, N'CAO THI THAO',     N'coffee payment'),
 (16, 3, 16, 27, 12, 6500000, N'HIGH_AMOUNT',  6500000, N'CONG TY TNHH MINH PHAT', NULL),
 (17, 2,  8, 51, 29,   72000, N'LEGIT',           72000, N'VU THI HONG',       NULL),
 (18, 2, 10, 24,  6,  135000, N'LEGIT',          135000, N'DINH VAN SON',      NULL),
@@ -114,24 +122,27 @@ INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, c
 (29, 0, 10, 41, 15,   65000, N'LEGIT',           65000, N'KIEU MY DUYEN',     NULL),
 (30, 0, 10, 41, 27,   39000, N'LEGIT',           39000, N'DUONG TUAN KIET',   NULL),
 (31, 0, 10, 41, 38,   52000, N'LEGIT',           52000, N'THAI HOA BINH',     NULL),
-(32, 0, 10, 41, 50,   35000, N'BURST_RATE',      35000, N'QUACH TUONG VY',    NULL);
+(32, 0, 10, 41, 50,   35000, N'BURST_RATE',      35000, N'QUACH TUONG VY',    NULL),
+(33, 2, 11, 30,  0,   80000, N'AMOUNT_MISMATCH', 90000, N'LAI VAN TAI',       NULL),
+(34, 1, 14, 20,  0,   66000, N'ORDER_CLOSED',    66000, N'PHUNG THI OANH',    NULL);
 
 DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
 DECLARE @auditor_id INT = (SELECT user_id FROM Users WHERE user_code = N'dung_auditor');
 
 -- The cashier creates each order about 3 minutes before the customer pays; the QR lives 15 minutes.
+-- The ORDER_CLOSED order was created 20 minutes before the transfer, so its QR was already dead.
 INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at)
 SELECT N'TINKY' + CAST(20100 + n AS NVARCHAR(10)),
        @cashier_id,
        N'nam_cashier',
        order_amount,
-       N'PAID',
+       CASE WHEN kind IN (N'AMOUNT_MISMATCH', N'ORDER_CLOSED') THEN N'CANCELLED' ELSE N'COMPLETED' END,
        N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount='
          + CAST(CAST(order_amount AS BIGINT) AS NVARCHAR(20))
          + N'&addInfo=TINKY' + CAST(20100 + n AS NVARCHAR(10))
          + N'&accountName=LAM%20HOANG%20AN',
-       DATEADD(MINUTE, 12, DATEADD(SECOND, hh * 3600 + mm * 60 + ss, CAST(CAST(DATEADD(DAY, -days_ago, SYSDATETIME()) AS DATE) AS DATETIME2))),
-       DATEADD(MINUTE, -3, DATEADD(SECOND, hh * 3600 + mm * 60 + ss, CAST(CAST(DATEADD(DAY, -days_ago, SYSDATETIME()) AS DATE) AS DATETIME2)))
+       DATEADD(MINUTE, CASE WHEN kind = N'ORDER_CLOSED' THEN -5 ELSE 12 END, DATEADD(SECOND, hh * 3600 + mm * 60 + ss, CAST(CAST(DATEADD(DAY, -days_ago, SYSDATETIME()) AS DATE) AS DATETIME2))),
+       DATEADD(MINUTE, CASE WHEN kind = N'ORDER_CLOSED' THEN -20 ELSE -3 END, DATEADD(SECOND, hh * 3600 + mm * 60 + ss, CAST(CAST(DATEADD(DAY, -days_ago, SYSDATETIME()) AS DATE) AS DATETIME2)))
 FROM @demo
 WHERE order_amount IS NOT NULL;
 
@@ -139,13 +150,11 @@ INSERT INTO Transactions (bank_trans_id, order_id, amount, content, bank_account
 SELECT N'FT26' + CAST(10200000 + d.n * 3917 AS NVARCHAR(12)),
        o.order_id,
        d.amount,
-       COALESCE(d.content, d.cname + N' chuyen tien TINKY' + CAST(20100 + d.n AS NVARCHAR(10))),
+       COALESCE(d.content, N'TINKY' + CAST(20100 + d.n AS NVARCHAR(10))),
        N'77884268888',
-       N'SEPAY',
-       CASE WHEN d.kind IN (N'LEGIT') THEN N'LEGIT'
-            WHEN d.kind = N'DUP_TRANS' THEN N'DUPLICATE'
-            WHEN d.kind IN (N'HIGH_AMOUNT', N'BURST_RATE') THEN N'LEGIT'
-            ELSE N'NO_ORDER' END,
+       N'TPBank',
+       CASE WHEN d.kind IN (N'LEGIT', N'HIGH_AMOUNT', N'BURST_RATE') THEN N'COMPLETED'
+            ELSE N'CANCELLED' END,
        DATEADD(SECOND, d.hh * 3600 + d.mm * 60 + d.ss, CAST(CAST(DATEADD(DAY, -d.days_ago, SYSDATETIME()) AS DATE) AS DATETIME2)),
        DATEADD(SECOND, d.hh * 3600 + d.mm * 60 + d.ss + 6, CAST(CAST(DATEADD(DAY, -d.days_ago, SYSDATETIME()) AS DATE) AS DATETIME2)),
        1, 0
@@ -156,9 +165,14 @@ INSERT INTO FraudAlerts (trans_id, rule_code, reason, severity, status, resolved
 SELECT t.trans_id,
        CASE d.kind WHEN N'NO_ORDER' THEN N'NO_ORDER' WHEN N'DUP_TRANS' THEN N'DUP_TRANS'
                    WHEN N'HIGH_AMOUNT' THEN N'HIGH_AMOUNT'
+                   WHEN N'AMOUNT_MISMATCH' THEN N'AMOUNT_MISMATCH'
+                   WHEN N'ORDER_CLOSED' THEN N'ORDER_NOT_PENDING'
                    ELSE N'BURST_RATE' END,
        CASE d.kind
             WHEN N'NO_ORDER' THEN N'No order matches the code in the transfer content.'
+            WHEN N'AMOUNT_MISMATCH' THEN N'Order TINKY' + CAST(20100 + d.n AS NVARCHAR(10)) + N' expects '
+                 + CAST(d.order_amount AS NVARCHAR(20)) + N' VND by transfer but ' + CAST(d.amount AS NVARCHAR(20)) + N' VND arrived.'
+            WHEN N'ORDER_CLOSED' THEN N'Order TINKY' + CAST(20100 + d.n AS NVARCHAR(10)) + N' is EXPIRED and no longer waiting for payment.'
             WHEN N'DUP_TRANS' THEN N'A transaction with the same amount and content arrived within the last 60 seconds.'
             WHEN N'HIGH_AMOUNT' THEN N'Amount is 5000000 VND or more and needs a manual check.'
             ELSE N'5 or more transactions within 60 seconds.' END,
@@ -177,20 +191,51 @@ GO
 DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
 
 INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at) VALUES
-(N'TINKY84305', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY84305&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:45:00'),
-(N'TINKY78040', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY78040&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:46:00'),
-(N'TINKY47407', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY47407&accountName=LAM%20HOANG%20AN', '2026-10-12 15:35:00', '2026-10-12 15:20:00'),
-(N'TINKY98430', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY98430&accountName=LAM%20HOANG%20AN', '2026-10-12 15:40:00', '2026-10-12 15:25:00'),
-(N'TINKY27104', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY27104&accountName=LAM%20HOANG%20AN', '2026-10-12 16:45:00', '2026-10-12 16:28:00'),
-(N'TINKY16282', @cashier_id, N'nam_cashier', 2000.00, N'PAID', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY16282&accountName=LAM%20HOANG%20AN', '2026-10-12 16:50:00', '2026-10-12 16:32:00');
+(N'TINKY84305', @cashier_id, N'nam_cashier', 2000.00, N'COMPLETED', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY84305&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:45:00'),
+(N'TINKY78040', @cashier_id, N'nam_cashier', 2000.00, N'COMPLETED', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY78040&accountName=LAM%20HOANG%20AN', '2026-10-12 15:00:00', '2026-10-12 14:46:00'),
+(N'TINKY47407', @cashier_id, N'nam_cashier', 2000.00, N'COMPLETED', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY47407&accountName=LAM%20HOANG%20AN', '2026-10-12 15:35:00', '2026-10-12 15:20:00'),
+(N'TINKY98430', @cashier_id, N'nam_cashier', 2000.00, N'COMPLETED', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY98430&accountName=LAM%20HOANG%20AN', '2026-10-12 15:40:00', '2026-10-12 15:25:00'),
+(N'TINKY27104', @cashier_id, N'nam_cashier', 2000.00, N'COMPLETED', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY27104&accountName=LAM%20HOANG%20AN', '2026-10-12 16:45:00', '2026-10-12 16:28:00'),
+(N'TINKY16282', @cashier_id, N'nam_cashier', 2000.00, N'COMPLETED', N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=2000&addInfo=TINKY16282&accountName=LAM%20HOANG%20AN', '2026-10-12 16:50:00', '2026-10-12 16:32:00');
 
 INSERT INTO Transactions (bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time, received_at, announced, printed) VALUES
-(N'89245446', (SELECT order_id FROM Orders WHERE order_code = N'TINKY84305'), 2000.00, N'151314413497-0901675018-TINKY84305', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 14:47:16', '2026-10-12 14:47:20', 1, 0),
-(N'89245668', (SELECT order_id FROM Orders WHERE order_code = N'TINKY78040'), 2000.00, N'151314458764-0901675018-TINKY78040', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 14:48:22', '2026-10-12 14:48:26', 1, 0),
-(N'89253800', (SELECT order_id FROM Orders WHERE order_code = N'TINKY47407'), 2000.00, N'151318377405-0901675018-TINKY47407', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 15:23:36', '2026-10-12 15:23:40', 1, 0),
-(N'89254760', (SELECT order_id FROM Orders WHERE order_code = N'TINKY98430'), 2000.00, N'151318890448 0901675018 TINKY98430', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 15:27:21', '2026-10-12 15:27:25', 1, 0),
-(N'89273074', (SELECT order_id FROM Orders WHERE order_code = N'TINKY27104'), 2000.00, N'TINKY27104', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 16:30:21', '2026-10-12 16:30:25', 1, 0),
-(N'89274782', (SELECT order_id FROM Orders WHERE order_code = N'TINKY16282'), 2000.00, N'151327617041 0901675018 TINKY16282', N'77884268888', N'TPBank', N'LEGIT', '2026-10-12 16:35:04', '2026-10-12 16:35:08', 1, 0);
+(N'89245446', (SELECT order_id FROM Orders WHERE order_code = N'TINKY84305'), 2000.00, N'151314413497-0901675018-TINKY84305', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 14:47:16', '2026-10-12 14:47:20', 1, 0),
+(N'89245668', (SELECT order_id FROM Orders WHERE order_code = N'TINKY78040'), 2000.00, N'151314458764-0901675018-TINKY78040', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 14:48:22', '2026-10-12 14:48:26', 1, 0),
+(N'89253800', (SELECT order_id FROM Orders WHERE order_code = N'TINKY47407'), 2000.00, N'151318377405-0901675018-TINKY47407', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 15:23:36', '2026-10-12 15:23:40', 1, 0),
+(N'89254760', (SELECT order_id FROM Orders WHERE order_code = N'TINKY98430'), 2000.00, N'151318890448 0901675018 TINKY98430', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 15:27:21', '2026-10-12 15:27:25', 1, 0),
+(N'89273074', (SELECT order_id FROM Orders WHERE order_code = N'TINKY27104'), 2000.00, N'TINKY27104', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 16:30:21', '2026-10-12 16:30:25', 1, 0),
+(N'89274782', (SELECT order_id FROM Orders WHERE order_code = N'TINKY16282'), 2000.00, N'151327617041 0901675018 TINKY16282', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 16:35:04', '2026-10-12 16:35:08', 1, 0);
+GO
+
+-- 4.7. Shift history: one shift per past day (07:00-21:00, cash counted 0), day 4 closed by force, today's shift still open
+-- Written like ShiftService does, so each record carries the same SHA-256 hash that util.AuditHash would compute.
+DECLARE @events TABLE (seq INT IDENTITY(1,1), actor NVARCHAR(50), action NVARCHAR(50), shift_id NVARCHAR(50), detail NVARCHAR(200), event_time DATETIME2(3));
+DECLARE @day INT = 6;
+WHILE @day >= 0
+BEGIN
+    DECLARE @base DATETIME2(3) = CAST(CAST(DATEADD(DAY, -@day, SYSDATETIME()) AS DATE) AS DATETIME2(3));
+    DECLARE @sid NVARCHAR(50) = N'S' + CONVERT(NVARCHAR(8), @base, 112) + N'-070000';
+    INSERT INTO @events (actor, action, shift_id, detail, event_time) VALUES (N'nam_cashier', N'OPEN_SHIFT', @sid, N'{}', DATEADD(HOUR, 7, @base));
+    IF @day > 0
+        INSERT INTO @events (actor, action, shift_id, detail, event_time) VALUES
+        (CASE WHEN @day = 4 THEN N'han_admin' ELSE N'nam_cashier' END, N'CLOSE_SHIFT', @sid,
+         CASE WHEN @day = 4 THEN N'{"forced":"true"}' ELSE N'{"counted_cash":"0"}' END, DATEADD(HOUR, 21, @base));
+    SET @day = @day - 1;
+END
+
+DECLARE @seq INT = 1, @last INT = (SELECT MAX(seq) FROM @events);
+WHILE @seq <= @last
+BEGIN
+    DECLARE @prev CHAR(64) = (SELECT curr_hash FROM AuditLogs WHERE log_id = (SELECT MAX(log_id) FROM AuditLogs));
+    INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, prev_hash, curr_hash, created_at)
+    SELECT actor, action, N'SHIFT', shift_id, detail, @prev, @prev, event_time FROM @events WHERE seq = @seq;
+    UPDATE AuditLogs
+    SET curr_hash = LOWER(CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONVERT(VARCHAR(MAX),
+            prev_hash + '|' + CAST(log_id AS VARCHAR(10)) + '|' + actor_username + '|' + action + '|' + target_entity
+            + '|' + entity_id + '|' + ISNULL(detail_json, '') + '|' + CONVERT(VARCHAR(23), created_at, 121))), 2))
+    WHERE log_id = SCOPE_IDENTITY();
+    SET @seq = @seq + 1;
+END
 GO
 
 PRINT N'>>> Database and sample data for PaymentSpeaker loaded successfully!';

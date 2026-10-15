@@ -11,10 +11,10 @@ UNION ALL SELECT 'Users', COUNT(*), 6 FROM Users
 UNION ALL SELECT 'LoginOtps', COUNT(*), 0 FROM LoginOtps
 UNION ALL SELECT 'Devices', COUNT(*), 1 FROM Devices
 UNION ALL SELECT 'MaintenanceTickets', COUNT(*), 1 FROM MaintenanceTickets
-UNION ALL SELECT 'Orders', COUNT(*), 37 FROM Orders
-UNION ALL SELECT 'Transactions', COUNT(*), 38 FROM Transactions
-UNION ALL SELECT 'FraudAlerts', COUNT(*), 6 FROM FraudAlerts
-UNION ALL SELECT 'AuditLogs', COUNT(*), 1 FROM AuditLogs;
+UNION ALL SELECT 'Orders', COUNT(*), 39 FROM Orders
+UNION ALL SELECT 'Transactions', COUNT(*), 40 FROM Transactions
+UNION ALL SELECT 'FraudAlerts', COUNT(*), 8 FROM FraudAlerts
+UNION ALL SELECT 'AuditLogs', COUNT(*), 14 FROM AuditLogs;
 GO
 
 -- CHECK 1b: the eight foreign keys, child table first
@@ -34,10 +34,10 @@ GO
 
 -- CHECK 3: idempotency. The first INSERT succeeds, the second fails with a duplicate key error on bank_trans_id
 INSERT INTO Transactions (bank_trans_id, amount, content, status)
-VALUES (N'MB_TEST_99999', 50000.00, N'TINKY10234 payment', N'LEGIT');
+VALUES (N'MB_TEST_99999', 50000.00, N'TINKY10234 payment', N'COMPLETED');
 GO
 INSERT INTO Transactions (bank_trans_id, amount, content, status)
-VALUES (N'MB_TEST_99999', 50000.00, N'TINKY10234 payment', N'LEGIT');
+VALUES (N'MB_TEST_99999', 50000.00, N'TINKY10234 payment', N'COMPLETED');
 GO
 DELETE FROM Transactions WHERE bank_trans_id = N'MB_TEST_99999';
 GO

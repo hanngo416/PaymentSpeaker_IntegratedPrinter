@@ -111,12 +111,12 @@ CREATE TABLE Orders (
     created_by_code NVARCHAR(50) NOT NULL,       -- Copy of that cashier user_code at creation time, so a plain SELECT on Orders shows who made it
     amount DECIMAL(18,2) NOT NULL,               -- Amount requested (total order amount)
     cash_amount DECIMAL(18,2) NOT NULL DEFAULT 0, -- Portion paid in cash at counter; the VietQR asks for amount - cash_amount
-    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, PAID, EXPIRED, CANCELLED
+    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, COMPLETED, CANCELLED, EXPIRED
     qr_content NVARCHAR(500) NULL,               -- Payload string used to build the VietQR code
     expires_at DATETIME2(3) NOT NULL,            -- Scan deadline (usually 10-15 minutes)
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT FK_Orders_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
-    CONSTRAINT CHK_Order_Status CHECK (status IN ('PENDING', 'PAID', 'EXPIRED', 'CANCELLED'))
+    CONSTRAINT CHK_Order_Status CHECK (status IN ('PENDING', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'PAID'))
 );
 GO
 
@@ -148,25 +148,25 @@ CREATE TABLE Transactions (
     content NVARCHAR(500) NOT NULL,              -- Transfer note typed by the customer
     bank_account NVARCHAR(50) NULL,              -- Receiving account number
     gateway NVARCHAR(50) NOT NULL DEFAULT 'SEPAY',
-    status NVARCHAR(50) NOT NULL DEFAULT 'LEGIT',-- LEGIT, DUPLICATE, NO_ORDER (no order for the code, or the amount is not the QR amount), ORDER_CLOSED (order not waiting for payment)
+    status NVARCHAR(50) NOT NULL DEFAULT 'COMPLETED', -- COMPLETED, CANCELLED, LEGIT, DUPLICATE, NO_ORDER, ORDER_CLOSED
     trans_time DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Time recorded by the bank
     received_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Time the server received the transaction
     announced BIT NOT NULL DEFAULT 0,            -- 0: payment popup not yet confirmed by the cashier, 1: confirmed (prevents repeats)
     printed BIT NOT NULL DEFAULT 0,              -- 0: receipt not printed, 1: receipt printed
     CONSTRAINT FK_Transactions_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    CONSTRAINT CHK_Trans_Status CHECK (status IN ('LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'))
+    CONSTRAINT CHK_Trans_Status CHECK (status IN ('COMPLETED', 'CANCELLED', 'LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'))
 );
 GO
 
--- Databases created with older status names (AMOUNT_MISMATCH, DEVICE_OFFLINE, PARTIAL): switch to NO_ORDER / ORDER_CLOSED
+-- Databases created with older status names: ensure COMPLETED and CANCELLED are allowed
 IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Trans_Status'
-           AND (definition NOT LIKE '%ORDER_CLOSED%' OR definition LIKE '%PARTIAL%'))
+           AND definition NOT LIKE '%COMPLETED%')
 BEGIN
     ALTER TABLE Transactions DROP CONSTRAINT CHK_Trans_Status;
-    EXEC(N'UPDATE Transactions SET status = CASE WHEN order_id IS NULL THEN N''NO_ORDER'' ELSE N''ORDER_CLOSED'' END
-           WHERE status IN (N''AMOUNT_MISMATCH'', N''DEVICE_OFFLINE'', N''PARTIAL'')');
+    EXEC(N'UPDATE Transactions SET status = N''COMPLETED'' WHERE status = N''LEGIT'';
+           UPDATE Transactions SET status = N''CANCELLED'' WHERE status IN (N''AMOUNT_MISMATCH'', N''DEVICE_OFFLINE'', N''PARTIAL'', N''ORDER_CLOSED'', N''NO_ORDER'', N''DUPLICATE'');');
     ALTER TABLE Transactions ADD CONSTRAINT CHK_Trans_Status
-        CHECK (status IN ('LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'));
+        CHECK (status IN ('COMPLETED', 'CANCELLED', 'LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'));
 END
 GO
 

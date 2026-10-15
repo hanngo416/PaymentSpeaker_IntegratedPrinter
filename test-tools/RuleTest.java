@@ -52,7 +52,7 @@ public class RuleTest {
 
         // Order missing or closed
         check("no order", engine.evaluate(new RuleContext(tx("40000"), null, 0, 0)), "NO_ORDER");
-        check("order already paid", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.PAID), 0, 0)), "ORDER_NOT_PENDING");
+        check("order already paid", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.COMPLETED), 0, 0)), "ORDER_NOT_PENDING");
         check("order expired", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.EXPIRED), 0, 0)), "ORDER_NOT_PENDING");
 
         // Expired order: judged by the bank time, not by the time the server saw the transfer
@@ -80,7 +80,7 @@ public class RuleTest {
 
         // Rule precedence
         check("duplicate wins first", engine.evaluate(new RuleContext(tx("50000"), null, 1, 0)), "DUP_TRANS");
-        check("duplicate beats closed order", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.PAID), 1, 0)), "DUP_TRANS");
+        check("duplicate beats closed order", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.COMPLETED), 1, 0)), "DUP_TRANS");
         check("second equal transfer of an order is a duplicate", engine.evaluate(new RuleContext(tx("50000"), order("50000", OrderStatus.PENDING), 1, 0)), "DUP_TRANS");
 
         // High amount boundary (threshold is 5,000,000 and it is inclusive)
