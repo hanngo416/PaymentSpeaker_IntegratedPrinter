@@ -35,6 +35,12 @@
                 <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
                     <a href="${ctx}/printer" class="${nav == 'printer' ? 'active' : ''}">Printer</a>
                 </c:if>
+                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                    <a href="${ctx}/shift" class="${nav == 'shift' ? 'active' : ''}">Shift</a>
+                </c:if>
+                <c:if test="${role == 'ADMIN' || role == 'AUDITOR'}">
+                    <a href="${ctx}/invoices" class="${nav == 'invoices' ? 'active' : ''}">Invoices</a>
+                </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
                     <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
                 </c:if>

@@ -1,0 +1,34 @@
+<%-- Money table of a report: what the paid orders should have brought in against what the account and the drawer really hold --%>
+<table>
+    <tbody>
+    <tr><td>Paid orders</td><td class="num">${report.summary.orderCount}</td></tr>
+    <tr><td>Order total</td><td class="num"><fmt:formatNumber value="${report.summary.total}" pattern="#,##0"/> VND</td></tr>
+    <tr><td>Cash that should be in the drawer</td><td class="num"><fmt:formatNumber value="${report.summary.cash}" pattern="#,##0"/> VND</td></tr>
+    <tr><td>Expected in the account (QR)</td><td class="num"><fmt:formatNumber value="${report.summary.transfer}" pattern="#,##0"/> VND</td></tr>
+    <tr><td>Received in the account (${report.summary.bankCount} transfers)</td><td class="num"><fmt:formatNumber value="${report.summary.bankReceived}" pattern="#,##0"/> VND</td></tr>
+    <tr>
+        <td>Account difference</td>
+        <td class="num"><span class="pill ${report.summary.bankDiff.signum() == 0 ? 'LEGIT' : 'HIGH'}"><fmt:formatNumber value="${report.summary.bankDiff}" pattern="#,##0"/> VND</span></td>
+    </tr>
+    <c:if test="${report.shift != null || not empty report.shifts}">
+        <tr>
+            <td>Cash counted in the drawer</td>
+            <td class="num">
+                <c:choose>
+                    <c:when test="${report.countedCash != null}"><fmt:formatNumber value="${report.countedCash}" pattern="#,##0"/> VND</c:when>
+                    <c:otherwise>not counted yet</c:otherwise>
+                </c:choose>
+            </td>
+        </tr>
+        <c:if test="${report.cashDiff != null}">
+            <tr>
+                <td>Drawer difference</td>
+                <td class="num"><span class="pill ${report.cashDiff.signum() == 0 ? 'LEGIT' : 'HIGH'}"><fmt:formatNumber value="${report.cashDiff}" pattern="#,##0"/> VND</span></td>
+            </tr>
+        </c:if>
+    </c:if>
+    </tbody>
+</table>
+<c:if test="${report.summary.pendingOrders > 0}">
+    <p class="hint">${report.summary.pendingOrders} order(s) are still waiting for the customer and are not counted.</p>
+</c:if>
