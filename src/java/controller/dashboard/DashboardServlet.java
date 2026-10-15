@@ -31,7 +31,7 @@ import util.TxChart;
  *
  * @author PC
  */
-@WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboard"})
+@WebServlet(name = "DashboardServlet", urlPatterns = {"/home", "/dashboard"})
 public class DashboardServlet extends HttpServlet {
 
     private static final int DAYS = 7;
@@ -52,6 +52,10 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if ("/dashboard".equals(request.getServletPath())) {
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
         User actor = (User) request.getSession().getAttribute(LoginServlet.SESSION_USER);
         boolean canTransactions = RolePermissions.has(actor.getRole(), Permission.TRANSACTION_READ);
         boolean canAlerts = RolePermissions.has(actor.getRole(), Permission.ALERT_READ);
@@ -101,11 +105,14 @@ public class DashboardServlet extends HttpServlet {
         request.setAttribute("flaggedToday", TxChart.money(flaggedToday));
         request.setAttribute("countToday", countToday);
         request.setAttribute("recent", recent);
-        request.setAttribute("bars", TxChart.bars(days));
+        BigDecimal ceiling = TxChart.ceiling(days);
+        request.setAttribute("bars", TxChart.bars(days, ceiling));
+        request.setAttribute("ticks", TxChart.ticks(ceiling));
         request.setAttribute("chartWidth", TxChart.WIDTH);
         request.setAttribute("chartHeight", TxChart.HEIGHT);
         request.setAttribute("chartLeft", TxChart.LEFT);
-        request.setAttribute("chartMax", TxChart.money(TxChart.max(days)));
+        request.setAttribute("chartTop", TxChart.TOP);
+        request.setAttribute("chartMax", TxChart.money(ceiling));
     }
 
     /**

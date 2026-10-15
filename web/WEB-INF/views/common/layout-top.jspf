@@ -7,8 +7,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light only">
     <title><c:out value="${pageTitle}"/></title>
-    <link rel="stylesheet" href="${ctx}/assets/css/app.css">
+    <link rel="stylesheet" href="${ctx}/assets/css/app.css?v=18">
 </head>
 <body>
 <div class="shell">
@@ -18,9 +19,13 @@
                 <div class="brand-mark">T</div>
                 <span class="brand-name">Tinky</span>
             </div>
+            <input type="checkbox" id="navToggle" class="nav-toggle" aria-hidden="true" tabindex="-1">
+            <label for="navToggle" class="nav-burger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </label>
             <nav class="nav">
-                <a href="${ctx}/dashboard" class="${nav == 'home' ? 'active' : ''}">Home</a>
-                <c:if test="${role == 'CASHIER'}">
+                <a href="${ctx}/home" class="${nav == 'home' ? 'active' : ''}">Home</a>
+                <c:if test="${role == 'CASHIER' || role == 'ADMIN'}">
                     <a href="${ctx}/orders/new" class="${nav == 'orders' ? 'active' : ''}">Create payment order</a>
                 </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
@@ -28,12 +33,6 @@
                 </c:if>
                 <c:if test="${role != 'TECHNICIAN'}">
                     <a href="${ctx}/transactions" class="${nav == 'transactions' ? 'active' : ''}">Transactions</a>
-                </c:if>
-                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
-                    <a href="${ctx}/speaker" class="${nav == 'speaker' ? 'active' : ''}">Sound</a>
-                </c:if>
-                <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
-                    <a href="${ctx}/printer" class="${nav == 'printer' ? 'active' : ''}">Printer</a>
                 </c:if>
                 <c:if test="${role == 'CASHIER' || role == 'ADMIN' || role == 'STORE_MANAGER'}">
                     <a href="${ctx}/shift" class="${nav == 'shift' ? 'active' : ''}">Shift</a>
@@ -44,9 +43,6 @@
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
                     <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
                 </c:if>
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'TECHNICIAN'}">
-                    <a href="${ctx}/admin/devices" class="${nav == 'devices' ? 'active' : ''}">Devices</a>
-                </c:if>
                 <%-- Maintenance tickets are hidden for now; remove this comment to show the menu item again
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'CASHIER' || role == 'TECHNICIAN'}">
                     <a href="${ctx}/tickets" class="${nav == 'tickets' ? 'active' : ''}">Maintenance tickets</a>
@@ -55,21 +51,35 @@
                 <c:if test="${role == 'ADMIN' || role == 'AUDITOR'}">
                     <a href="${ctx}/admin/audit" class="${nav == 'audit' ? 'active' : ''}">Audit log</a>
                 </c:if>
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'CASHIER' || role == 'TECHNICIAN'}">
+                    <a href="${ctx}/settings" class="${nav == 'settings' ? 'active' : ''}">Settings</a>
+                </c:if>
                 <a href="${ctx}/profile" class="${nav == 'profile' ? 'active' : ''}">Profile</a>
             </nav>
         </div>
-        <form method="post" action="${ctx}/logout" class="sidebar-foot">
-            <button type="submit">Logout</button>
-        </form>
+        <div class="sidebar-foot">
+            <div class="sidebar-user">
+                <span class="avatar"><c:out value="${fn:toUpperCase(fn:substring(me.fullName, 0, 1))}"/></span>
+                <div class="user-meta">
+                    <span class="user-name" title="<c:out value='${me.fullName}'/>"><c:out value="${me.fullName}"/></span>
+                    <span class="user-role-pill"><c:out value="${role}"/></span>
+                </div>
+            </div>
+            <form method="post" action="${ctx}/logout" class="sidebar-logout">
+                <button type="submit">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </form>
+        </div>
     </aside>
     <div class="main">
         <header class="topbar">
             <div class="topbar-title"><c:out value="${pageTitle}"/></div>
-            <div class="user-chip">
-                <span class="avatar"><c:out value="${fn:toUpperCase(fn:substring(me.fullName, 0, 1))}"/></span>
-                <span class="user-name"><c:out value="${me.fullName}"/> (<c:out value="${me.userCode}"/>)</span>
-                <span class="pill"><c:out value="${role}"/></span>
-            </div>
         </header>
         <main class="content">
             <c:if test="${newAlertCount > 0 && (role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'CASHIER')}">

@@ -44,6 +44,8 @@ public final class AccessPolicy {
             new Rule("/transactions", TRANSACTION_READ, TRANSACTION_READ),
             new Rule("/alerts", ALERT_READ, ALERT_WRITE),
             new Rule("/tickets", TICKET_WRITE, TICKET_WRITE),
+            new Rule("/settings", DASHBOARD_READ, DASHBOARD_READ),
+            new Rule("/home", DASHBOARD_READ, DASHBOARD_READ),
             new Rule("/dashboard", DASHBOARD_READ, DASHBOARD_READ)
     );
 
