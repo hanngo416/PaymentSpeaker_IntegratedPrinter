@@ -60,7 +60,6 @@ public class UserEditServlet extends HttpServlet {
         boolean creating = id == null;
 
         User u = new User();
-        u.setUserCode(request.getParameter("userCode"));
         u.setFullName(request.getParameter("fullName"));
         u.setEmail(request.getParameter("email"));
         u.setRole(parseRole(request.getParameter("role")));

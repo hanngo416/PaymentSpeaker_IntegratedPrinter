@@ -14,28 +14,21 @@
             <input type="hidden" name="id" value="${u.userId}">
         </c:if>
 
-        <label>User code
-            <c:choose>
-                <c:when test="${creating}">
-                    <input type="text" name="userCode" required minlength="3" maxlength="50"
-                           pattern="[A-Za-z0-9_.]{3,50}" value="<c:out value='${u.userCode}'/>">
-                    <span class="hint">Letters, digits, dot and underscore. Cannot be changed later.</span>
-                </c:when>
-                <c:otherwise>
-                    <input type="text" value="<c:out value='${u.userCode}'/>" disabled>
-                </c:otherwise>
-            </c:choose>
-            <c:if test="${not empty errors.userCode}"><div class="field-error"><c:out value="${errors.userCode}"/></div></c:if>
-        </label>
+        <c:if test="${not creating}">
+            <label>User code
+                <input type="text" value="<c:out value='${u.userCode}'/>" disabled>
+            </label>
+        </c:if>
 
         <label>Full name
-            <input type="text" name="fullName" required maxlength="100" value="<c:out value='${u.fullName}'/>">
+            <input type="text" name="fullName" id="fullName" required minlength="2" maxlength="100" value="<c:out value='${u.fullName}'/>">
+            <span class="hint">Letters, spaces, dot, apostrophe and hyphen only.</span>
             <c:if test="${not empty errors.fullName}"><div class="field-error"><c:out value="${errors.fullName}"/></div></c:if>
         </label>
 
         <label>Email (used for OTP and Google login)
             <input type="email" name="email" required maxlength="256" value="<c:out value='${u.email}'/>">
-            <c:if test="${not creating}"><span class="hint">Changing the email also unlinks the Google account.</span></c:if>
+            <span class="hint"><c:choose><c:when test="${creating}">The user code is made from the part before the @.</c:when><c:otherwise>Changing the email also unlinks the Google account.</c:otherwise></c:choose></span>
             <c:if test="${not empty errors.email}"><div class="field-error"><c:out value="${errors.email}"/></div></c:if>
         </label>
 
@@ -60,5 +53,16 @@
     </form>
 </div>
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
+<script>
+    (function () {
+        var name = document.getElementById('fullName');
+        var rule = /^[\p{L}][\p{L} .'-]{1,99}$/u;
+        function check() {
+            name.setCustomValidity(rule.test(name.value.trim()) ? '' : 'Use 2-100 letters, spaces, dot, apostrophe or hyphen (no digits).');
+        }
+        name.addEventListener('input', check);
+        check();
+    })();
+</script>
 </body>
 </html>

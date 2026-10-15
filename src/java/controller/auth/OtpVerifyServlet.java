@@ -84,7 +84,7 @@ public class OtpVerifyServlet extends HttpServlet {
                     LOG.log(Level.INFO, "OTP_LOGIN_OK user={0} ip={1}",
                             new Object[]{user.getUserCode(), request.getRemoteAddr()});
                     LoginServlet.startSession(request, authService.forSession(user));
-                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                    response.sendRedirect(request.getContextPath() + "/home");
                     return;
                 case WRONG_CODE:
                     showForm(request, response, "Wrong code. Please try again.");

@@ -24,7 +24,6 @@ import service.GoogleOAuthService;
 @WebServlet(name = "GoogleCallbackServlet", urlPatterns = {"/login/google/callback"})
 public class GoogleCallbackServlet extends HttpServlet {
 
-    private static final String LOGIN_VIEW = "/WEB-INF/views/auth/login.jsp";
     private static final Logger LOG = Logger.getLogger(GoogleCallbackServlet.class.getName());
 
     private final AuthService authService = new AuthService();
@@ -78,7 +77,10 @@ public class GoogleCallbackServlet extends HttpServlet {
                 LOG.log(Level.INFO, "GOOGLE_LOGIN_OK user={0} ip={1}",
                         new Object[]{result.getUser().getUserCode(), request.getRemoteAddr()});
                 LoginServlet.startSession(request, result.getUser());
-                response.sendRedirect(request.getContextPath() + "/dashboard");
+                response.sendRedirect(request.getContextPath() + "/home");
+                return;
+            case NOT_REGISTERED:
+                showLogin(request, response, "This Google account is not registered. Please contact an administrator.");
                 return;
             case PENDING:
                 showLogin(request, response, "Your account is waiting for an administrator to approve it and give it a role. Please try again later.");
@@ -105,8 +107,9 @@ public class GoogleCallbackServlet extends HttpServlet {
     }// </editor-fold>
 
     private void showLogin(HttpServletRequest request, HttpServletResponse response, String error)
-            throws ServletException, IOException {
-        request.setAttribute("error", error);
-        request.getRequestDispatcher(LOGIN_VIEW).forward(request, response);
+            throws IOException {
+        HttpSession session = request.getSession(true);
+        session.setAttribute("loginError", error);
+        response.sendRedirect(request.getContextPath() + "/login");
     }
 }

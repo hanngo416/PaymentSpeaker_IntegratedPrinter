@@ -36,9 +36,16 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute(SESSION_USER) != null) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
-            return;
+        if (session != null) {
+            if (session.getAttribute(SESSION_USER) != null) {
+                response.sendRedirect(request.getContextPath() + "/home");
+                return;
+            }
+            String flashError = (String) session.getAttribute("loginError");
+            if (flashError != null) {
+                session.removeAttribute("loginError");
+                request.setAttribute("error", flashError);
+            }
         }
         request.getRequestDispatcher(VIEW).forward(request, response);
     }

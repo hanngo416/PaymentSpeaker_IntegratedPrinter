@@ -72,11 +72,6 @@ public class UserDAO {
             = "INSERT INTO Users (user_code, full_name, email, role_id, status) "
             + "VALUES (?, ?, ?, (SELECT role_id FROM Roles WHERE role_name = ?), N'ACTIVE')";
 
-    // A self-registered account: the role is only a placeholder (CASHIER) because role_id cannot be empty; it cannot sign in until an admin approves it
-    private static final String INSERT_PENDING
-            = "INSERT INTO Users (user_code, full_name, email, google_id, role_id, status) "
-            + "VALUES (?, ?, ?, ?, (SELECT role_id FROM Roles WHERE role_name = N'CASHIER'), N'PENDING')";
-
     private static final String APPROVE_USER
             = "UPDATE Users SET role_id = (SELECT role_id FROM Roles WHERE role_name = ?), status = N'ACTIVE' "
             + "WHERE user_id = ? AND status = N'PENDING'";
@@ -160,17 +155,6 @@ public class UserDAO {
             ps.setString(2, u.getFullName());
             ps.setString(3, u.getEmail());
             ps.setString(4, u.getRole().name());
-            ps.executeUpdate();
-        }
-    }
-
-    public void insertPending(String userCode, String fullName, String email, String googleId) throws SQLException {
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(INSERT_PENDING)) {
-            ps.setString(1, userCode);
-            ps.setString(2, fullName);
-            ps.setString(3, email);
-            ps.setString(4, googleId);
             ps.executeUpdate();
         }
     }
@@ -263,22 +247,6 @@ public class UserDAO {
                 return rs.getInt(1) > 0;
             }
         }
-    }
-
-    public String suggestNextUserCode(String baseCode) throws SQLException {
-        if (baseCode == null || baseCode.trim().isEmpty()) {
-            return "user1";
-        }
-        String trimmed = baseCode.trim();
-        String root = trimmed.replaceAll("\\d+$", "");
-        if (root.isEmpty()) {
-            root = trimmed;
-        }
-        int num = 2;
-        while (userCodeExists(root + num, 0)) {
-            num++;
-        }
-        return root + num;
     }
 
     private static String sortColumn(String sort) {

@@ -17,7 +17,7 @@ import model.enums.UserStatus;
  */
 public class AuthService {
 
-    public enum Status { OK, LOCKED, PENDING, EMAIL_NOT_VERIFIED, GOOGLE_MISMATCH }
+    public enum Status { OK, LOCKED, NOT_REGISTERED, PENDING, EMAIL_NOT_VERIFIED, GOOGLE_MISMATCH }
 
     public static class Result {
         private final Status status;
@@ -33,8 +33,6 @@ public class AuthService {
     }
 
     private static final Logger LOG = Logger.getLogger(AuthService.class.getName());
-    private static final int SQL_DUPLICATE_KEY = 2627;
-    private static final int SQL_DUPLICATE_INDEX = 2601;
 
     private final UserDAO userDAO = new UserDAO();
 
@@ -53,7 +51,7 @@ public class AuthService {
         }
         User user = userDAO.findByEmail(email);
         if (user == null) {
-            user = register(email, fullName, googleId);
+            return new Result(Status.NOT_REGISTERED, null);
         }
         if (user.getStatus() == UserStatus.LOCKED) {
             return new Result(Status.LOCKED, null);
@@ -67,38 +65,6 @@ public class AuthService {
             return new Result(Status.PENDING, null);
         }
         return new Result(Status.OK, forSession(user));
-    }
-
-    // First Google sign-in of an unknown email: open a PENDING account that an admin must approve
-    private User register(String email, String fullName, String googleId) throws SQLException {
-        String name = fullName == null || fullName.trim().isEmpty() ? email : fullName.trim();
-        if (name.length() > 100) {
-            name = name.substring(0, 100);
-        }
-        String code = userCodeFrom(email);
-        if (userDAO.userCodeExists(code, 0)) {
-            code = userDAO.suggestNextUserCode(code);
-        }
-        try {
-            userDAO.insertPending(code, name, email, googleId);
-            AuditService.log(null, "REGISTER_USER", "USER", code, "email", email);
-        } catch (SQLException e) {
-            // Two sign-ins at the same moment: the other one created it first, so use that account
-            if (e.getErrorCode() != SQL_DUPLICATE_KEY && e.getErrorCode() != SQL_DUPLICATE_INDEX) {
-                throw e;
-            }
-            LOG.log(Level.INFO, "REGISTER_RACE email={0}", email);
-        }
-        return userDAO.findByEmail(email);
-    }
-
-    // User code = the part of the email before @, keeping only letters, digits, dot and underscore (3-50 characters)
-    private static String userCodeFrom(String email) {
-        String local = email.substring(0, Math.max(email.indexOf('@'), 0)).replaceAll("[^A-Za-z0-9_.]", "");
-        if (local.length() < 3) {
-            local = "user";
-        }
-        return local.length() > 50 ? local.substring(0, 50) : local;
     }
 
     public User forSession(User user) {

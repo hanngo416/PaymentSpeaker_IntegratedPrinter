@@ -19,7 +19,7 @@ public class UserService {
 
     public enum Result { OK, SELF, LAST_ADMIN, NOT_FOUND, HAS_HISTORY, FORBIDDEN, PENDING }
 
-    private static final Pattern USER_CODE = Pattern.compile("^[A-Za-z0-9_.]{3,50}$");
+    private static final Pattern FULL_NAME = Pattern.compile("^\\p{L}[\\p{L} .'-]{1,99}$");
     private static final Pattern EMAIL = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final int SQL_FK_VIOLATION = 547;
 
@@ -49,30 +49,38 @@ public class UserService {
         u.setFullName(trim(u.getFullName()));
         u.setEmail(trim(u.getEmail()).toLowerCase());
 
-        if (creating) {
-            u.setUserCode(trim(u.getUserCode()));
-            if (!USER_CODE.matcher(u.getUserCode()).matches()) {
-                errors.put("userCode", "User code must be 3-50 characters: letters, digits, dot or underscore.");
-            } else if (userDAO.userCodeExists(u.getUserCode(), 0)) {
-                String suggested = userDAO.suggestNextUserCode(u.getUserCode());
-                errors.put("userCode", "User code '" + u.getUserCode() + "' is already taken. Suggested: '" + suggested + "'.");
-            }
-        }
-
-        if (u.getFullName().isEmpty() || u.getFullName().length() > 100) {
-            errors.put("fullName", "Full name is required and must be at most 100 characters.");
+        if (!FULL_NAME.matcher(u.getFullName()).matches()) {
+            errors.put("fullName", "Full name must be 2-100 characters: letters, spaces, dot, apostrophe or hyphen (no digits).");
         }
 
         if (u.getEmail().length() > 256 || !EMAIL.matcher(u.getEmail()).matches()) {
             errors.put("email", "Enter a valid email address.");
         } else if (userDAO.emailExists(u.getEmail(), creating ? 0 : u.getUserId())) {
             errors.put("email", "This email is already used by another account.");
+        } else if (creating) {
+            u.setUserCode(uniqueCodeFromEmail(u.getEmail()));
         }
 
         if (u.getRole() == null) {
             errors.put("role", "Choose a role.");
         }
         return errors;
+    }
+
+    // The user code is the part of the email before the @, kept to letters, digits, dot and underscore; a number is added when it is taken
+    private String uniqueCodeFromEmail(String email) throws SQLException {
+        String code = email.substring(0, email.indexOf('@')).toLowerCase().replaceAll("[^a-z0-9_.]", "_");
+        if (code.length() > 45) {
+            code = code.substring(0, 45);
+        }
+        while (code.length() < 3) {
+            code = code + "_";
+        }
+        String candidate = code;
+        for (int n = 2; userDAO.userCodeExists(candidate, 0); n++) {
+            candidate = code + n;
+        }
+        return candidate;
     }
 
     /** A manager only manages CASHIER accounts; an admin manages everyone. */
