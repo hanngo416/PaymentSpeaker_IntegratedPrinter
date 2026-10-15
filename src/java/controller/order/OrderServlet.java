@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.Order;
 import model.User;
 import service.OrderService;
+import service.ShiftService;
 
 /**
  *
@@ -30,6 +31,7 @@ public class OrderServlet extends HttpServlet {
     private static final String VIEW_ORDER = "/WEB-INF/views/order/view.jsp";
 
     private final OrderService orderService = new OrderService();
+    private final ShiftService shiftService = new ShiftService();
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -47,6 +49,9 @@ public class OrderServlet extends HttpServlet {
         try {
             switch (request.getServletPath()) {
                 case "/orders/new":
+                    if (!shiftOpen(request, response)) {
+                        break;
+                    }
                     showNewForm(request, response, user, null, null, null);
                     break;
                 case "/orders/view":
@@ -78,6 +83,9 @@ public class OrderServlet extends HttpServlet {
         try {
             switch (request.getServletPath()) {
                 case "/orders/new":
+                    if (!shiftOpen(request, response)) {
+                        break;
+                    }
                     createOrder(request, response, user);
                     break;
                 case "/orders/cancel":
@@ -100,6 +108,15 @@ public class OrderServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    // Orders belong to the open shift; without one the cashier is sent to the shift page to start it
+    private boolean shiftOpen(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+        if (shiftService.current() != null) {
+            return true;
+        }
+        response.sendRedirect(request.getContextPath() + "/shift?msg=noshift");
+        return false;
+    }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response, User user,
             String error, String amount, String cashAmount) throws SQLException, ServletException, IOException {
