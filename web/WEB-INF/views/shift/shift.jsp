@@ -18,24 +18,72 @@
             </form>
         </c:when>
         <c:otherwise>
-            <p>Shift <strong><c:out value="${shift.id}"/></strong> started by <strong><c:out value="${shift.openedBy}"/></strong>
-                at <fmt:formatDate value="${shift.openedAt}" pattern="yyyy-MM-dd HH:mm"/>.</p>
+            <div class="report-header" style="margin-top: 10px;">
+                <div>
+                    <span class="report-kicker">ACTIVE SHIFT</span>
+                    <h2 class="report-title">Shift <c:out value="${shift.id}"/></h2>
+                    <p class="hint" style="margin: 4px 0 0;">Started by <strong><c:out value="${shift.openedBy}"/></strong> at <fmt:formatDate value="${shift.openedAt}" pattern="yyyy-MM-dd HH:mm"/>.</p>
+                </div>
+                <span class="pill NEW" style="font-size: var(--fs-xs); padding: 4px 10px;">IN PROGRESS</span>
+            </div>
             <%@ include file="/WEB-INF/views/shift/summary.jspf" %>
-            <form method="post" action="${ctx}/shift" class="filters">
-                <input type="hidden" name="action" value="close">
-                <label>Cash counted in the drawer (VND)
-                    <input type="text" name="counted" inputmode="numeric" required placeholder="0 if the drawer is empty">
-                </label>
-                <button type="submit" class="primary">End shift and print</button>
-            </form>
-            <c:if test="${isAdmin}">
-                <form method="post" action="${ctx}/shift"
-                      onsubmit="return confirm('Close this shift without a cash count?');">
-                    <input type="hidden" name="action" value="force">
-                    <button type="submit" class="danger">Force close (admin)</button>
-                    <span class="hint">For a shift that was forgotten. The drawer is not counted.</span>
+            <div class="shift-close-section">
+                <div class="shift-close-header">
+                    <div>
+                        <h3 class="shift-close-title">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <path d="M6 12h.01M18 12h.01"></path>
+                            </svg>
+                            End Shift &amp; Cash Reconciliation
+                        </h3>
+                        <p class="shift-close-subtitle">Count the physical currency in the cash drawer to close out the shift and generate the print receipt.</p>
+                    </div>
+                </div>
+
+                <form method="post" action="${ctx}/shift" class="shift-close-form">
+                    <input type="hidden" name="action" value="close">
+                    <div class="shift-close-row">
+                        <div class="shift-input-col">
+                            <label for="cashCounted" class="pos-field-label">Actual cash counted in drawer</label>
+                            <div class="shift-amount-input-wrap">
+                                <input id="cashCounted" class="shift-amount-input" type="text" name="counted" inputmode="numeric"
+                                       placeholder="0" ${isAdmin ? '' : 'required'} autocomplete="off">
+                                <span class="shift-currency-suffix">VND</span>
+                            </div>
+                            <span class="hint">Type 0 if the drawer is empty or all orders were paid via VietQR.<c:if test="${isAdmin}"> Admin may leave this empty.</c:if></span>
+                        </div>
+                        <div class="shift-btn-col">
+                            <button type="submit" class="btn-end-shift">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                    <rect x="6" y="14" width="12" height="8"></rect>
+                                </svg>
+                                <span>End shift and print</span>
+                            </button>
+                        </div>
+                    </div>
                 </form>
-            </c:if>
+
+                <c:if test="${isAdmin}">
+                    <div class="shift-force-bar">
+                        <div class="force-text">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span>Forgotten shift? Close immediately without drawer cash audit.</span>
+                        </div>
+                        <form method="post" action="${ctx}/shift" onsubmit="return confirm('Close this shift without a cash count?');" class="inline">
+                            <input type="hidden" name="action" value="force">
+                            <button type="submit" class="btn-action btn-danger-soft">Force close (admin)</button>
+                        </form>
+                    </div>
+                </c:if>
+            </div>
         </c:otherwise>
     </c:choose>
 </div>
@@ -55,7 +103,7 @@
     <h2>Recent shifts</h2>
     <table>
         <thead>
-        <tr><th>Shift</th><th>Opened</th><th>By</th><th>Closed</th><th>By</th><th>Counted cash</th><th>Summary</th></tr>
+        <tr><th>Shift</th><th>Opened</th><th>By</th><th>Closed</th><th>By</th><th class="num" style="text-align: right;">Counted cash</th><th>Summary</th></tr>
         </thead>
         <tbody>
         <c:forEach var="s" items="${recent}">

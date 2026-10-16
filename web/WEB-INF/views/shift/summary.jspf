@@ -1,34 +1,149 @@
-<%-- Money table of a report: what the paid orders should have brought in against what the account and the drawer really hold --%>
-<table>
-    <tbody>
-    <tr><td>Paid orders</td><td class="num">${report.summary.orderCount}</td></tr>
-    <tr><td>Order total</td><td class="num"><fmt:formatNumber value="${report.summary.total}" pattern="#,##0"/> VND</td></tr>
-    <tr><td>Cash that should be in the drawer</td><td class="num"><fmt:formatNumber value="${report.summary.cash}" pattern="#,##0"/> VND</td></tr>
-    <tr><td>Expected in the account (QR)</td><td class="num"><fmt:formatNumber value="${report.summary.transfer}" pattern="#,##0"/> VND</td></tr>
-    <tr><td>Received in the account (${report.summary.bankCount} transfers)</td><td class="num"><fmt:formatNumber value="${report.summary.bankReceived}" pattern="#,##0"/> VND</td></tr>
-    <tr>
-        <td>Account difference</td>
-        <td class="num"><span class="pill ${report.summary.bankDiff.signum() == 0 ? 'LEGIT' : 'HIGH'}"><fmt:formatNumber value="${report.summary.bankDiff}" pattern="#,##0"/> VND</span></td>
-    </tr>
-    <c:if test="${report.shift != null || not empty report.shifts}">
-        <tr>
-            <td>Cash counted in the drawer</td>
-            <td class="num">
-                <c:choose>
-                    <c:when test="${report.countedCash != null}"><fmt:formatNumber value="${report.countedCash}" pattern="#,##0"/> VND</c:when>
-                    <c:otherwise>not counted yet</c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
-        <c:if test="${report.cashDiff != null}">
+<div class="report-kpis">
+    <div class="report-kpi-card">
+        <span class="kpi-label">Total Sales</span>
+        <div class="kpi-value accent">
+            <fmt:formatNumber value="${report.summary.total}" pattern="#,##0"/> <span class="kpi-unit">VND</span>
+        </div>
+        <div class="kpi-sub">
+            <span>${report.summary.orderCount} paid order(s)</span>
+        </div>
+    </div>
+    <div class="report-kpi-card">
+        <span class="kpi-label">Bank QR Received</span>
+        <div class="kpi-value">
+            <fmt:formatNumber value="${report.summary.bankReceived}" pattern="#,##0"/> <span class="kpi-unit">VND</span>
+        </div>
+        <div class="kpi-sub">
+            <span>${report.summary.bankCount} transfer(s)</span>
+            <span class="pill ${report.summary.bankDiff.signum() == 0 ? 'COMPLETED' : 'HIGH'}" style="font-size: 11px; padding: 2px 7px;">
+                ${report.summary.bankDiff.signum() == 0 ? 'Balanced' : 'Mismatch'}
+            </span>
+        </div>
+    </div>
+    <div class="report-kpi-card">
+        <span class="kpi-label">Cash in Drawer</span>
+        <div class="kpi-value">
+            <c:choose>
+                <c:when test="${report.countedCash != null}">
+                    <fmt:formatNumber value="${report.countedCash}" pattern="#,##0"/> <span class="kpi-unit">VND</span>
+                </c:when>
+                <c:otherwise>
+                    <fmt:formatNumber value="${report.summary.cash}" pattern="#,##0"/> <span class="kpi-unit">VND</span>
+                </c:otherwise>
+            </c:choose>
+        </div>
+        <div class="kpi-sub">
+            <c:choose>
+                <c:when test="${report.countedCash != null}">
+                    <span>Counted</span>
+                    <span class="pill ${report.cashDiff.signum() == 0 ? 'COMPLETED' : 'HIGH'}" style="font-size: 11px; padding: 2px 7px;">
+                        ${report.cashDiff.signum() == 0 ? 'Matched' : 'Discrepancy'}
+                    </span>
+                </c:when>
+                <c:otherwise>
+                    <span>Expected from orders</span>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</div>
+
+<div class="report-grid">
+    <div class="report-panel">
+        <div class="report-panel-header">
+            <h3>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                Bank Reconciliation (VietQR)
+            </h3>
+        </div>
+        <table class="report-table">
+            <tbody>
             <tr>
-                <td>Drawer difference</td>
-                <td class="num"><span class="pill ${report.cashDiff.signum() == 0 ? 'LEGIT' : 'HIGH'}"><fmt:formatNumber value="${report.cashDiff}" pattern="#,##0"/> VND</span></td>
+                <td class="label">Expected in account (QR orders)</td>
+                <td class="value"><fmt:formatNumber value="${report.summary.transfer}" pattern="#,##0"/> VND</td>
             </tr>
-        </c:if>
-    </c:if>
-    </tbody>
-</table>
+            <tr>
+                <td class="label">Received in account (${report.summary.bankCount} transfers)</td>
+                <td class="value"><fmt:formatNumber value="${report.summary.bankReceived}" pattern="#,##0"/> VND</td>
+            </tr>
+            <tr class="highlight">
+                <td class="label">Account difference</td>
+                <td class="value">
+                    <span class="pill ${report.summary.bankDiff.signum() == 0 ? 'COMPLETED' : 'HIGH'}">
+                        <c:choose>
+                            <c:when test="${report.summary.bankDiff.signum() == 0}">Matched (0 VND)</c:when>
+                            <c:otherwise><fmt:formatNumber value="${report.summary.bankDiff}" pattern="#,##0"/> VND</c:otherwise>
+                        </c:choose>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="report-panel">
+        <div class="report-panel-header">
+            <h3>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="6" y1="12" x2="18" y2="12"></line>
+                    <circle cx="12" cy="16" r="1"></circle>
+                </svg>
+                Cash Drawer Reconciliation
+            </h3>
+        </div>
+        <table class="report-table">
+            <tbody>
+            <tr>
+                <td class="label">Cash expected from orders</td>
+                <td class="value"><fmt:formatNumber value="${report.summary.cash}" pattern="#,##0"/> VND</td>
+            </tr>
+            <tr>
+                <td class="label">Cash counted in drawer</td>
+                <td class="value">
+                    <c:choose>
+                        <c:when test="${report.countedCash != null}">
+                            <fmt:formatNumber value="${report.countedCash}" pattern="#,##0"/> VND
+                        </c:when>
+                        <c:otherwise>
+                            <span style="color: var(--muted); font-style: italic;">not counted yet</span>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+            </tr>
+            <tr class="highlight">
+                <td class="label">Drawer difference</td>
+                <td class="value">
+                    <c:choose>
+                        <c:when test="${report.cashDiff != null}">
+                            <span class="pill ${report.cashDiff.signum() == 0 ? 'COMPLETED' : 'HIGH'}">
+                                <c:choose>
+                                    <c:when test="${report.cashDiff.signum() == 0}">Matched (0 VND)</c:when>
+                                    <c:otherwise><fmt:formatNumber value="${report.cashDiff}" pattern="#,##0"/> VND</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="pill" style="opacity: 0.75; font-size: 11px;">Awaiting closing count</span>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <c:if test="${report.summary.pendingOrders > 0}">
-    <p class="hint">${report.summary.pendingOrders} order(s) are still waiting for the customer and are not counted.</p>
+    <div class="report-notice">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>${report.summary.pendingOrders} order(s) are still waiting for customer payment and are not counted in these totals.</span>
+    </div>
 </c:if>

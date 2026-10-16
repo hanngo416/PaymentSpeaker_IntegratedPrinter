@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
+import model.enums.Role;
 import model.view.ShiftRow;
 
 /**
@@ -43,7 +44,8 @@ public class ShiftService {
             throw new IllegalStateException(NOT_OPEN);
         }
         JsonObject detail = new JsonObject();
-        if (force) {
+        boolean adminSkipsCount = user.getRole() == Role.ADMIN && (rawCounted == null || rawCounted.trim().isEmpty());
+        if (force || adminSkipsCount) {
             detail.addProperty("forced", "true");
         } else {
             detail.addProperty("counted_cash", String.valueOf(parseCash(rawCounted)));

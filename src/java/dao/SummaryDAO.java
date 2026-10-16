@@ -23,7 +23,7 @@ public class SummaryDAO {
         try (Connection con = DBUtil.getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(
                     "SELECT COUNT(*), ISNULL(SUM(amount), 0), ISNULL(SUM(cash_amount), 0) FROM Orders "
-                    + "WHERE status = N'PAID' AND created_at >= ? AND created_at < ?")) {
+                    + "WHERE status IN (N'COMPLETED', N'PAID') AND created_at >= ? AND created_at < ?")) {
                 window(ps, from, to);
                 try (ResultSet rs = ps.executeQuery()) {
                     rs.next();
@@ -59,7 +59,7 @@ public class SummaryDAO {
         try (Connection con = DBUtil.getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(
                     "SELECT CONVERT(VARCHAR(" + labelLength + "), created_at, 120) AS k, COUNT(*), SUM(amount), SUM(cash_amount) "
-                    + "FROM Orders WHERE status = N'PAID' AND created_at >= ? AND created_at < ? "
+                    + "FROM Orders WHERE status IN (N'COMPLETED', N'PAID') AND created_at >= ? AND created_at < ? "
                     + "GROUP BY CONVERT(VARCHAR(" + labelLength + "), created_at, 120)")) {
                 window(ps, from, to);
                 try (ResultSet rs = ps.executeQuery()) {

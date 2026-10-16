@@ -115,7 +115,7 @@ public class InvoiceServlet extends HttpServlet {
         response.setHeader("Content-Disposition", "attachment; filename=\"invoices-" + report.getPeriod() + ".csv\"");
         PrintWriter out = response.getWriter();
         out.print('﻿');   // lets Excel read the file as UTF-8
-        out.print("Period,Paid orders,Order total,Cash,Expected by transfer,Received in account,Difference\r\n");
+        out.print("Period,Completed orders,Order total,Cash,Expected by transfer,Received in account,Difference\r\n");
         if (report.getRows().isEmpty()) {
             csvLine(out, report.getPeriod(), report.getSummary());
         } else {
