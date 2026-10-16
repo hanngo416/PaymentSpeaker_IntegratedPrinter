@@ -37,7 +37,7 @@ public class OrderDAO {
             ps.setInt(3, order.getCreatedBy());
             ps.setBigDecimal(4, order.getAmount());
             ps.setBigDecimal(5, order.getCashAmount());
-            ps.setString(6, OrderStatus.PENDING.name());
+            ps.setString(6, order.getStatus() != null ? order.getStatus().name() : OrderStatus.PENDING.name());
             ps.setString(7, order.getQrContent());
             ps.setInt(8, validMinutes);
             ps.executeUpdate();
@@ -82,7 +82,7 @@ public class OrderDAO {
 
     // Mark expired orders
     public void expireOverdue() throws SQLException {
-        String sql = "UPDATE Orders SET status = N'EXPIRED' WHERE status = N'PENDING' AND expires_at < GETDATE()";
+        String sql = "UPDATE Orders SET status = N'CANCELLED' WHERE status = N'PENDING' AND expires_at < GETDATE()";
         try (Connection con = DBUtil.getConnection();
              Statement st = con.createStatement()) {
             st.execute(sql);

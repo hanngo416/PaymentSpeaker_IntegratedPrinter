@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import model.Order;
 import model.User;
+import model.enums.OrderStatus;
 import model.enums.Role;
 import util.AppConfig;
 import util.SqlErrors;
@@ -38,10 +39,11 @@ public class OrderService {
         if (cash < 0) {
             throw new IllegalArgumentException("Cash amount cannot be negative.");
         }
-        if (cash >= amount) {
-            throw new IllegalArgumentException("Cash amount must be less than order total (cannot be 100% cash for QR orders).");
+        if (cash > amount) {
+            throw new IllegalArgumentException("Cash amount cannot exceed order total.");
         }
-        long transfer = amount - cash;
+        boolean isAllCash = (cash == amount);
+        long transfer = isAllCash ? 0 : (amount - cash);
 
         for (int attempt = 0; attempt < MAX_CODE_ATTEMPTS; attempt++) {
             String code = AppConfig.ORDER_PREFIX + String.format("%05d", RANDOM.nextInt(100000));
@@ -51,14 +53,16 @@ public class OrderService {
             order.setCreatedBy(user.getUserId());
             order.setAmount(BigDecimal.valueOf(amount));
             order.setCashAmount(BigDecimal.valueOf(cash));
-            order.setQrContent(VietQrUtil.buildImageUrl(transfer, code));
+            order.setStatus(isAllCash ? OrderStatus.COMPLETED : OrderStatus.PENDING);
+            order.setQrContent(isAllCash ? null : VietQrUtil.buildImageUrl(transfer, code));
             try {
                 orderDAO.insert(order, AppConfig.ORDER_MINUTES);
                 Order created = orderDAO.findByCode(code);
                 AuditService.log(user, "CREATE_ORDER", "ORDER", code,
                         "amount", String.valueOf(amount),
                         "cash", String.valueOf(cash),
-                        "transfer", String.valueOf(transfer));
+                        "transfer", String.valueOf(transfer),
+                        "status", order.getStatus().name());
                 return created;
             } catch (SQLException e) {
                 if (!SqlErrors.isDuplicateKey(e)) {

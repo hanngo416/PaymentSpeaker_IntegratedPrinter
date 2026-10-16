@@ -10,7 +10,8 @@ package model.enums;
  */
 public enum OrderStatus {
     PENDING,
+    COMPLETED,
+    CANCELLED,
     PAID,
-    EXPIRED,
-    CANCELLED
+    EXPIRED
 }
