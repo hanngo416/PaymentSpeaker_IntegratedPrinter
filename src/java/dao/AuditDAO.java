@@ -65,19 +65,48 @@ public class AuditDAO {
         }
     }
 
-    public Page<AuditRow> search(int page, int pageSize) throws SQLException {
+    // q matches the actor, the entity id or the detail; actions (any of), from and to may be null or empty
+    public Page<AuditRow> search(int page, int pageSize, String q, List<String> actions, java.sql.Date from, java.sql.Date to)
+            throws SQLException {
+        StringBuilder where = new StringBuilder("WHERE 1 = 1 ");
+        List<Object> args = new ArrayList<>();
+        if (q != null) {
+            where.append("AND (actor_username LIKE ? OR entity_id LIKE ? OR detail_json LIKE ?) ");
+            for (int k = 0; k < 3; k++) {
+                args.add("%" + q + "%");
+            }
+        }
+        if (actions != null && !actions.isEmpty()) {
+            StringBuilder marks = new StringBuilder();
+            for (String a : actions) {
+                marks.append(marks.length() == 0 ? "?" : ", ?");
+                args.add(a);
+            }
+            where.append("AND action IN (").append(marks).append(") ");
+        }
+        if (from != null) {
+            where.append("AND created_at >= ? ");
+            args.add(from);
+        }
+        if (to != null) {
+            where.append("AND created_at < DATEADD(DAY, 1, CAST(? AS DATETIME2)) ");
+            args.add(to);
+        }
         int total;
         List<AuditRow> items = new ArrayList<>();
         try (Connection con = DBUtil.getConnection()) {
-            try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM AuditLogs");
-                 ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                total = rs.getInt(1);
+            try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM AuditLogs " + where)) {
+                bind(ps, args, 0);
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    total = rs.getInt(1);
+                }
             }
             try (PreparedStatement ps = con.prepareStatement(
-                    COLUMNS + "ORDER BY log_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY")) {
-                ps.setInt(1, (page - 1) * pageSize);
-                ps.setInt(2, pageSize);
+                    COLUMNS + where + "ORDER BY log_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY")) {
+                bind(ps, args, 0);
+                ps.setInt(args.size() + 1, (page - 1) * pageSize);
+                ps.setInt(args.size() + 2, pageSize);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         items.add(map(rs));
@@ -86,6 +115,24 @@ public class AuditDAO {
             }
         }
         return new Page<>(items, total, page, pageSize);
+    }
+
+    private static void bind(PreparedStatement ps, List<Object> args, int offset) throws SQLException {
+        for (int k = 0; k < args.size(); k++) {
+            ps.setObject(offset + k + 1, args.get(k));
+        }
+    }
+
+    public List<String> findActions() throws SQLException {
+        List<String> list = new ArrayList<>();
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT DISTINCT action FROM AuditLogs ORDER BY action");
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+        }
+        return list;
     }
 
     // The whole chain, oldest first, for the integrity check
