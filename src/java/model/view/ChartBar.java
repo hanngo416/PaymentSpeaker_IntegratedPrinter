@@ -6,10 +6,16 @@ public class ChartBar {
     private String tip;
     private int x;
     private int width;
+    private int barWidth;
+    private int legitX;
     private int legitY;
     private int legitHeight;
+    private int flaggedX;
     private int flaggedY;
     private int flaggedHeight;
+    private int hitX;
+    private int hitWidth;
+    private int labelX;
 
     public String getLabel() {
         return label;
@@ -43,6 +49,22 @@ public class ChartBar {
         this.width = width;
     }
 
+    public int getBarWidth() {
+        return barWidth;
+    }
+
+    public void setBarWidth(int barWidth) {
+        this.barWidth = barWidth;
+    }
+
+    public int getLegitX() {
+        return legitX;
+    }
+
+    public void setLegitX(int legitX) {
+        this.legitX = legitX;
+    }
+
     public int getLegitY() {
         return legitY;
     }
@@ -59,6 +81,14 @@ public class ChartBar {
         this.legitHeight = legitHeight;
     }
 
+    public int getFlaggedX() {
+        return flaggedX;
+    }
+
+    public void setFlaggedX(int flaggedX) {
+        this.flaggedX = flaggedX;
+    }
+
     public int getFlaggedY() {
         return flaggedY;
     }
@@ -73,5 +103,29 @@ public class ChartBar {
 
     public void setFlaggedHeight(int flaggedHeight) {
         this.flaggedHeight = flaggedHeight;
+    }
+
+    public int getHitX() {
+        return hitX;
+    }
+
+    public void setHitX(int hitX) {
+        this.hitX = hitX;
+    }
+
+    public int getHitWidth() {
+        return hitWidth;
+    }
+
+    public void setHitWidth(int hitWidth) {
+        this.hitWidth = hitWidth;
+    }
+
+    public int getLabelX() {
+        return labelX;
+    }
+
+    public void setLabelX(int labelX) {
+        this.labelX = labelX;
     }
 }

@@ -29,9 +29,9 @@ public class TransactionDAO {
             + "(bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ISNULL(?, SYSDATETIME()))";
 
-    // Closes the order as PAID. The WHERE part refuses a transfer the order can no longer take (closed in the meantime).
+    // Closes the order as COMPLETED. The WHERE part refuses a transfer the order can no longer take (closed in the meantime).
     private static final String CREDIT_ORDER
-            = "UPDATE Orders SET status = N'PAID' WHERE order_id = ? AND status IN (N'PENDING', N'EXPIRED')";
+            = "UPDATE Orders SET status = N'COMPLETED' WHERE order_id = ? AND status IN (N'PENDING', N'EXPIRED')";
 
     private static final String INSERT_ALERT
             = "INSERT INTO FraudAlerts (trans_id, rule_code, reason, severity) VALUES (?, ?, ?, ?)";
@@ -53,7 +53,7 @@ public class TransactionDAO {
     private static final String SELECT_TO_ANNOUNCE
             = "SELECT TOP (?) t.trans_id, t.amount, t.trans_time, o.order_code FROM Transactions t "
             + "LEFT JOIN Orders o ON o.order_id = t.order_id "
-            + "WHERE t.status = N'LEGIT' AND t.announced = 0 "
+            + "WHERE t.status IN (N'COMPLETED', N'LEGIT') AND t.announced = 0 "
             + "AND t.received_at >= DATEADD(MINUTE, -?, SYSDATETIME()) "
             + "AND t.trans_time >= DATEADD(MINUTE, -?, SYSDATETIME()) "
             + "ORDER BY t.trans_id";
@@ -171,28 +171,7 @@ public class TransactionDAO {
     private static final String RECEIPT_SELECT
             = "SELECT t.trans_id, t.bank_trans_id, o.order_code, o.created_by_code, t.amount, o.amount AS order_amount, "
             + "ISNULL(o.cash_amount, 0) AS cash_amount, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
-            + "WHERE t.status = N'LEGIT' ";
-
-    // Money kept for an order, newest first, that can have a receipt. cashierId limits it to that cashier's orders (null = all)
-    public List<ReceiptRow> findPrintable(int limit, Integer cashierId) throws SQLException {
-        String sql = RECEIPT_SELECT + (cashierId == null ? "" : "AND o.created_by = ? ")
-                + "ORDER BY t.trans_time DESC, t.trans_id DESC OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
-        List<ReceiptRow> list = new ArrayList<>();
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            int i = 1;
-            if (cashierId != null) {
-                ps.setInt(i++, cashierId);
-            }
-            ps.setInt(i, limit);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapReceipt(rs));
-                }
-            }
-        }
-        return list;
-    }
+            + "WHERE t.status IN (N'COMPLETED', N'LEGIT') ";
 
     public ReceiptRow findReceipt(int transId, Integer cashierId) throws SQLException {
         String sql = RECEIPT_SELECT + "AND t.trans_id = ? " + (cashierId == null ? "" : "AND o.created_by = ?");
@@ -246,7 +225,7 @@ public class TransactionDAO {
                 }
             }
             String sql = "SELECT t.trans_id, t.bank_trans_id, o.order_code, t.amount, "
-                    + "t.content, t.status, t.trans_time" + FROM + where
+                    + "t.content, t.status, t.trans_time, o.created_by" + FROM + where
                     + " ORDER BY t.trans_time DESC, t.trans_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 bind(ps, params);
@@ -262,6 +241,8 @@ public class TransactionDAO {
                         r.setContent(rs.getString("content"));
                         r.setStatus(rs.getString("status"));
                         r.setTransTime(rs.getTimestamp("trans_time"));
+                        Object cb = rs.getObject("created_by");
+                        r.setCreatedBy(cb != null ? ((Number) cb).intValue() : null);
                         items.add(r);
                     }
                 }
@@ -274,8 +255,8 @@ public class TransactionDAO {
         List<Object> params = new ArrayList<>();
         String where = where(f, params);
         String sql = "SELECT CAST(t.trans_time AS DATE) AS day, "
-                + "SUM(CASE WHEN t.status = N'LEGIT' THEN t.amount ELSE 0 END) AS legit_total, "
-                + "SUM(CASE WHEN t.status <> N'LEGIT' THEN t.amount ELSE 0 END) AS flagged_total, "
+                + "SUM(CASE WHEN t.status IN (N'COMPLETED', N'LEGIT') THEN t.amount ELSE 0 END) AS legit_total, "
+                + "SUM(CASE WHEN t.status NOT IN (N'COMPLETED', N'LEGIT') THEN t.amount ELSE 0 END) AS flagged_total, "
                 + "COUNT(*) AS cnt" + FROM + where
                 + " GROUP BY CAST(t.trans_time AS DATE) ORDER BY CAST(t.trans_time AS DATE)";
         List<DayTotal> list = new ArrayList<>();
@@ -314,7 +295,7 @@ public class TransactionDAO {
             ps.setString(4, t.getContent());
             ps.setString(5, t.getBankAccount());
             ps.setString(6, t.getGateway());
-            ps.setString(7, label.name());
+            ps.setString(7, label == TxLabel.LEGIT ? "COMPLETED" : "CANCELLED");
             if (t.getTransTime() == null) {
                 ps.setNull(8, Types.TIMESTAMP);
             } else {
@@ -331,8 +312,14 @@ public class TransactionDAO {
     private static String where(TxFilter f, List<Object> params) {
         StringBuilder w = new StringBuilder(" WHERE 1 = 1");
         if (f.getLabel() != null) {
-            w.append(" AND t.status = ?");
-            params.add(f.getLabel());
+            if ("COMPLETED".equalsIgnoreCase(f.getLabel()) || "LEGIT".equalsIgnoreCase(f.getLabel())) {
+                w.append(" AND t.status IN (N'COMPLETED', N'LEGIT')");
+            } else if ("CANCELLED".equalsIgnoreCase(f.getLabel())) {
+                w.append(" AND t.status NOT IN (N'COMPLETED', N'LEGIT')");
+            } else {
+                w.append(" AND t.status = ?");
+                params.add(f.getLabel());
+            }
         }
         if (f.getFrom() != null) {
             w.append(" AND t.trans_time >= ?");

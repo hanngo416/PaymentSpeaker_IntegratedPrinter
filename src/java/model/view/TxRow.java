@@ -12,6 +12,7 @@ public class TxRow {
     private String content;
     private String status;
     private Timestamp transTime;
+    private Integer createdBy;
 
     public int getTransId() {
         return transId;
@@ -68,5 +69,13 @@ public class TxRow {
 
     public void setTransTime(Timestamp transTime) {
         this.transTime = transTime;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
     }
 }

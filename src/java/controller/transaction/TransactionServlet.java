@@ -43,7 +43,11 @@ public class TransactionServlet extends HttpServlet {
         TxFilter f = new TxFilter();
         f.setFrom(from);
         f.setTo(to);
-        f.setLabel(oneOfLabels(request.getParameter("label")));
+        String statusParam = request.getParameter("status");
+        if (statusParam == null || statusParam.trim().isEmpty()) {
+            statusParam = request.getParameter("label");
+        }
+        f.setLabel(oneOfLabels(statusParam));
         Integer page = parseInt(request.getParameter("page"));
         f.setPage(page == null || page < 1 ? 1 : page);
 
@@ -57,7 +61,7 @@ public class TransactionServlet extends HttpServlet {
 
             request.setAttribute("result", result);
             request.setAttribute("f", f);
-            request.setAttribute("labels", TxLabel.values());
+            request.setAttribute("labels", new String[]{"COMPLETED", "CANCELLED"});
             request.setAttribute("fromText", from == null ? "" : from.toString());
             request.setAttribute("toText", to == null ? "" : to.toString());
             request.setAttribute("filterQuery", filterQuery(f, from, to));
@@ -69,11 +73,14 @@ public class TransactionServlet extends HttpServlet {
             }
             request.setAttribute("sumValid", TxChart.money(sumValid));
             request.setAttribute("sumFlagged", TxChart.money(sumFlagged));
-            request.setAttribute("bars", TxChart.bars(days));
+            BigDecimal ceiling = TxChart.ceiling(days);
+            request.setAttribute("bars", TxChart.bars(days, ceiling));
+            request.setAttribute("ticks", TxChart.ticks(ceiling));
             request.setAttribute("chartWidth", TxChart.WIDTH);
             request.setAttribute("chartHeight", TxChart.HEIGHT);
             request.setAttribute("chartLeft", TxChart.LEFT);
-            request.setAttribute("chartMax", TxChart.money(TxChart.max(days)));
+            request.setAttribute("chartTop", TxChart.TOP);
+            request.setAttribute("chartMax", TxChart.money(ceiling));
         } catch (SQLException e) {
             throw new ServletException("Cannot load transactions", e);
         }
@@ -100,9 +107,16 @@ public class TransactionServlet extends HttpServlet {
     }
 
     private static String oneOfLabels(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        String v = value.trim().toUpperCase();
+        if ("COMPLETED".equals(v) || "CANCELLED".equals(v)) {
+            return v;
+        }
         for (TxLabel l : TxLabel.values()) {
-            if (l.name().equals(value)) {
-                return value;
+            if (l.name().equals(v)) {
+                return v;
             }
         }
         return null;

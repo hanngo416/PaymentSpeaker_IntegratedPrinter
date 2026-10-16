@@ -5,47 +5,13 @@
 <c:set var="nav" value="alerts"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <div class="card">
-    <div class="head-row">
-        <h1>Alert center</h1>
-    </div>
+    <h1>Alert center</h1>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
-    <div class="alert-summary-grid">
-        <div class="alert-stat-card stat-new">
-            <div class="stat-icon-wrap">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-            </div>
-            <div>
-                <span class="stat-label">New Alerts</span>
-                <strong class="stat-count">${empty counts['NEW'] ? 0 : counts['NEW']}</strong>
-            </div>
-        </div>
-        <div class="alert-stat-card stat-progress">
-            <div class="stat-icon-wrap">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
-            </div>
-            <div>
-                <span class="stat-label">In Progress</span>
-                <strong class="stat-count">${empty counts['IN_PROGRESS'] ? 0 : counts['IN_PROGRESS']}</strong>
-            </div>
-        </div>
-        <div class="alert-stat-card stat-resolved">
-            <div class="stat-icon-wrap">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            </div>
-            <div>
-                <span class="stat-label">Resolved</span>
-                <strong class="stat-count">${empty counts['RESOLVED'] ? 0 : counts['RESOLVED']}</strong>
-            </div>
-        </div>
-        <div class="alert-stat-card stat-dismissed">
-            <div class="stat-icon-wrap">
-                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
-            </div>
-            <div>
-                <span class="stat-label">Dismissed</span>
-                <strong class="stat-count">${empty counts['DISMISSED'] ? 0 : counts['DISMISSED']}</strong>
-            </div>
-        </div>
+    <div class="summary">
+        <span>New: <span class="pill NEW">${empty counts['NEW'] ? 0 : counts['NEW']}</span></span>
+        <span>In progress: <span class="pill IN_PROGRESS">${empty counts['IN_PROGRESS'] ? 0 : counts['IN_PROGRESS']}</span></span>
+        <span>Resolved: <span class="pill RESOLVED">${empty counts['RESOLVED'] ? 0 : counts['RESOLVED']}</span></span>
+        <span>Dismissed: <span class="pill DISMISSED">${empty counts['DISMISSED'] ? 0 : counts['DISMISSED']}</span></span>
     </div>
     <form method="get" action="${ctx}/alerts" class="filters">
         <label>Status
@@ -70,110 +36,181 @@
 </div>
 
 <div class="card">
-    <table class="table-alerts">
+    <table>
         <thead>
         <tr>
             <th>Time</th>
             <th>Rule</th>
             <th>Severity</th>
-            <th>Amount (VND)</th>
-            <th>Reason & Details</th>
-            <th>Status</th>
-            <th class="th-decision">${canWrite ? 'Decision' : 'Handled by'}</th>
+            <th style="width: 140px;">Amount (VND)</th>
+            <th>Reason</th>
+            <th style="width: 90px;">Status</th>
+            <th style="min-width: 180px; max-width: 280px;">${canWrite ? 'Actions' : 'Handled by'}</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach var="a" items="${result.items}">
             <tr>
-                <td class="cell-time"><fmt:formatDate value="${a.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                <td><span class="rule-code-badge"><c:out value="${a.ruleCode}"/></span></td>
+                <td><fmt:formatDate value="${a.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                <td><c:out value="${a.ruleCode}"/></td>
                 <td><span class="pill ${a.severity}"><c:out value="${a.severity}"/></span></td>
-                <td class="num"><fmt:formatNumber value="${a.amount}" pattern="#,##0"/></td>
-                <td class="cell-reason">
-                    <div class="reason-text"><c:out value="${a.reason}"/></div>
+                <td class="amount-cell"><fmt:formatNumber value="${a.amount}" pattern="#,##0"/></td>
+                <td class="wrap">
+                    <c:out value="${a.reason}"/>
                     <c:if test="${not empty a.content}">
-                        <div class="reason-snippet" title="<c:out value="${a.content}"/>">
-                            <span class="snippet-label">Tx:</span>
-                            <code><c:out value="${a.content}"/></code>
-                        </div>
+                        <br><small class="hint">Content: <c:out value="${a.content}"/></small>
                     </c:if>
                 </td>
                 <td><span class="pill ${a.status}"><c:out value="${a.status}"/></span></td>
-                <td class="cell-decision">
+                <td style="min-width: 180px; max-width: 280px;">
                     <c:choose>
                         <c:when test="${(a.status == 'NEW' || a.status == 'IN_PROGRESS') && canWrite}">
-                            <form method="post" action="${ctx}/alerts" class="alert-decision-form">
-                                <input type="hidden" name="id" value="${a.alertId}">
-                                <div class="alert-input-container">
-                                    <svg class="alert-input-icon" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                    </svg>
-                                    <input type="text" name="notes" maxlength="500" class="alert-input-field" placeholder="Ghi chú xử lý (bắt buộc khi Dismiss)...">
-                                </div>
-                                <div class="alert-action-btns">
-                                    <c:if test="${a.status == 'NEW'}">
-                                        <button type="submit" name="decision" value="IN_PROGRESS" class="btn-alert-action btn-alert-review" formnovalidate title="Bắt đầu xem xét alert này">
-                                            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
-                                            Start review
+                            <div class="actions" style="display: flex; gap: 6px; white-space: nowrap;">
+                                <c:if test="${a.status == 'NEW'}">
+                                    <form method="post" action="${ctx}/alerts" class="inline">
+                                        <input type="hidden" name="id" value="${a.alertId}">
+                                        <input type="hidden" name="decision" value="IN_PROGRESS">
+                                        <button type="submit" class="btn-action btn-review" title="Start reviewing this alert">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                            <span>Review</span>
                                         </button>
-                                    </c:if>
-                                    <button type="submit" name="decision" value="RESOLVED" class="btn-alert-action btn-alert-resolve" title="Xác nhận giải quyết thành công">
-                                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                        Resolve
-                                    </button>
-                                    <button type="submit" name="decision" value="DISMISSED" class="btn-alert-action btn-alert-dismiss" onclick="if(!this.form.notes.value.trim()){alert('Vui lòng nhập ghi chú lý do trước khi Dismiss!');this.form.notes.focus();return false;}" title="Bỏ qua cảnh báo (bắt buộc có ghi chú)">
-                                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                                        Dismiss
-                                    </button>
-                                </div>
-                            </form>
+                                    </form>
+                                </c:if>
+                                <button type="button" class="btn-action btn-resolve"
+                                        onclick="openAlertModal(${a.alertId}, 'RESOLVED', '<c:out value="${a.ruleCode}"/>', '<fmt:formatNumber value="${a.amount}" pattern="#,##0"/>')"
+                                        title="Resolve this alert">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Resolve</span>
+                                </button>
+                                <button type="button" class="btn-action btn-dismiss"
+                                        onclick="openAlertModal(${a.alertId}, 'DISMISSED', '<c:out value="${a.ruleCode}"/>', '<fmt:formatNumber value="${a.amount}" pattern="#,##0"/>')"
+                                        title="Dismiss this alert">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    <span>Dismiss</span>
+                                </button>
+                            </div>
                         </c:when>
                         <c:when test="${not empty a.resolvedBy}">
-                            <div class="alert-handled-card ${a.status == 'RESOLVED' ? 'is-resolved' : 'is-dismissed'}">
-                                <div class="alert-handled-top">
-                                    <span class="auditor-badge">
-                                        <svg class="auditor-icon" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            <div class="handled-cell">
+                                <div class="handled-user">
+                                    <span class="handled-avatar" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
-                                        <c:out value="${a.resolvedBy}"/>
                                     </span>
-                                    <span class="handled-state-chip ${a.status == 'RESOLVED' ? 'chip-resolved' : 'chip-dismissed'}">
-                                        ${a.status == 'RESOLVED' ? 'Resolved' : 'Dismissed'}
-                                    </span>
+                                    <span class="auditor-tag"><c:out value="${a.resolvedBy}"/></span>
                                 </div>
                                 <c:if test="${not empty a.resolvedNotes}">
-                                    <div class="handled-note-quote">
-                                        <span class="quote-symbol">“</span><c:out value="${a.resolvedNotes}"/><span class="quote-symbol">”</span>
+                                    <div class="auditor-bubble" title="<c:out value='${a.resolvedNotes}'/> (Click to toggle full text)" onclick="this.classList.toggle('expanded')">
+                                        <c:out value="${a.resolvedNotes}"/>
                                     </div>
                                 </c:if>
                             </div>
                         </c:when>
-                        <c:otherwise>
-                            <span class="text-muted-dash">—</span>
-                        </c:otherwise>
+                        <c:otherwise>—</c:otherwise>
                     </c:choose>
                 </td>
             </tr>
         </c:forEach>
         <c:if test="${empty result.items}">
-            <tr><td colspan="7" class="empty-state-cell">No alerts match the filter.</td></tr>
+            <tr><td colspan="7">No alerts match the filter.</td></tr>
         </c:if>
         </tbody>
     </table>
-    <div class="table-footer-bar">
-        <span class="total-text">${result.total} alert(s), page ${result.page} of ${result.totalPages}</span>
-        <div class="pages">
-            <c:forEach begin="1" end="${result.totalPages}" var="p">
-                <c:choose>
-                    <c:when test="${p == result.page}"><span>${p}</span></c:when>
-                    <c:otherwise>
-                        <a href="${ctx}/alerts?status=${f.status}&severity=${f.severity}&page=${p}">${p}</a>
-                    </c:otherwise>
-                </c:choose>
-            </c:forEach>
-        </div>
+    <p>${result.total} alert(s), page ${result.page} of ${result.totalPages}</p>
+    <div class="pages">
+        <c:forEach begin="1" end="${result.totalPages}" var="p">
+            <c:choose>
+                <c:when test="${p == result.page}"><span>${p}</span></c:when>
+                <c:otherwise>
+                    <a href="${ctx}/alerts?status=${f.status}&severity=${f.severity}&page=${p}">${p}</a>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
     </div>
 </div>
+
+<div class="modal-backdrop" id="alertModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="modal-close" id="alertModalClose" aria-label="Close">&times;</button>
+        <p class="modal-kicker" id="modalKicker">Action</p>
+        <h2 id="modalTitle" style="margin-top:0;margin-bottom:6px;font-size:var(--fs-xl);">Resolve Alert</h2>
+        <p id="modalSub" class="hint" style="margin-bottom:16px;"></p>
+        <form method="post" action="${ctx}/alerts" id="modalForm">
+            <input type="hidden" name="id" id="modalAlertId">
+            <input type="hidden" name="decision" id="modalDecision">
+            <label id="modalNotesLabel">
+                <span id="modalNotesPrompt">Handling notes:</span>
+                <input type="text" name="notes" id="modalNotes" maxlength="500" placeholder="Enter a note...">
+            </label>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+                <button type="button" class="btn" id="modalCancelBtn">Cancel</button>
+                <button type="submit" class="btn primary" id="modalSubmitBtn">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
+<script>
+(function() {
+    var modal = document.getElementById('alertModal');
+    if (!modal) return;
+    var modalId = document.getElementById('modalAlertId');
+    var modalDec = document.getElementById('modalDecision');
+    var modalTitle = document.getElementById('modalTitle');
+    var modalKicker = document.getElementById('modalKicker');
+    var modalSub = document.getElementById('modalSub');
+    var modalNotes = document.getElementById('modalNotes');
+    var modalPrompt = document.getElementById('modalNotesPrompt');
+    var submitBtn = document.getElementById('modalSubmitBtn');
+    var closeBtn = document.getElementById('alertModalClose');
+    var cancelBtn = document.getElementById('modalCancelBtn');
+
+    window.openAlertModal = function(id, decision, rule, amount) {
+        modalId.value = id;
+        modalDec.value = decision;
+        modalNotes.value = '';
+        modalSub.textContent = 'Alert #' + id + ' · Rule: ' + rule + ' · ' + amount + ' VND';
+
+        if (decision === 'RESOLVED') {
+            modalKicker.textContent = 'Resolve Alert';
+            modalTitle.textContent = 'Resolve alert #' + id;
+            modalPrompt.textContent = 'Resolution note (optional):';
+            modalNotes.placeholder = 'Optional note explaining the resolution...';
+            modalNotes.required = false;
+            submitBtn.textContent = 'Confirm Resolve';
+            submitBtn.className = 'btn primary';
+        } else {
+            modalKicker.textContent = 'Dismiss Alert';
+            modalTitle.textContent = 'Dismiss alert #' + id;
+            modalPrompt.textContent = 'Reason for dismissal (required):';
+            modalNotes.placeholder = 'Explain why this alert is dismissed (false alarm, duplicate, etc.)...';
+            modalNotes.required = true;
+            submitBtn.textContent = 'Confirm Dismiss';
+            submitBtn.className = 'btn danger';
+        }
+
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        setTimeout(function() { modalNotes.focus(); }, 50);
+    };
+
+    function closeModal() {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.hidden) closeModal();
+    });
+})();
+</script>
 </body>
 </html>

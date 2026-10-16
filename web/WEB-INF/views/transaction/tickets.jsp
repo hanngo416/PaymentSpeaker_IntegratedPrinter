@@ -46,7 +46,7 @@
                 <td><c:out value="${t.deviceCode}"/></td>
                 <td><c:out value="${t.reportedBy}"/></td>
                 <td class="wrap"><c:out value="${t.description}"/></td>
-                <td><span class="pill ${t.status == 'RESOLVED' ? 'RESOLVED' : 'PENDING'}"><c:out value="${t.status}"/></span></td>
+                <td><span class="pill ${t.status == 'RESOLVED' ? 'RESOLVED' : (t.status == 'IN_PROGRESS' ? 'IN_PROGRESS' : 'PENDING')}"><c:out value="${t.status}"/></span></td>
                 <td class="wrap">
                     <c:choose>
                         <c:when test="${canHandle && t.status != 'RESOLVED'}">

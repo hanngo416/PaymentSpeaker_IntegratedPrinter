@@ -82,6 +82,7 @@ public class TransactionIngestService {
             Verdict recorded = transactionDAO.record(t, verdict);
             AuditService.log(null, "TRANSACTION_INGEST", "TRANSACTION", bankTransId,
                     "amount", t.getAmount().toPlainString(), "label", recorded.getLabel().name(),
+                    "status", recorded.isLegit() ? "COMPLETED" : "CANCELLED",
                     "order", order == null ? "" : order.getOrderCode());
             return Outcome.CREATED;
         } catch (SQLException e) {

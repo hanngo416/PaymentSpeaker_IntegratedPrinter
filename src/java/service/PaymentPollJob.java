@@ -34,7 +34,7 @@ public class PaymentPollJob implements Runnable {
         long now = System.currentTimeMillis();
         Timestamp latest = transactionDAO.findLatestTransTime();
         long from = latest != null
-                ? latest.getTime() - OVERLAP_MINUTES * 60000L
+                ? Math.min(latest.getTime(), now) - OVERLAP_MINUTES * 60000L
                 : now - client.getWindowMinutes() * 60000L;
         return new Date(Math.max(from, now - MAX_LOOK_BACK_DAYS * 86400000L));
     }

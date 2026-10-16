@@ -16,9 +16,22 @@
         field('mTime', d.time);
         field('mOrder', d.order);
         field('mContent', d.content);
-        var label = document.getElementById('mLabel');
-        label.textContent = d.label;
-        label.className = 'pill ' + d.label;
+        var statusEl = document.getElementById('mStatus') || document.getElementById('mLabel');
+        var statusVal = d.status || d.label;
+        if (statusEl) {
+            statusEl.textContent = statusVal;
+            statusEl.className = 'pill ' + statusVal;
+        }
+        var printWrap = document.getElementById('mPrintWrapper');
+        var printId = document.getElementById('modalPrintTransId');
+        if (printWrap && printId) {
+            if (d.canPrint === '1' && d.id) {
+                printId.value = d.id;
+                printWrap.style.display = 'flex';
+            } else {
+                printWrap.style.display = 'none';
+            }
+        }
         lastRow = row;
         backdrop.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -32,9 +45,17 @@
     }
 
     rows.forEach(function (row) {
-        row.addEventListener('click', function () { open(row); });
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('button, form, a, input, select')) {
+                return;
+            }
+            open(row);
+        });
         row.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ' ') {
+                if (e.target.closest('button, form, a, input, select')) {
+                    return;
+                }
                 e.preventDefault();
                 open(row);
             }
