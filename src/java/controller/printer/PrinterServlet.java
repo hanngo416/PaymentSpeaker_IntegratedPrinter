@@ -16,14 +16,12 @@ import model.view.ReceiptRow;
 import service.AuditService;
 
 /**
- * Receipt printer: /printer lists the money received, /printer/print opens the receipt of one transfer and marks it printed.
+ * Receipt printer: POST /printer/print marks the receipt of one transfer as printed, GET /printer/print shows it. The buttons are on the transactions page.
  */
-@WebServlet(name = "PrinterServlet", urlPatterns = {"/printer", "/printer/print"})
+@WebServlet(name = "PrinterServlet", urlPatterns = {"/printer/print"})
 public class PrinterServlet extends HttpServlet {
 
-    private static final String VIEW = "/WEB-INF/views/printer/printer.jsp";
     private static final String RECEIPT = "/WEB-INF/views/printer/receipt.jsp";
-    private static final int LIST_SIZE = 30;
 
     private final TransactionDAO transactionDAO = new TransactionDAO();
     private final DeviceDAO deviceDAO = new DeviceDAO();
@@ -31,21 +29,8 @@ public class PrinterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!"/printer".equals(request.getServletPath())) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
         User actor = (User) request.getSession().getAttribute(LoginServlet.SESSION_USER);
-        try {
-            deviceDAO.ping("PRINTER");
-            request.setAttribute("maintenance", deviceDAO.isInMaintenance("PRINTER"));
-            request.setAttribute("receipts", transactionDAO.findPrintable(LIST_SIZE, cashierScope(actor)));
-        } catch (SQLException e) {
-            throw new ServletException("Cannot load the printer page", e);
-        }
-        request.setAttribute("message", "busy".equals(request.getParameter("msg"))
-                ? "The printer is in maintenance, receipts cannot be printed now." : null);
-        request.getRequestDispatcher(VIEW).forward(request, response);
+        showReceipt(request, response, actor);
     }
 
     @Override
@@ -64,8 +49,9 @@ public class PrinterServlet extends HttpServlet {
             return;
         }
         try {
+            deviceDAO.ping("PRINTER");
             if (deviceDAO.isInMaintenance("PRINTER")) {
-                response.sendRedirect(request.getContextPath() + "/printer?msg=busy");
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "The printer is in maintenance, receipts cannot be printed now.");
                 return;
             }
             ReceiptRow receipt = transactionDAO.findReceipt(id, cashierScope(actor));
@@ -77,11 +63,32 @@ public class PrinterServlet extends HttpServlet {
             transactionDAO.markPrinted(id);
             AuditService.log(actor, reprint ? "REPRINT_RECEIPT" : "PRINT_RECEIPT", "TRANSACTION", id,
                     "order", receipt.getOrderCode());
-            request.setAttribute("receipt", receipt);
-            request.setAttribute("reprint", reprint);
-            request.getRequestDispatcher(RECEIPT).forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/printer/print?id=" + id + (reprint ? "&copy=1" : ""));
         } catch (SQLException e) {
             throw new ServletException("Cannot print the receipt", e);
+        }
+    }
+
+    private void showReceipt(HttpServletRequest request, HttpServletResponse response, User actor)
+            throws ServletException, IOException {
+        int id;
+        try {
+            id = Integer.parseInt(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        try {
+            ReceiptRow receipt = transactionDAO.findReceipt(id, cashierScope(actor));
+            if (receipt == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            request.setAttribute("receipt", receipt);
+            request.setAttribute("reprint", "1".equals(request.getParameter("copy")));
+            request.getRequestDispatcher(RECEIPT).forward(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("Cannot load the receipt", e);
         }
     }
 
