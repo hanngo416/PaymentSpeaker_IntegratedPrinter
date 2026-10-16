@@ -7,11 +7,13 @@
 
     var pollUrl = box.dataset.pollUrl;
     var ackUrl = box.dataset.ackUrl;
+    var printUrl = box.dataset.printUrl;
     var okBtn = document.getElementById('payOk');
     var SOUND_KEY = 'spk-sound';
     var HISTORY_KEY = 'spk-history';
     var ACKED_KEY = 'spk-acked';
     var SAID_PREFIX = 'spk-said-';
+    var PRINTED_PREFIX = 'spk-printed-';
 
     var queue = [];        // payments not confirmed yet; queue[0] is the one in the popup
     var confirmed = {};    // ids confirmed in this page, so a slow poll cannot bring them back
@@ -34,12 +36,34 @@
         }
         voiceText = viVoice
             ? 'Voice: ' + viVoice.name + ' (' + viVoice.lang + ')'
-            : 'No Vietnamese voice found (' + voices.length + ' available). Using default voice.';
+            : 'No Vietnamese voice installed. Windows: Settings > Time & language > Speech > Add voices > Vietnamese, then restart the browser.';
     }
     pickVoice();
     if (window.speechSynthesis) { window.speechSynthesis.onvoiceschanged = pickVoice; }
 
+    function chime() {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) { return; }
+        try {
+            var ctx = new Ctx();
+            [880, 1320].forEach(function (freq, i) {
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+                var start = ctx.currentTime + i * 0.25;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.3, start);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(start);
+                osc.stop(start + 0.5);
+            });
+            setTimeout(function () { ctx.close(); }, 1200);
+        } catch (e) { }
+    }
+
     function say(text) {
+        if (!viVoice) { chime(); return; }
         if (!window.speechSynthesis) { return; }
         var u = new SpeechSynthesisUtterance(text);
         u.lang = 'vi-VN';
@@ -63,6 +87,35 @@
         say(announceText(item.amount));
     }
 
+    // Auto-print: the receipt is posted into a hidden frame like the Print button does, so it is marked printed and
+    // audited, and the receipt page opens the print dialog by itself. Only the first tab does it.
+    function autoPrint(item) {
+        if (load('spk-autoprint') !== 'on' || !printUrl || !item.order) { return; }
+        var key = PRINTED_PREFIX + item.id;
+        if (load(key)) { return; }
+        save(key, String(Date.now()));
+        var frame = document.getElementById('printFrame');
+        if (!frame) {
+            frame = document.createElement('iframe');
+            frame.id = 'printFrame';
+            frame.name = 'printFrame';
+            frame.style.display = 'none';
+            document.body.appendChild(frame);
+        }
+        var form = document.createElement('form');
+        form.method = 'post';
+        form.action = printUrl;
+        form.target = 'printFrame';
+        var field = document.createElement('input');
+        field.type = 'hidden';
+        field.name = 'id';
+        field.value = item.id;
+        form.appendChild(field);
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    }
+
     function money(n) { return n.toLocaleString('vi-VN'); }
 
     function show() {
@@ -77,6 +130,7 @@
         if (!item.spoken) {
             item.spoken = true;
             speakFor(item);
+            autoPrint(item);
         }
     }
 

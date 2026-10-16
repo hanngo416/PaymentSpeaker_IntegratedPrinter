@@ -13,13 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import model.view.SpeakItem;
 
 /**
- * Payment popup: /speaker (sound settings page), /speaker/poll (JSON of payments to show), /speaker/ack (cashier confirms one).
+ * Payment popup: /speaker/poll (JSON of payments to show), /speaker/ack (cashier confirms one).
  * Every page of a cashier polls /speaker/poll (assets/js/announcer.js), so the popup and the computer speaker work on any page.
  */
-@WebServlet(name = "SpeakerServlet", urlPatterns = {"/speaker", "/speaker/poll", "/speaker/ack"})
+@WebServlet(name = "SpeakerServlet", urlPatterns = {"/speaker/poll", "/speaker/ack"})
 public class SpeakerServlet extends HttpServlet {
 
-    private static final String VIEW = "/WEB-INF/views/speaker/speaker.jsp";
     private static final int BATCH_SIZE = 5;
     private static final int MAX_AGE_MINUTES = 5;
 
@@ -30,11 +29,7 @@ public class SpeakerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if ("/speaker/poll".equals(request.getServletPath())) {
-            writePollJson(response);
-            return;
-        }
-        request.getRequestDispatcher(VIEW).forward(request, response);
+        writePollJson(response);
     }
 
     @Override
