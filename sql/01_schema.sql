@@ -1,7 +1,7 @@
 -- =====================================================================================
 -- SMART PAYMENT NOTIFICATION SPEAKER WITH INTEGRATED RECEIPT PRINTER
 -- Database Setup Script (SQL Server 2019)
--- PRJ301 project - 3NF design, idempotency and audit hash chain
+-- PRJ301 project - 3NF design, idempotency and audit log
 -- =====================================================================================
 
 USE master;
@@ -86,20 +86,8 @@ CREATE TABLE Devices (
 );
 GO
 
--- TABLE 4: MAINTENANCE_TICKETS (hardware incident and maintenance tickets)
-IF OBJECT_ID('MaintenanceTickets', 'U') IS NULL
-CREATE TABLE MaintenanceTickets (
-    ticket_id INT IDENTITY(1,1) PRIMARY KEY,
-    device_id INT NOT NULL,
-    reported_by INT NOT NULL,                    -- Cashier / manager who opened the ticket
-    issue_description NVARCHAR(500) NOT NULL,    -- Example: "Printer cutter jammed", "Printer paper is out"
-    status NVARCHAR(20) NOT NULL DEFAULT 'OPEN', -- OPEN, IN_PROGRESS, RESOLVED
-    tech_notes NVARCHAR(500) NULL,               -- Technician notes
-    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
-    resolved_at DATETIME2(3) NULL,
-    CONSTRAINT FK_Tickets_Devices FOREIGN KEY (device_id) REFERENCES Devices(device_id),
-    CONSTRAINT FK_Tickets_Users FOREIGN KEY (reported_by) REFERENCES Users(user_id)
-);
+-- Databases created before the tickets were removed
+IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
 GO
 
 -- TABLE 5: ORDERS (payment requests and VietQR)
@@ -136,6 +124,34 @@ BEGIN
     IF @df IS NOT NULL EXEC(N'ALTER TABLE Orders DROP CONSTRAINT ' + @df);
     ALTER TABLE Orders DROP COLUMN paid_amount;
 END
+GO
+
+-- TABLE 5b: DISCOUNT CODES (holder NULL = shared code the cashier picks from a list; holder set = personal code typed by hand)
+IF OBJECT_ID('DiscountCodes', 'U') IS NULL
+CREATE TABLE DiscountCodes (
+    code_id INT IDENTITY(1,1) PRIMARY KEY,
+    code NVARCHAR(30) NOT NULL UNIQUE,
+    kind NVARCHAR(10) NOT NULL,                  -- PERCENT or FIXED
+    value DECIMAL(18,2) NOT NULL,                -- Percent (1-100) or amount in VND
+    holder NVARCHAR(100) NULL,                   -- Person the personal code was issued to
+    max_uses INT NULL,                           -- NULL = unlimited
+    used_count INT NOT NULL DEFAULT 0,
+    valid_from DATE NOT NULL,
+    valid_to DATE NOT NULL,                      -- Usable through the end of this day
+    active BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT CHK_Discount_Kind CHECK (kind IN ('PERCENT', 'FIXED')),
+    CONSTRAINT CHK_Discount_Value CHECK (value > 0 AND (kind = 'FIXED' OR value <= 100)),
+    CONSTRAINT CHK_Discount_Dates CHECK (valid_to >= valid_from)
+);
+GO
+
+-- Databases created before discount codes existed: store the code and the amount taken off on each order
+IF COL_LENGTH('Orders', 'discount_code') IS NULL
+    ALTER TABLE Orders ADD discount_code NVARCHAR(30) NULL;
+GO
+IF COL_LENGTH('Orders', 'discount_amount') IS NULL
+    ALTER TABLE Orders ADD discount_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_discount_amount DEFAULT 0;
 GO
 
 -- TABLE 6: TRANSACTIONS (balance changes pulled from the SePay API by the polling job)
@@ -181,7 +197,6 @@ END
 GO
 IF EXISTS (SELECT 1 FROM Devices WHERE device_type = N'SPEAKER')
 BEGIN
-    DELETE FROM MaintenanceTickets WHERE device_id IN (SELECT device_id FROM Devices WHERE device_type = N'SPEAKER');
     DELETE FROM Devices WHERE device_type = N'SPEAKER';
 END
 GO
@@ -215,7 +230,7 @@ GO
 IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 GO
 
--- TABLE 8: AUDIT_LOGS (tamper-evident audit trail - hash chain / mini blockchain)
+-- TABLE 8: AUDIT_LOGS (audit trail: who did what, when)
 IF OBJECT_ID('AuditLogs', 'U') IS NULL
 CREATE TABLE AuditLogs (
     log_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -224,8 +239,6 @@ CREATE TABLE AuditLogs (
     target_entity NVARCHAR(50) NOT NULL,         -- USER, ORDER, TRANSACTION, DEVICE
     entity_id NVARCHAR(50) NOT NULL,
     detail_json NVARCHAR(MAX) NULL,              -- Changed content as a JSON diff
-    prev_hash CHAR(64) NOT NULL,                 -- SHA-256 of the previous record (chain protection)
-    curr_hash CHAR(64) NOT NULL,                 -- SHA-256(prev_hash + log_id + actor + action + entity + detail + created_at)
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME()
 );
 GO
@@ -241,6 +254,4 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Time' AND
 CREATE INDEX IX_Transactions_Time ON Transactions(trans_time);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Orders_OrderCode' AND object_id = OBJECT_ID('Orders'))
 CREATE INDEX IX_Orders_OrderCode ON Orders(order_code);
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_AuditLogs_PrevHash' AND object_id = OBJECT_ID('AuditLogs'))
-CREATE INDEX IX_AuditLogs_PrevHash ON AuditLogs(prev_hash);
 GO

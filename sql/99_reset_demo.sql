@@ -13,6 +13,7 @@ IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 IF OBJECT_ID('FraudAlerts', 'U') IS NOT NULL DROP TABLE FraudAlerts;
 IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
 IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
+IF OBJECT_ID('DiscountCodes', 'U') IS NOT NULL DROP TABLE DiscountCodes;
 IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
 IF OBJECT_ID('Devices', 'U') IS NOT NULL DROP TABLE Devices;
 IF OBJECT_ID('LoginOtps', 'U') IS NOT NULL DROP TABLE LoginOtps;

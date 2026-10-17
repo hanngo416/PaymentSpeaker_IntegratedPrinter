@@ -4,49 +4,58 @@ GO
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
--- Safety guard: seed only an EMPTY database, never overwrite existing (real) data.
--- To start over, run 99_reset_demo.sql and 01_schema.sql first.
-IF EXISTS (SELECT 1 FROM Users) OR EXISTS (SELECT 1 FROM Transactions)
-BEGIN
-    PRINT N'>>> Database already has data - seed skipped. Run 99_reset_demo.sql first for a reset.';
-    SET NOEXEC ON;
-END
-GO
-
 -- =====================================================================================
 -- 4. SAMPLE DATA
 -- =====================================================================================
 
--- 4.1. Roles
-INSERT INTO Roles (role_id, role_name, description) VALUES
+-- 4.1. Roles (safe to run again: a row that already exists is skipped, so logins never break)
+INSERT INTO Roles (role_id, role_name, description)
+SELECT v.role_id, v.role_name, v.description FROM (VALUES
 (1, N'ADMIN', N'System administrator: full configuration and staff management rights'),
 (2, N'STORE_MANAGER', N'Store manager: manages revenue and cashier accounts'),
 (3, N'CASHIER', N'Counter cashier: creates orders, sees the payment popup and prints receipts'),
 (4, N'AUDITOR', N'Auditor: investigates fraudulent transactions and checks data integrity'),
-(5, N'TECHNICIAN', N'Technician: maintains the printer hardware');
+(5, N'TECHNICIAN', N'Technician: maintains the printer hardware')
+) AS v(role_id, role_name, description)
+WHERE NOT EXISTS (SELECT 1 FROM Roles r WHERE r.role_id = v.role_id);
 GO
 
 -- 4.2. Users
 -- No password: staff log in by email OTP or Google.
-INSERT INTO Users (user_code, full_name, email, role_id, status) VALUES
+INSERT INTO Users (user_code, full_name, email, role_id, status)
+SELECT v.user_code, v.full_name, v.email, v.role_id, v.status FROM (VALUES
 (N'han_admin', N'Ngo Ngoc Gia Han', N'hanngo816@gmail.com', 1, N'ACTIVE'),
 (N'mai_manager', N'Do Thi Mai', N'hanngo816+manager@gmail.com', 2, N'ACTIVE'),
 (N'nam_cashier', N'Bui Van Nam', N'hanngo816+cashier@gmail.com', 3, N'ACTIVE'),
 (N'dung_auditor', N'Pham Quoc Dung', N'hanngo816+auditor@gmail.com', 4, N'ACTIVE'),
 (N'em_technician', N'Hoang Van Em', N'hanngo816+tech@gmail.com', 5, N'ACTIVE'),
-(N'ha_cashier', N'Vu Thi Ha', N'hanngo816+locked@gmail.com', 3, N'LOCKED');
+(N'ha_cashier', N'Vu Thi Ha', N'hanngo816+locked@gmail.com', 3, N'LOCKED')
+) AS v(user_code, full_name, email, role_id, status)
+WHERE NOT EXISTS (SELECT 1 FROM Users u WHERE u.user_code = v.user_code OR u.email = v.email);
 GO
 
 -- 4.3. Devices
-INSERT INTO Devices (device_code, device_type, model_name, api_key, status) VALUES
-(N'PRN_01', N'PRINTER', N'Aiyin A70 Thermal 80mm', N'KEY_PRN_01_SECRET_5432', N'ONLINE');
+INSERT INTO Devices (device_code, device_type, model_name, api_key, status)
+SELECT N'PRN_01', N'PRINTER', N'Aiyin A70 Thermal 80mm', N'KEY_PRN_01_SECRET_5432', N'ONLINE'
+WHERE NOT EXISTS (SELECT 1 FROM Devices WHERE device_code = N'PRN_01');
 GO
 
--- 4.3b. One open maintenance ticket, so the ticket page is not empty in a demo
-INSERT INTO MaintenanceTickets (device_id, reported_by, issue_description)
-SELECT d.device_id, u.user_id, N'Printer cutter jammed, receipts do not tear off'
-FROM Devices d, Users u
-WHERE d.device_code = N'PRN_01' AND u.user_code = N'nam_cashier';
+-- 4.3b. Discount codes: two shared codes for the cashier list and one personal code typed by hand.
+-- Every run puts the codes back to their start state (used_count = 0); orders keep the code as plain text, so nothing else is touched.
+DELETE FROM DiscountCodes;
+INSERT INTO DiscountCodes (code, kind, value, holder, max_uses, valid_from, valid_to) VALUES
+(N'SUMMER10', N'PERCENT', 10, NULL, NULL, '2026-10-01', '2026-12-31'),
+(N'WELCOME20K', N'FIXED', 20000, NULL, 200, '2026-10-01', '2026-12-31'),
+(N'TINKY123', N'PERCENT', 15, N'Nguyen Van An', 1, '2026-10-01', '2026-12-31');
+GO
+
+-- Safety guard for the demo data below: it is added only to an EMPTY database, never over real transfers.
+-- To start over, run 99_reset_demo.sql and 01_schema.sql first.
+IF EXISTS (SELECT 1 FROM Orders) OR EXISTS (SELECT 1 FROM Transactions)
+BEGIN
+    PRINT N'>>> Orders or transactions already exist - demo data skipped (roles, users, devices and discount codes were checked).';
+    SET NOEXEC ON;
+END
 GO
 
 -- 4.4. Sample orders
@@ -63,20 +72,10 @@ INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_
  DATEADD(MINUTE, 60, SYSDATETIME()));
 GO
 
--- 4.5. Genesis block of AuditLogs (first block of the hash chain)
--- The first block always has a prev_hash of 64 '0' characters
-INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, prev_hash, curr_hash, created_at) VALUES
-(N'SYSTEM', N'INIT_SYSTEM', N'SYSTEM', N'0', N'{"message": "Genesis block created. System initialized."}',
- '0000000000000000000000000000000000000000000000000000000000000000',
- '0000000000000000000000000000000000000000000000000000000000000000',
+-- 4.5. First audit record
+INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at) VALUES
+(N'SYSTEM', N'INIT_SYSTEM', N'SYSTEM', N'0', N'{"message": "System initialized."}',
  CAST(CAST(DATEADD(DAY, -6, SYSDATETIME()) AS DATE) AS DATETIME2(3)));
-
--- Same formula as util.AuditHash: SHA-256 of prev_hash|log_id|actor|action|entity|entity_id|detail|time
-UPDATE AuditLogs
-SET curr_hash = LOWER(CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONVERT(VARCHAR(MAX),
-        prev_hash + '|' + CAST(log_id AS VARCHAR(10)) + '|' + actor_username + '|' + action + '|' + target_entity
-        + '|' + entity_id + '|' + ISNULL(detail_json, '') + '|' + CONVERT(VARCHAR(23), created_at, 121))), 2))
-WHERE log_id = 1;
 GO
 
 -- 4.6. Demo data: transfers, their orders and the alerts the rules engine would raise
@@ -208,7 +207,6 @@ INSERT INTO Transactions (bank_trans_id, order_id, amount, content, bank_account
 GO
 
 -- 4.7. Shift history: one shift per past day (07:00-21:00, cash counted 0), day 4 closed by force, today's shift still open
--- Written like ShiftService does, so each record carries the same SHA-256 hash that util.AuditHash would compute.
 DECLARE @events TABLE (seq INT IDENTITY(1,1), actor NVARCHAR(50), action NVARCHAR(50), shift_id NVARCHAR(50), detail NVARCHAR(200), event_time DATETIME2(3));
 DECLARE @day INT = 6;
 WHILE @day >= 0
@@ -223,19 +221,8 @@ BEGIN
     SET @day = @day - 1;
 END
 
-DECLARE @seq INT = 1, @last INT = (SELECT MAX(seq) FROM @events);
-WHILE @seq <= @last
-BEGIN
-    DECLARE @prev CHAR(64) = (SELECT curr_hash FROM AuditLogs WHERE log_id = (SELECT MAX(log_id) FROM AuditLogs));
-    INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, prev_hash, curr_hash, created_at)
-    SELECT actor, action, N'SHIFT', shift_id, detail, @prev, @prev, event_time FROM @events WHERE seq = @seq;
-    UPDATE AuditLogs
-    SET curr_hash = LOWER(CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONVERT(VARCHAR(MAX),
-            prev_hash + '|' + CAST(log_id AS VARCHAR(10)) + '|' + actor_username + '|' + action + '|' + target_entity
-            + '|' + entity_id + '|' + ISNULL(detail_json, '') + '|' + CONVERT(VARCHAR(23), created_at, 121))), 2))
-    WHERE log_id = SCOPE_IDENTITY();
-    SET @seq = @seq + 1;
-END
+INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at)
+SELECT actor, action, N'SHIFT', shift_id, detail, event_time FROM @events ORDER BY seq;
 GO
 
 PRINT N'>>> Database and sample data for PaymentSpeaker loaded successfully!';

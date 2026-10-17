@@ -10,14 +10,14 @@ SELECT 'Roles' AS table_name, COUNT(*) AS row_count, 5 AS expected FROM Roles
 UNION ALL SELECT 'Users', COUNT(*), 6 FROM Users
 UNION ALL SELECT 'LoginOtps', COUNT(*), 0 FROM LoginOtps
 UNION ALL SELECT 'Devices', COUNT(*), 1 FROM Devices
-UNION ALL SELECT 'MaintenanceTickets', COUNT(*), 1 FROM MaintenanceTickets
 UNION ALL SELECT 'Orders', COUNT(*), 39 FROM Orders
 UNION ALL SELECT 'Transactions', COUNT(*), 40 FROM Transactions
 UNION ALL SELECT 'FraudAlerts', COUNT(*), 8 FROM FraudAlerts
-UNION ALL SELECT 'AuditLogs', COUNT(*), 14 FROM AuditLogs;
+UNION ALL SELECT 'AuditLogs', COUNT(*), 14 FROM AuditLogs
+UNION ALL SELECT 'DiscountCodes', COUNT(*), 3 FROM DiscountCodes;
 GO
 
--- CHECK 1b: the eight foreign keys, child table first
+-- CHECK 1b: the six foreign keys, child table first
 SELECT fk.name AS foreign_key, OBJECT_NAME(fk.parent_object_id) AS child_table, OBJECT_NAME(fk.referenced_object_id) AS parent_table
 FROM sys.foreign_keys fk ORDER BY child_table, foreign_key;
 GO
@@ -47,7 +47,7 @@ DECLARE @cashier_uid INT = (SELECT user_id FROM Users WHERE user_code = N'nam_ca
 DELETE FROM Users WHERE user_id = @cashier_uid;
 GO
 
--- CHECK 5: the genesis block of the audit chain exists (prev_hash is 64 zeros)
-SELECT log_id, actor_username, action, prev_hash, curr_hash
+-- CHECK 5: the audit log holds the first record and the shift history
+SELECT log_id, actor_username, action, created_at
 FROM AuditLogs;
 GO
