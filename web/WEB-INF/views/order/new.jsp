@@ -108,6 +108,20 @@
                 <button type="button" class="preset-chip" data-amount="500000">500k</button>
             </div>
 
+            <div class="pos-compact-label-row">
+                <label for="pickedCode" class="pos-compact-label">Discount code</label>
+            </div>
+            <div class="pos-discount-row">
+                <select id="pickedCode" name="pickedCode">
+                    <option value="">No discount</option>
+                    <c:forEach var="d" items="${sharedCodes}">
+                        <option value="<c:out value='${d.code}'/>" ${pickedCode == d.code ? 'selected' : ''}><c:out value="${d.code}"/> (<c:choose><c:when test="${d.kind == 'PERCENT'}">-<fmt:formatNumber value="${d.value}" pattern="#,##0"/>%</c:when><c:otherwise>-<fmt:formatNumber value="${d.value}" pattern="#,##0"/> VND</c:otherwise></c:choose>)</option>
+                    </c:forEach>
+                </select>
+                <input type="text" id="typedCode" name="typedCode" maxlength="30" autocomplete="off" placeholder="Or type a code"
+                       value="<c:out value='${typedCode}'/>">
+            </div>
+
             <div class="pos-compact-methods">
                 <label class="pos-seg-label">
                     <input type="checkbox" id="methodCash" name="methodCash" value="1" ${not empty cashAmount && cashAmount != '0' ? 'checked' : ''}>

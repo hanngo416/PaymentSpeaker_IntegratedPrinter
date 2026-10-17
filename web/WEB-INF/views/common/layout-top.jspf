@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light only">
     <title><c:out value="${pageTitle}"/></title>
-    <link rel="stylesheet" href="${ctx}/assets/css/app.css?v=18">
+    <link rel="stylesheet" href="${ctx}/assets/css/app.css?v=19">
 </head>
 <body>
 <div class="shell">
@@ -31,6 +31,9 @@
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
                     <a href="${ctx}/admin/users" class="${nav == 'users' ? 'active' : ''}">Users</a>
                 </c:if>
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                    <a href="${ctx}/admin/discounts" class="${nav == 'discounts' ? 'active' : ''}">Discount codes</a>
+                </c:if>
                 <c:if test="${role != 'TECHNICIAN'}">
                     <a href="${ctx}/transactions" class="${nav == 'transactions' ? 'active' : ''}">Transactions</a>
                 </c:if>
@@ -43,11 +46,6 @@
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR'}">
                     <a href="${ctx}/alerts" class="${nav == 'alerts' ? 'active' : ''}">Alert center</a>
                 </c:if>
-                <%-- Maintenance tickets are hidden for now; remove this comment to show the menu item again
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'CASHIER' || role == 'TECHNICIAN'}">
-                    <a href="${ctx}/tickets" class="${nav == 'tickets' ? 'active' : ''}">Maintenance tickets</a>
-                </c:if>
-                --%>
                 <c:if test="${role == 'ADMIN' || role == 'AUDITOR'}">
                     <a href="${ctx}/admin/audit" class="${nav == 'audit' ? 'active' : ''}">Audit log</a>
                 </c:if>

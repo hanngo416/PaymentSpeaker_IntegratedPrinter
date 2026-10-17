@@ -84,6 +84,16 @@
                                 <span class="val"><fmt:formatNumber value="${order.transferAmount}" pattern="#,##0"/> ₫</span>
                             </div>
                         </c:if>
+                        <c:if test="${not empty order.discountCode}">
+                            <div class="summary-row">
+                                <span class="label">Order Amount</span>
+                                <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Discount <span class="mono">(<c:out value="${order.discountCode}"/>)</span></span>
+                                <span class="val">-<fmt:formatNumber value="${order.discountAmount}" pattern="#,##0"/> ₫</span>
+                            </div>
+                        </c:if>
                         <div class="summary-row">
                             <span class="label">Cashier</span>
                             <span class="val"><strong><c:out value="${order.createdByCode}"/></strong></span>
@@ -151,6 +161,16 @@
                             <span class="label">Order Code</span>
                             <span class="val mono"><c:out value="${order.orderCode}"/></span>
                         </div>
+                        <c:if test="${not empty order.discountCode}">
+                            <div class="summary-row">
+                                <span class="label">Order Amount</span>
+                                <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Discount <span class="mono">(<c:out value="${order.discountCode}"/>)</span></span>
+                                <span class="val">-<fmt:formatNumber value="${order.discountAmount}" pattern="#,##0"/> ₫</span>
+                            </div>
+                        </c:if>
                         <div class="summary-row">
                             <span class="label">Cashier</span>
                             <span class="val"><strong><c:out value="${order.createdByCode}"/></strong></span>
@@ -198,6 +218,16 @@
                             <span class="label">Order Code</span>
                             <span class="val mono"><c:out value="${order.orderCode}"/></span>
                         </div>
+                        <c:if test="${not empty order.discountCode}">
+                            <div class="summary-row">
+                                <span class="label">Order Amount</span>
+                                <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Discount <span class="mono">(<c:out value="${order.discountCode}"/>)</span></span>
+                                <span class="val">-<fmt:formatNumber value="${order.discountAmount}" pattern="#,##0"/> ₫</span>
+                            </div>
+                        </c:if>
                         <div class="summary-row">
                             <span class="label">Cashier</span>
                             <span class="val"><strong><c:out value="${order.createdByCode}"/></strong></span>

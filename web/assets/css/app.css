@@ -2432,6 +2432,15 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     user-select: none;
 }
 
+.pos-discount-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.pos-discount-row input { text-transform: uppercase; }
+.pos-discount-row input::placeholder { text-transform: none; }
+
 .pos-compact-presets {
     display: flex;
     gap: 8px;
