@@ -24,7 +24,7 @@ public class PaymentPollListener implements ServletContextListener {
 
     private static final Logger LOG = Logger.getLogger(PaymentPollListener.class.getName());
     private static final int INITIAL_DELAY_SECONDS = 10;
-    private static final int DEFAULT_PERIOD_SECONDS = 30;
+    private static final int DEFAULT_PERIOD_SECONDS = 5;
 
     private ScheduledExecutorService scheduler;
 
@@ -43,11 +43,11 @@ public class PaymentPollListener implements ServletContextListener {
         LOG.log(Level.INFO, "Payment polling started: every {0} seconds", period);
     }
 
-    // poll.seconds in sepay.properties; anything missing or below 10 falls back, so SePay is never hammered
+    // poll.seconds in sepay.properties; anything missing or below 5 falls back, so SePay is never hammered
     private static int periodSeconds() {
         try {
             int value = Integer.parseInt(ConfigUtil.load("sepay.properties").getProperty("poll.seconds", "").trim());
-            return value >= 10 ? value : DEFAULT_PERIOD_SECONDS;
+            return value >= 5 ? value : DEFAULT_PERIOD_SECONDS;
         } catch (NumberFormatException e) {
             return DEFAULT_PERIOD_SECONDS;
         }

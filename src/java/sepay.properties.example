@@ -7,4 +7,4 @@ account.name=NGUYEN VAN A
 # Only used the very first time, when the database has no transaction yet: how far back to read
 window.minutes=30
 # How often the server asks SePay for new transactions
-poll.seconds=30
+poll.seconds=5

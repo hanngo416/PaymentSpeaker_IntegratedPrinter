@@ -70,7 +70,10 @@
         if (viVoice) { u.voice = viVoice; }
         u.onerror = function (e) {
             // The browser only lets a page speak after the user clicked on it once; keep the text for the next click
-            if (e.error === 'not-allowed') { pendingSpeech = text; }
+            if (e.error === 'not-allowed') {
+                pendingSpeech = text;
+                document.getElementById('payMore').textContent = 'Click anywhere on this page to hear the announcement';
+            }
         };
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(u);
@@ -118,13 +121,17 @@
 
     function money(n) { return n.toLocaleString('vi-VN'); }
 
+    function showMore() {
+        document.getElementById('payMore').textContent = queue.length > 1 ? (queue.length - 1) + ' more payment(s) waiting' : '';
+    }
+
     function show() {
         if (!popup.hidden || queue.length === 0) { return; }
         var item = queue[0];
         document.getElementById('payAmount').textContent = money(item.amount) + ' VND';
         document.getElementById('payOrder').textContent = item.order || '-';
         document.getElementById('payTime').textContent = item.time;
-        document.getElementById('payMore').textContent = queue.length > 1 ? (queue.length - 1) + ' more payment(s) waiting' : '';
+        showMore();
         popup.hidden = false;
         okBtn.focus();
         if (!item.spoken) {
@@ -198,6 +205,7 @@
         if (pendingSpeech) {
             var text = pendingSpeech;
             pendingSpeech = null;
+            showMore();
             say(text);
         }
     }
