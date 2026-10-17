@@ -37,3 +37,15 @@ Thumbs.db
 src/java/mail.properties
 src/java/google-oauth.properties
 src/java/sepay.properties
+
+# Agent, Claude, AI configs and tools
+AGENTS.md
+CLAUDE.md
+.agents/
+.claude/
+.gemini/
+demo-project*
+tools/*.js
+
+# Presentations and docs
+docs/
