@@ -125,7 +125,7 @@
                     </span>
                     <span class="quick-nav-content">
                         <strong>Audit Log</strong>
-                        <small>Hash chain</small>
+                        <small>Who did what</small>
                     </span>
                 </a>
             </c:if>

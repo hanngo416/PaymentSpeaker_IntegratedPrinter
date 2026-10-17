@@ -40,7 +40,7 @@ Hệ thống không lưu mật khẩu. Nhân viên đăng nhập bằng mã OTP 
 
 Chín bảng, chín khóa ngoại, tạo một lượt từ trên xuống, không cần câu `ALTER TABLE`:
 
-`Roles` → `Users` → `LoginOtps` → `Devices` → `MaintenanceTickets` → `Orders` → `Transactions` → `FraudAlerts` → `AuditLogs`
+`Roles` → `Users` → `LoginOtps` → `Devices` → `Orders` → `Transactions` → `FraudAlerts` → `AuditLogs`
 
 - `01_schema.sql` chỉ tạo bảng khi chưa có, chạy lại không mất dữ liệu.
 - `02_seed.sql` bỏ qua nếu đã có người dùng hoặc giao dịch.

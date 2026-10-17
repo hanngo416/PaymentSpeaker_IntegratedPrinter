@@ -6,18 +6,7 @@
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <div class="card">
     <h1>Audit log</h1>
-    <p class="hint">The history of who did what in the system: logins, orders, payments received, shifts, alerts and account changes. Records cannot be edited or deleted without being detected, so it is the proof for an audit. Each record carries the hash (a fingerprint) of the record before it, so changing or deleting an old record breaks the chain after it.</p>
-    <c:if test="${not empty check}">
-        <c:choose>
-            <c:when test="${check.ok}">
-                <div class="msg">Chain intact: ${check.checked} record(s) checked, none changed or removed.</div>
-            </c:when>
-            <c:otherwise>
-                <div class="alert-banner">Chain broken at record #${check.brokenLogId}: <c:out value="${check.reason}"/>. ${check.checked} record(s) before it are still good.</div>
-            </c:otherwise>
-        </c:choose>
-    </c:if>
-    <a class="btn primary" href="${ctx}/admin/audit?verify=1">Verify the whole chain</a>
+    <p class="hint">The history of who did what in the system: logins, orders, payments received, shifts, alerts and account changes. Records are only added, the application has no way to edit or delete them.</p>
 </div>
 
 <div class="card">
@@ -44,7 +33,7 @@
     </form>
     <table>
         <thead>
-        <tr><th>#</th><th>Time</th><th>Who</th><th>What happened</th><th>Hash</th></tr>
+        <tr><th>#</th><th>Time</th><th>Who</th><th>What happened</th></tr>
         </thead>
         <tbody>
         <c:forEach var="r" items="${result.items}">
@@ -52,12 +41,10 @@
                 <td>${r.logId}</td>
                 <td><fmt:formatDate value="${r.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                 <td><c:out value="${r.actor}"/></td>
-                <td class="wrap" title="<c:out value='${r.action} ${r.entity} ${r.entityId}'/>"><c:out value="${r.summary}"/></td>
-                <td><small><c:out value="${r.currHash.substring(0, 12)}"/>...</small></td>
-            </tr>
+                <td class="wrap" title="<c:out value='${r.action} ${r.entity} ${r.entityId}'/>"><c:out value="${r.summary}"/></td>            </tr>
         </c:forEach>
         <c:if test="${empty result.items}">
-            <tr><td colspan="5">No records yet.</td></tr>
+            <tr><td colspan="4">No records yet.</td></tr>
         </c:if>
         </tbody>
     </table>

@@ -8,11 +8,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import service.AuditService;
 
 /**
- * Audit trail: /admin/audit lists the records, newest first. Adding verify=1 also walks the whole hash chain.
- */
+ * Audit trail: /admin/audit lists the records, newest first. */
 @WebServlet(name = "AuditServlet", urlPatterns = {"/admin/audit"})
 public class AuditServlet extends HttpServlet {
 
@@ -20,7 +18,6 @@ public class AuditServlet extends HttpServlet {
     private static final int PAGE_SIZE = 10;
 
     private final AuditDAO auditDAO = new AuditDAO();
-    private final AuditService auditService = new AuditService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -60,9 +57,6 @@ public class AuditServlet extends HttpServlet {
             request.setAttribute("actionQuery", query.toString());
             request.setAttribute("from", fromDate == null ? null : from);
             request.setAttribute("to", toDate == null ? null : to);
-            if ("1".equals(request.getParameter("verify"))) {
-                request.setAttribute("check", auditService.verify());
-            }
         } catch (SQLException e) {
             throw new ServletException("Cannot load the audit trail", e);
         }

@@ -41,7 +41,7 @@ public class UserListServlet extends HttpServlet {
         MESSAGES.put("unlinked", "Google account unlinked. The user can link again at the next Google login.");
         MESSAGES.put("self", "You cannot lock, delete or change the role of your own account.");
         MESSAGES.put("lastadmin", "The last active administrator cannot be locked or deleted.");
-        MESSAGES.put("history", "This user has history (orders or tickets) and cannot be deleted. Lock the account instead.");
+        MESSAGES.put("history", "This user has history (orders) and cannot be deleted. Lock the account instead.");
         MESSAGES.put("notfound", "User not found.");
     }
 
