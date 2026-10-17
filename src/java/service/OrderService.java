@@ -4,11 +4,13 @@
  */
 package service;
 
+import dao.DiscountDAO;
 import dao.OrderDAO;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.List;
+import model.DiscountCode;
 import model.Order;
 import model.User;
 import model.enums.OrderStatus;
@@ -27,20 +29,23 @@ public class OrderService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final OrderDAO orderDAO = new OrderDAO();
+    private final DiscountDAO discountDAO = new DiscountDAO();
 
-    public Order create(User user, String rawAmount) throws SQLException {
-        return create(user, rawAmount, null);
-    }
-
-    public Order create(User user, String rawAmount, String rawCashAmount) throws SQLException {
-        long amount = parseAmount(rawAmount);
-        long cash = parseOptionalAmount(rawCashAmount);
+    public Order create(User user, String rawAmount, String rawCashAmount, boolean allCash, String rawCode) throws SQLException {
+        long subtotal = parseAmount(rawAmount);
+        DiscountCode discountCode = findUsableCode(rawCode);
+        long discount = discountCode == null ? 0 : discountCode.discountFor(subtotal);
+        long amount = subtotal - discount;
+        if (amount < AppConfig.MIN_AMOUNT) {
+            throw new IllegalArgumentException("The amount after the discount must be at least " + AppConfig.MIN_AMOUNT + " VND.");
+        }
+        long cash = allCash ? amount : parseOptionalAmount(rawCashAmount);
 
         if (cash < 0) {
             throw new IllegalArgumentException("Cash amount cannot be negative.");
         }
         if (cash > amount) {
-            throw new IllegalArgumentException("Cash amount cannot exceed order total.");
+            throw new IllegalArgumentException("Cash amount cannot exceed the amount to pay (" + amount + " VND after the discount).");
         }
         boolean isAllCash = (cash == amount);
         long transfer = isAllCash ? 0 : (amount - cash);
@@ -53,6 +58,8 @@ public class OrderService {
             order.setCreatedBy(user.getUserId());
             order.setAmount(BigDecimal.valueOf(amount));
             order.setCashAmount(BigDecimal.valueOf(cash));
+            order.setDiscountCode(discountCode == null ? null : discountCode.getCode());
+            order.setDiscountAmount(BigDecimal.valueOf(discount));
             order.setStatus(isAllCash ? OrderStatus.COMPLETED : OrderStatus.PENDING);
             order.setQrContent(isAllCash ? null : VietQrUtil.buildImageUrl(transfer, code));
             try {
@@ -60,6 +67,8 @@ public class OrderService {
                 Order created = orderDAO.findByCode(code);
                 AuditService.log(user, "CREATE_ORDER", "ORDER", code,
                         "amount", String.valueOf(amount),
+                        "discount_code", discountCode == null ? "" : discountCode.getCode(),
+                        "discount", String.valueOf(discount),
                         "cash", String.valueOf(cash),
                         "transfer", String.valueOf(transfer),
                         "status", order.getStatus().name());
@@ -71,6 +80,22 @@ public class OrderService {
             }
         }
         throw new IllegalStateException("Could not generate a unique order code. Please try again.");
+    }
+
+    public List<DiscountCode> sharedCodes() throws SQLException {
+        return discountDAO.findSharedUsable();
+    }
+
+    private DiscountCode findUsableCode(String rawCode) throws SQLException {
+        String code = rawCode == null ? "" : rawCode.trim().toUpperCase();
+        if (code.isEmpty()) {
+            return null;
+        }
+        DiscountCode found = code.matches("[A-Z0-9_-]{3,30}") ? discountDAO.findByCode(code) : null;
+        if (found == null || !found.isAvailable()) {
+            throw new IllegalArgumentException("The discount code is not valid, has expired or has been used up.");
+        }
+        return found;
     }
 
     public Order findForUser(User user, String code) throws SQLException {

@@ -33,6 +33,7 @@ public final class AccessPolicy {
             new Rule("/admin/users/edit", USER_WRITE, USER_WRITE),
             new Rule("/admin/users", USER_READ, USER_WRITE),
             new Rule("/admin/devices", DEVICE_READ, DEVICE_WRITE),
+            new Rule("/admin/discounts", DISCOUNT_MANAGE, DISCOUNT_MANAGE),
             new Rule("/admin/audit", AUDIT_READ, AUDIT_READ),
             new Rule("/admin", SYSTEM_ADMIN, SYSTEM_ADMIN),
             new Rule("/shift/print", SHIFT_PRINT, SHIFT_PRINT),
@@ -43,7 +44,6 @@ public final class AccessPolicy {
             new Rule("/printer", SPEAKER_USE, SPEAKER_USE),
             new Rule("/transactions", TRANSACTION_READ, TRANSACTION_READ),
             new Rule("/alerts", ALERT_READ, ALERT_WRITE),
-            new Rule("/tickets", TICKET_WRITE, TICKET_WRITE),
             new Rule("/settings", DASHBOARD_READ, DASHBOARD_READ),
             new Rule("/home", DASHBOARD_READ, DASHBOARD_READ),
             new Rule("/dashboard", DASHBOARD_READ, DASHBOARD_READ)
