@@ -52,7 +52,7 @@ public class OrderServlet extends HttpServlet {
                     if (!shiftOpen(request, response)) {
                         break;
                     }
-                    showNewForm(request, response, user, null, null, null);
+                    showNewForm(request, response, user, null, null, null, null, null);
                     break;
                 case "/orders/view":
                     showOrder(request, response, user);
@@ -119,11 +119,14 @@ public class OrderServlet extends HttpServlet {
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response, User user,
-            String error, String amount, String cashAmount) throws SQLException, ServletException, IOException {
+            String error, String amount, String cashAmount, String pickedCode, String typedCode) throws SQLException, ServletException, IOException {
         request.setAttribute("recentOrders", orderService.recent(user));
         request.setAttribute("error", error);
         request.setAttribute("amount", amount);
         request.setAttribute("cashAmount", cashAmount);
+        request.setAttribute("sharedCodes", orderService.sharedCodes());
+        request.setAttribute("pickedCode", pickedCode);
+        request.setAttribute("typedCode", typedCode);
         request.getRequestDispatcher(VIEW_NEW).forward(request, response);
     }
 
@@ -131,11 +134,15 @@ public class OrderServlet extends HttpServlet {
             throws SQLException, ServletException, IOException {
         String rawAmount = request.getParameter("amount");
         String rawCash = request.getParameter("cashAmount");
+        String picked = request.getParameter("pickedCode");
+        String typed = request.getParameter("typedCode");
+        boolean allCash = request.getParameter("methodCash") != null && request.getParameter("methodQr") == null;
+        String rawCode = typed != null && !typed.trim().isEmpty() ? typed : picked;
         try {
-            Order order = orderService.create(user, rawAmount, rawCash);
+            Order order = orderService.create(user, rawAmount, rawCash, allCash, rawCode);
             response.sendRedirect(request.getContextPath() + "/orders/view?code=" + order.getOrderCode());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            showNewForm(request, response, user, e.getMessage(), rawAmount, rawCash);
+            showNewForm(request, response, user, e.getMessage(), rawAmount, rawCash, picked, typed);
         }
     }
 
