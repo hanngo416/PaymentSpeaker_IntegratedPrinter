@@ -20,6 +20,8 @@ public class Order {
     private String createdByCode;
     private BigDecimal amount;
     private BigDecimal cashAmount = BigDecimal.ZERO;
+    private String discountCode;
+    private BigDecimal discountAmount = BigDecimal.ZERO;
     private OrderStatus status;
     private String qrContent;
     private Timestamp expiresAt;
@@ -46,6 +48,16 @@ public class Order {
 
     public BigDecimal getTransferAmount() {
         return amount != null ? amount.subtract(getCashAmount()) : BigDecimal.ZERO;
+    }
+
+    public String getDiscountCode() { return discountCode; }
+    public void setDiscountCode(String discountCode) { this.discountCode = discountCode; }
+
+    public BigDecimal getDiscountAmount() { return discountAmount != null ? discountAmount : BigDecimal.ZERO; }
+    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount != null ? discountAmount : BigDecimal.ZERO; }
+
+    public BigDecimal getSubtotal() {
+        return amount != null ? amount.add(getDiscountAmount()) : BigDecimal.ZERO;
     }
 
     public OrderStatus getStatus() { return status; }
