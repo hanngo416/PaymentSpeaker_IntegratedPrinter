@@ -6,12 +6,15 @@ package service;
 
 import dao.DiscountDAO;
 import dao.OrderDAO;
+import dao.OrderItemDAO;
+import dao.SettingDAO;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.List;
 import model.DiscountCode;
 import model.Order;
+import model.OrderItem;
 import model.User;
 import model.enums.OrderStatus;
 import model.enums.Role;
@@ -30,9 +33,24 @@ public class OrderService {
 
     private final OrderDAO orderDAO = new OrderDAO();
     private final DiscountDAO discountDAO = new DiscountDAO();
+    private final OrderItemDAO orderItemDAO = new OrderItemDAO();
+    private final SettingDAO settingDAO = new SettingDAO();
 
     public Order create(User user, String rawAmount, String rawCashAmount, boolean allCash, String rawCode) throws SQLException {
-        long subtotal = parseAmount(rawAmount);
+        return create(user, rawAmount, rawCashAmount, allCash, rawCode, null);
+    }
+
+    public Order create(User user, String rawAmount, String rawCashAmount, boolean allCash, String rawCode, List<OrderItem> items) throws SQLException {
+        long subtotal;
+        if (items != null && !items.isEmpty()) {
+            long sum = 0;
+            for (OrderItem it : items) {
+                sum += it.getSubtotal().longValue();
+            }
+            subtotal = sum;
+        } else {
+            subtotal = parseAmount(rawAmount);
+        }
         DiscountCode discountCode = findUsableCode(rawCode);
         long discount = discountCode == null ? 0 : discountCode.discountFor(subtotal);
         long amount = subtotal - discount;
@@ -47,6 +65,7 @@ public class OrderService {
         if (cash > amount) {
             throw new IllegalArgumentException("Cash amount cannot exceed the amount to pay (" + amount + " VND after the discount).");
         }
+        BigDecimal vatRate = settingDAO.getVatRate();
         boolean isAllCash = (cash == amount);
         long transfer = isAllCash ? 0 : (amount - cash);
 
@@ -60,17 +79,20 @@ public class OrderService {
             order.setCashAmount(BigDecimal.valueOf(cash));
             order.setDiscountCode(discountCode == null ? null : discountCode.getCode());
             order.setDiscountAmount(BigDecimal.valueOf(discount));
+            order.setVatRate(vatRate);
             order.setStatus(isAllCash ? OrderStatus.COMPLETED : OrderStatus.PENDING);
             order.setQrContent(isAllCash ? null : VietQrUtil.buildImageUrl(transfer, code));
             try {
-                orderDAO.insert(order, AppConfig.ORDER_MINUTES);
+                orderDAO.insert(order, AppConfig.ORDER_MINUTES, items);
                 Order created = orderDAO.findByCode(code);
                 AuditService.log(user, "CREATE_ORDER", "ORDER", code,
                         "amount", String.valueOf(amount),
                         "discount_code", discountCode == null ? "" : discountCode.getCode(),
                         "discount", String.valueOf(discount),
+                        "vat_rate", vatRate.toPlainString(),
                         "cash", String.valueOf(cash),
                         "transfer", String.valueOf(transfer),
+                        "items_count", String.valueOf(items == null ? 0 : items.size()),
                         "status", order.getStatus().name());
                 return created;
             } catch (SQLException e) {
@@ -80,6 +102,10 @@ public class OrderService {
             }
         }
         throw new IllegalStateException("Could not generate a unique order code. Please try again.");
+    }
+
+    public List<OrderItem> itemsOf(int orderId) throws SQLException {
+        return orderItemDAO.findByOrderId(orderId);
     }
 
     public List<DiscountCode> sharedCodes() throws SQLException {
