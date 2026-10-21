@@ -57,6 +57,44 @@
             </label>
         </div>
     </div>
+
+    <div class="setting-item">
+        <div class="setting-info">
+            <strong>Receipt paper size</strong>
+            <p class="hint">Match the paper loaded in the printer on this computer so the receipt fits the roll or sheet.</p>
+        </div>
+        <div class="setting-control">
+            <select id="paperSize" aria-label="Receipt paper size">
+                <option value="58">Thermal roll 58 mm</option>
+                <option value="80">Thermal roll 80 mm / 76×130 mm</option>
+                <option value="76">Thermal slip 76×130 mm</option>
+                <option value="a4">A4 sheet</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Tax (VAT)</h2>
+    <div class="setting-item">
+        <div class="setting-info">
+            <strong>VAT rate included in prices</strong>
+            <p class="hint">Printed on the receipt as "VAT included". 8% applies until 31/12/2026, then 10% unless the law is extended. Use 0 to hide the VAT line. Each order keeps the rate it was created with.</p>
+        </div>
+        <div class="setting-control">
+            <c:choose>
+                <c:when test="${isAdmin}">
+                    <form method="post" action="${ctx}/settings" class="filters">
+                        <input type="hidden" name="action" value="vat">
+                        <input type="text" name="vatRate" value="${vatRate}" inputmode="decimal" maxlength="5" aria-label="VAT rate in percent" style="width:80px">
+                        <span>%</span>
+                        <button type="submit" class="btn">Save</button>
+                    </form>
+                </c:when>
+                <c:otherwise><strong><c:out value="${vatRate}"/>%</strong></c:otherwise>
+            </c:choose>
+        </div>
+    </div>
 </div>
 
 <div class="card">
@@ -87,14 +125,14 @@
                             <input type="hidden" name="id" value="${d.deviceId}">
                             <input type="hidden" name="action" value="${d.status == 'MAINTENANCE' ? 'online' : 'maintenance'}">
                             <label class="toggle-switch" title="Switch between Online and Maintenance mode">
-                                <input type="checkbox" ${d.status == 'ONLINE' ? 'checked' : ''} onchange="this.form.submit()">
+                                <input type="checkbox" ${d.status != 'MAINTENANCE' ? 'checked' : ''} onchange="this.form.submit()">
                                 <span class="toggle-slider"></span>
                             </label>
                         </form>
                     </c:when>
                     <c:otherwise>
                         <label class="toggle-switch disabled" title="Only technician or admin can change device status">
-                            <input type="checkbox" ${d.status == 'ONLINE' ? 'checked' : ''} disabled>
+                            <input type="checkbox" ${d.status != 'MAINTENANCE' ? 'checked' : ''} disabled>
                             <span class="toggle-slider"></span>
                         </label>
                     </c:otherwise>
@@ -115,6 +153,6 @@
 </div>
 
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
-<script src="${ctx}/assets/js/settings.js?v=2" charset="UTF-8"></script>
+<script src="${ctx}/assets/js/settings.js?v=3" charset="UTF-8"></script>
 </body>
 </html>

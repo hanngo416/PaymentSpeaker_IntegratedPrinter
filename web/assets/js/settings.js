@@ -8,6 +8,7 @@
     var autoprintToggle = document.getElementById('autoprintToggle');
     var autoprintStatus = document.getElementById('autoprintStatus');
     var logEl = document.getElementById('speakerLog');
+    var paperSize = document.getElementById('paperSize');
 
     function money(n) { return n.toLocaleString('vi-VN'); }
 
@@ -76,6 +77,14 @@
         autoprintToggle.addEventListener('change', function () {
             localStorage.setItem('spk-autoprint', autoprintToggle.checked ? 'on' : 'off');
             renderAutoprint();
+        });
+    }
+
+    if (paperSize) {
+        paperSize.value = localStorage.getItem('spk-paper') || '80';
+        if (!paperSize.value) { paperSize.value = '80'; }
+        paperSize.addEventListener('change', function () {
+            localStorage.setItem('spk-paper', paperSize.value);
         });
     }
 
