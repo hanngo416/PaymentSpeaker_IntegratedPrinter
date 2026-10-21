@@ -4,9 +4,17 @@
  */
 package controller.order;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import controller.auth.LoginServlet;
+import dao.CatalogDAO;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -15,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.Order;
+import model.OrderItem;
 import model.User;
 import service.OrderService;
 import service.ShiftService;
@@ -32,6 +41,7 @@ public class OrderServlet extends HttpServlet {
 
     private final OrderService orderService = new OrderService();
     private final ShiftService shiftService = new ShiftService();
+    private final CatalogDAO catalogDAO = new CatalogDAO();
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -121,6 +131,9 @@ public class OrderServlet extends HttpServlet {
     private void showNewForm(HttpServletRequest request, HttpServletResponse response, User user,
             String error, String amount, String cashAmount, String pickedCode, String typedCode) throws SQLException, ServletException, IOException {
         request.setAttribute("recentOrders", orderService.recent(user));
+        request.setAttribute("categories", catalogDAO.findAllCategories());
+        request.setAttribute("groups", catalogDAO.findAllGroups());
+        request.setAttribute("products", catalogDAO.findActiveProducts());
         request.setAttribute("error", error);
         request.setAttribute("amount", amount);
         request.setAttribute("cashAmount", cashAmount);
@@ -136,14 +149,48 @@ public class OrderServlet extends HttpServlet {
         String rawCash = request.getParameter("cashAmount");
         String picked = request.getParameter("pickedCode");
         String typed = request.getParameter("typedCode");
+        String rawCartItems = request.getParameter("cartItems");
         boolean allCash = request.getParameter("methodCash") != null && request.getParameter("methodQr") == null;
         String rawCode = typed != null && !typed.trim().isEmpty() ? typed : picked;
+        List<OrderItem> items = parseCartItems(rawCartItems);
         try {
-            Order order = orderService.create(user, rawAmount, rawCash, allCash, rawCode);
+            Order order = orderService.create(user, rawAmount, rawCash, allCash, rawCode, items.isEmpty() ? null : items);
             response.sendRedirect(request.getContextPath() + "/orders/view?code=" + order.getOrderCode());
         } catch (IllegalArgumentException | IllegalStateException e) {
             showNewForm(request, response, user, e.getMessage(), rawAmount, rawCash, picked, typed);
         }
+    }
+
+    private static List<OrderItem> parseCartItems(String rawJson) {
+        List<OrderItem> items = new ArrayList<>();
+        if (rawJson == null || rawJson.trim().isEmpty() || "[]".equals(rawJson.trim())) {
+            return items;
+        }
+        try {
+            JsonElement el = new JsonParser().parse(rawJson);
+            if (!el.isJsonArray()) {
+                return items;
+            }
+            JsonArray arr = el.getAsJsonArray();
+            for (JsonElement itemEl : arr) {
+                if (!itemEl.isJsonObject()) {
+                    continue;
+                }
+                JsonObject obj = itemEl.getAsJsonObject();
+                int pId = obj.has("productId") && !obj.get("productId").isJsonNull() ? obj.get("productId").getAsInt() : 0;
+                String name = obj.has("productName") && !obj.get("productName").isJsonNull() ? obj.get("productName").getAsString().trim() : "";
+                BigDecimal price = obj.has("unitPrice") && !obj.get("unitPrice").isJsonNull()
+                        ? new BigDecimal(obj.get("unitPrice").getAsString().trim())
+                        : BigDecimal.ZERO;
+                int qty = obj.has("quantity") && !obj.get("quantity").isJsonNull() ? obj.get("quantity").getAsInt() : 1;
+                if (!name.isEmpty() && price.signum() > 0 && qty > 0) {
+                    BigDecimal subtotal = price.multiply(BigDecimal.valueOf(qty));
+                    items.add(new OrderItem(0, pId > 0 ? pId : null, name, price, qty, subtotal));
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return items;
     }
 
     private void showOrder(HttpServletRequest request, HttpServletResponse response, User user)
@@ -154,6 +201,7 @@ public class OrderServlet extends HttpServlet {
             return;
         }
         request.setAttribute("order", order);
+        request.setAttribute("orderItems", orderService.itemsOf(order.getOrderId()));
         request.getRequestDispatcher(VIEW_ORDER).forward(request, response);
     }
 
