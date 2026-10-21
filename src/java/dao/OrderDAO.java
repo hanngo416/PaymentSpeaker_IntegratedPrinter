@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import model.Order;
+import model.OrderItem;
 import model.enums.OrderStatus;
 import util.DBUtil;
 
@@ -23,7 +24,7 @@ import util.DBUtil;
 public class OrderDAO {
 
     private static final String SELECT_COLUMNS
-            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, status, qr_content, "
+            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, vat_rate, status, qr_content, "
             + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
             + "FROM Orders ";
 
@@ -34,8 +35,12 @@ public class OrderDAO {
             + "FROM DiscountCodes d WHERE d.code IN (SELECT code FROM @c)";
 
     public void insert(Order order, int validMinutes) throws SQLException {
-        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, discount_code, discount_amount, status, qr_content, expires_at) "
-                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
+        insert(order, validMinutes, null);
+    }
+
+    public void insert(Order order, int validMinutes, List<OrderItem> items) throws SQLException {
+        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, discount_code, discount_amount, vat_rate, status, qr_content, expires_at) "
+                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
         try (Connection con = DBUtil.getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -49,14 +54,18 @@ public class OrderDAO {
                 ps.setBigDecimal(5, order.getCashAmount());
                 ps.setString(6, order.getDiscountCode());
                 ps.setBigDecimal(7, order.getDiscountAmount());
-                ps.setString(8, order.getStatus() != null ? order.getStatus().name() : OrderStatus.PENDING.name());
-                ps.setString(9, order.getQrContent());
-                ps.setInt(10, validMinutes);
+                ps.setBigDecimal(8, order.getVatRate());
+                ps.setString(9, order.getStatus() != null ? order.getStatus().name() : OrderStatus.PENDING.name());
+                ps.setString(10, order.getQrContent());
+                ps.setInt(11, validMinutes);
                 ps.executeUpdate();
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
                         order.setOrderId(keys.getInt(1));
                     }
+                }
+                if (items != null && !items.isEmpty()) {
+                    OrderItemDAO.insertBatch(con, order.getOrderId(), items);
                 }
                 con.commit();
             } catch (SQLException | RuntimeException e) {
@@ -77,7 +86,7 @@ public class OrderDAO {
     }
 
     public List<Order> findRecent(int limit, Integer createdBy) throws SQLException {
-        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, status, qr_content, "
+        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, vat_rate, status, qr_content, "
                 + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
                 + "FROM Orders " + (createdBy == null ? "" : "WHERE created_by = ? ")
                 + "ORDER BY created_at DESC, order_id DESC";
@@ -128,6 +137,7 @@ public class OrderDAO {
         } catch (SQLException ignored) { }
         o.setDiscountCode(rs.getString("discount_code"));
         o.setDiscountAmount(rs.getBigDecimal("discount_amount"));
+        o.setVatRate(rs.getBigDecimal("vat_rate"));
         o.setStatus(OrderStatus.valueOf(rs.getString("status")));
         o.setQrContent(rs.getString("qr_content"));
         o.setExpiresAt(rs.getTimestamp("expires_at"));

@@ -169,8 +169,8 @@ public class TransactionDAO {
     }
 
     private static final String RECEIPT_SELECT
-            = "SELECT t.trans_id, t.bank_trans_id, o.order_code, o.created_by_code, t.amount, o.amount AS order_amount, "
-            + "ISNULL(o.cash_amount, 0) AS cash_amount, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
+            = "SELECT t.trans_id, t.bank_trans_id, o.order_id, o.order_code, o.created_by_code, t.amount, o.amount AS order_amount, "
+            + "ISNULL(o.cash_amount, 0) AS cash_amount, o.vat_rate, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
             + "WHERE t.status IN (N'COMPLETED', N'LEGIT') ";
 
     public ReceiptRow findReceipt(int transId, Integer cashierId) throws SQLException {
@@ -178,6 +178,25 @@ public class TransactionDAO {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, transId);
+            if (cashierId != null) {
+                ps.setInt(2, cashierId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapReceipt(rs) : null;
+            }
+        }
+    }
+
+    public ReceiptRow findReceiptByOrder(int orderId, Integer cashierId) throws SQLException {
+        String sql = "SELECT ISNULL(t.trans_id, 0) AS trans_id, t.bank_trans_id, o.order_id, o.order_code, o.created_by_code, "
+                + "ISNULL(t.amount, 0) AS amount, o.amount AS order_amount, ISNULL(o.cash_amount, 0) AS cash_amount, o.vat_rate, "
+                + "ISNULL(t.trans_time, o.created_at) AS trans_time, ISNULL(t.printed, 0) AS printed "
+                + "FROM Orders o LEFT JOIN Transactions t ON t.order_id = o.order_id AND t.status IN (N'COMPLETED', N'LEGIT') "
+                + "WHERE o.order_id = ? AND o.status IN (N'COMPLETED', N'PAID') "
+                + (cashierId == null ? "" : "AND o.created_by = ?");
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
             if (cashierId != null) {
                 ps.setInt(2, cashierId);
             }
@@ -198,6 +217,7 @@ public class TransactionDAO {
     private static ReceiptRow mapReceipt(ResultSet rs) throws SQLException {
         ReceiptRow r = new ReceiptRow();
         r.setTransId(rs.getInt("trans_id"));
+        r.setOrderId(rs.getInt("order_id"));
         r.setBankTransId(rs.getString("bank_trans_id"));
         r.setOrderCode(rs.getString("order_code"));
         r.setCashierCode(rs.getString("created_by_code"));
@@ -206,6 +226,7 @@ public class TransactionDAO {
         try {
             r.setCashAmount(rs.getBigDecimal("cash_amount"));
         } catch (SQLException ignored) { }
+        r.setVatRate(rs.getBigDecimal("vat_rate"));
         r.setTransTime(rs.getTimestamp("trans_time"));
         r.setPrinted(rs.getBoolean("printed"));
         return r;

@@ -22,6 +22,7 @@ public class Order {
     private BigDecimal cashAmount = BigDecimal.ZERO;
     private String discountCode;
     private BigDecimal discountAmount = BigDecimal.ZERO;
+    private BigDecimal vatRate = BigDecimal.ZERO;
     private OrderStatus status;
     private String qrContent;
     private Timestamp expiresAt;
@@ -55,6 +56,9 @@ public class Order {
 
     public BigDecimal getDiscountAmount() { return discountAmount != null ? discountAmount : BigDecimal.ZERO; }
     public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount != null ? discountAmount : BigDecimal.ZERO; }
+
+    public BigDecimal getVatRate() { return vatRate != null ? vatRate : BigDecimal.ZERO; }
+    public void setVatRate(BigDecimal vatRate) { this.vatRate = vatRate != null ? vatRate : BigDecimal.ZERO; }
 
     public BigDecimal getSubtotal() {
         return amount != null ? amount.add(getDiscountAmount()) : BigDecimal.ZERO;
