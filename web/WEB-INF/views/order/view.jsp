@@ -106,6 +106,32 @@
                         </c:if>
                     </div>
 
+                    <c:if test="${not empty orderItems}">
+                        <div class="order-items-box">
+                            <div class="order-items-title">Purchased Items</div>
+                            <table class="order-items-table">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left;">Item</th>
+                                        <th style="text-align: center; width: 50px;">Qty</th>
+                                        <th style="text-align: right; width: 90px;">Price</th>
+                                        <th style="text-align: right; width: 100px;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="item" items="${orderItems}">
+                                        <tr>
+                                            <td style="text-align: left;"><strong><c:out value="${item.productName}"/></strong></td>
+                                            <td style="text-align: center;"><c:out value="${item.quantity}"/></td>
+                                            <td style="text-align: right;"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0"/> ₫</td>
+                                            <td style="text-align: right; font-weight: 600;"><fmt:formatNumber value="${item.subtotal}" pattern="#,##0"/> ₫</td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </c:if>
+
                     <div class="order-card-actions">
                         <a href="${ctx}/orders/new" class="btn primary btn-pos">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -114,6 +140,10 @@
                             </svg>
                             Create New Order
                         </a>
+                        <form method="post" action="${ctx}/printer/print" target="_blank" class="inline">
+                            <input type="hidden" name="order" value="${order.orderId}">
+                            <button type="submit" class="btn secondary">Print Receipt</button>
+                        </form>
                         <a href="${ctx}/transactions" class="btn secondary">
                             View All Transactions
                         </a>
@@ -176,6 +206,32 @@
                             <span class="val"><strong><c:out value="${order.createdByCode}"/></strong></span>
                         </div>
                     </div>
+
+                    <c:if test="${not empty orderItems}">
+                        <div class="order-items-box">
+                            <div class="order-items-title">Order Items</div>
+                            <table class="order-items-table">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left;">Item</th>
+                                        <th style="text-align: center; width: 50px;">Qty</th>
+                                        <th style="text-align: right; width: 90px;">Price</th>
+                                        <th style="text-align: right; width: 100px;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="item" items="${orderItems}">
+                                        <tr>
+                                            <td style="text-align: left;"><strong><c:out value="${item.productName}"/></strong></td>
+                                            <td style="text-align: center;"><c:out value="${item.quantity}"/></td>
+                                            <td style="text-align: right;"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0"/> ₫</td>
+                                            <td style="text-align: right; font-weight: 600;"><fmt:formatNumber value="${item.subtotal}" pattern="#,##0"/> ₫</td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </c:if>
 
                     <div class="order-card-actions">
                         <form method="post" action="${ctx}/orders/cancel" style="width: 100%;"

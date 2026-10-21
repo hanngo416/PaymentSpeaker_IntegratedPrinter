@@ -18,162 +18,272 @@
 </c:forEach>
 
 <div class="pos-dual-layout">
-    <!-- LEFT: Frameless Small Cards Pending Orders Queue -->
-    <div class="pos-pending-panel">
-        <div class="pos-mini-queue-header">
-            <span class="pos-mini-queue-title">Pending Orders</span>
-            <span class="pos-mini-queue-badge" id="queueBadge" style="${pendingCount > 0 ? '' : 'display:none;'}">
-                <span id="queueCount">${pendingCount}</span>
-            </span>
+    <!-- LEFT: Convenience Store Product Catalog -->
+    <div class="card pos-catalog-panel">
+        <div class="pos-catalog-header">
+            <div class="pos-search-wrap">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="posSearchInput" placeholder="Search by name, brand, or code (e.g. Lay's, Coca, DRK01)..." autocomplete="off">
+                <button type="button" id="posSearchClear" class="pos-search-clear" style="display: none;">&times;</button>
+            </div>
+            <button type="button" class="btn-custom-sale" id="btnCustomSale" title="Switch to custom amount sale">
+                ⚡ Quick Custom Sale
+            </button>
         </div>
 
-        <c:choose>
-            <c:when test="${pendingCount == 0}">
-                <p class="pos-mini-empty" id="emptyQueueMsg">No pending orders waiting for payment.</p>
-                <div class="pos-queue-list" id="posQueueList" style="display: none;"></div>
-            </c:when>
-            <c:otherwise>
-                <p class="pos-mini-empty" id="emptyQueueMsg" style="display: none;">No pending orders waiting for payment.</p>
-                <div class="pos-queue-list" id="posQueueList">
-                    <c:forEach var="o" items="${recentOrders}">
-                        <c:if test="${o.status == 'PENDING'}">
-                            <div class="pos-mini-card" id="card-${o.orderCode}" data-code="${o.orderCode}" data-status="PENDING">
-                                <div class="pos-mini-main" onclick="window.location.href='${ctx}/orders/view?code=<c:out value='${o.orderCode}'/>'" title="Click to view order details">
-                                    <div class="pos-mini-top">
-                                        <span class="pos-mini-code"><c:out value="${o.orderCode}"/></span>
-                                        <span class="pulse-dot"></span>
-                                        <span class="pos-mini-amt"><fmt:formatNumber value="${o.amount}" pattern="#,##0"/> ₫</span>
-                                    </div>
-                                    <div class="pos-mini-sub">
-                                        <span><fmt:formatDate value="${o.createdAt}" pattern="HH:mm"/></span>
-                                        <c:choose>
-                                            <c:when test="${o.cashAmount > 0}">
-                                                <span>&bull; Cash: <fmt:formatNumber value="${o.cashAmount}" pattern="#,##0"/> ₫ + QR</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span>&bull; 100% VietQR</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                </div>
-                                <div class="pos-mini-actions">
-                                    <button type="button" class="btn-mini-qr"
-                                            data-code="<c:out value='${o.orderCode}'/>"
-                                            data-amount="<fmt:formatNumber value='${o.amount}' pattern='#,##0'/> ₫"
-                                            data-transfer="<fmt:formatNumber value='${o.transferAmount}' pattern='#,##0'/> ₫"
-                                            data-cash="<fmt:formatNumber value='${o.cashAmount}' pattern='#,##0'/> ₫"
-                                            data-qr="<c:out value='${o.qrContent}'/>"
-                                            data-remaining="${o.remainingSeconds}"
-                                            title="Show QR code">
-                                        QR
-                                    </button>
-                                    <form method="post" action="${ctx}/orders/cancel" class="pos-mini-cancel-form"
-                                          onsubmit="return confirm('Cancel order ${o.orderCode}?');">
-                                        <input type="hidden" name="code" value="<c:out value='${o.orderCode}'/>">
-                                        <button type="submit" class="btn-mini-action cancel" title="Cancel order">&times;</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </c:if>
-                    </c:forEach>
+        <!-- Tier 1: Category Navigation Tabs -->
+        <div class="pos-cat-tabs" id="posCatTabs">
+            <button type="button" class="pos-cat-tab active" data-cat="all">
+                <span class="cat-icon">🏪</span>
+                <span>All Items</span>
+            </button>
+            <c:forEach var="c" items="${categories}">
+                <button type="button" class="pos-cat-tab" data-cat="${c.categoryId}">
+                    <c:choose>
+                        <c:when test="${c.categoryName == 'Beverages'}"><span class="cat-icon">🥤</span></c:when>
+                        <c:when test="${c.categoryName == 'Snacks'}"><span class="cat-icon">🍿</span></c:when>
+                        <c:when test="${c.categoryName == 'Bakery'}"><span class="cat-icon">🥐</span></c:when>
+                        <c:when test="${c.categoryName == 'Ready to Eat'}"><span class="cat-icon">🍜</span></c:when>
+                        <c:otherwise><span class="cat-icon">📦</span></c:otherwise>
+                    </c:choose>
+                    <span><c:out value="${c.categoryName}"/></span>
+                </button>
+            </c:forEach>
+        </div>
+
+        <!-- Tier 2: Group Sub-filter Pills -->
+        <div class="pos-grp-bar" id="posGrpBar">
+            <button type="button" class="pos-grp-pill active" data-grp="all" data-cat="all">All Groups</button>
+            <c:forEach var="g" items="${groups}">
+                <button type="button" class="pos-grp-pill" data-grp="${g.groupId}" data-cat="${g.categoryId}">
+                    <c:out value="${g.groupName}"/>
+                </button>
+            </c:forEach>
+        </div>
+
+        <!-- Tier 3: Products Grid -->
+        <div class="pos-product-grid" id="posProductGrid">
+            <c:forEach var="p" items="${products}">
+                <div class="pos-product-card"
+                     data-id="${p.productId}"
+                     data-code="<c:out value='${p.productCode}'/>"
+                     data-name="<c:out value='${p.productName}'/>"
+                     data-price="${p.price}"
+                     data-cat="${p.categoryId}"
+                     data-grp="${p.groupId}"
+                     tabindex="0"
+                     role="button"
+                     title="Click to add <c:out value='${p.productName}'/> to cart">
+                    <div class="pos-prod-top">
+                        <span class="pos-prod-code"><c:out value="${p.productCode}"/></span>
+                        <span class="pos-prod-grp"><c:out value="${p.groupName}"/></span>
+                    </div>
+                    <div class="pos-prod-name"><c:out value="${p.productName}"/></div>
+                    <div class="pos-prod-bottom">
+                        <span class="pos-prod-price"><fmt:formatNumber value="${p.price}" pattern="#,##0"/> ₫</span>
+                        <span class="pos-prod-add-btn" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </span>
+                    </div>
                 </div>
-            </c:otherwise>
-        </c:choose>
+            </c:forEach>
+        </div>
+        <div id="posNoProducts" class="pos-no-products" style="display: none;">
+            No products match your search or filter.
+        </div>
     </div>
 
-    <!-- RIGHT: Compact Short Form -->
+    <!-- RIGHT: Cart & Checkout / Pending Queue Panel -->
     <div class="card pos-create-panel">
-        <h2 class="pos-compact-title">Create payment order</h2>
+        <div class="pos-panel-tabs">
+            <button type="button" class="pos-panel-tab-btn active" id="tabBtnCart">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span>Current Cart</span>
+                <span class="pos-cart-badge" id="cartCountBadge" style="display: none;">0</span>
+            </button>
+            <button type="button" class="pos-panel-tab-btn" id="tabBtnPending">
+                <span class="pos-tab-dot ${pendingCount > 0 ? 'pulse' : ''}"></span>
+                <span>Pending Orders</span>
+                <span class="pos-mini-queue-badge" id="queueBadge" style="${pendingCount > 0 ? '' : 'display:none;'}">
+                    <span id="queueCount">${pendingCount}</span>
+                </span>
+            </button>
+        </div>
 
-        <c:if test="${not empty error}">
-            <div class="alert-banner" style="margin-bottom: 12px; padding: 8px 12px; font-size: 13px;"><c:out value="${error}"/></div>
-        </c:if>
+        <!-- VIEW 1: CART & CHECKOUT FORM -->
+        <div id="panelViewCart" class="pos-panel-view">
+            <c:if test="${not empty error}">
+                <div class="alert-banner" style="margin-bottom: 12px; padding: 8px 12px; font-size: 13px;"><c:out value="${error}"/></div>
+            </c:if>
 
-        <form method="post" action="${ctx}/orders/new" id="orderForm">
-            <div class="pos-compact-label-row">
-                <label for="amount" class="pos-compact-label">Amount</label>
-                <span class="pos-currency-pill">VND</span>
-            </div>
-            <div class="pos-compact-input-wrap">
-                <input id="amount" class="pos-compact-input" type="text" name="amount" inputmode="numeric" pattern="[0-9,]*" maxlength="11" autocomplete="off"
-                       value="<c:out value='${amount}'/>" placeholder="0" required autofocus>
-                <span class="pos-currency-symbol">₫</span>
-            </div>
+            <form method="post" action="${ctx}/orders/new" id="orderForm">
+                <input type="hidden" name="cartItems" id="cartItems" value="">
 
-            <div class="pos-compact-presets">
-                <button type="button" class="preset-chip" data-amount="20000">20k</button>
-                <button type="button" class="preset-chip" data-amount="50000">50k</button>
-                <button type="button" class="preset-chip" data-amount="100000">100k</button>
-                <button type="button" class="preset-chip" data-amount="200000">200k</button>
-                <button type="button" class="preset-chip" data-amount="500000">500k</button>
-            </div>
+                <!-- Selected Items List -->
+                <div class="pos-cart-section">
+                    <div class="pos-cart-header">
+                        <span class="pos-cart-title">Selected Items</span>
+                        <button type="button" class="pos-cart-clear-btn" id="btnClearCart" style="display: none;">Clear all</button>
+                    </div>
+                    <div class="pos-cart-list" id="posCartList"></div>
+                    <div class="pos-cart-empty-state" id="posCartEmpty">
+                        <p class="pos-cart-empty-title">Cart is empty</p>
+                        <p class="pos-cart-empty-desc">Click items from the catalog on the left to add, or type a custom amount below.</p>
+                    </div>
+                </div>
 
-            <div class="pos-compact-label-row">
-                <label for="pickedCode" class="pos-compact-label">Discount code</label>
-            </div>
-            <div class="pos-discount-row">
-                <select id="pickedCode" name="pickedCode">
-                    <option value="">No discount</option>
-                    <c:forEach var="d" items="${sharedCodes}">
-                        <option value="<c:out value='${d.code}'/>" ${pickedCode == d.code ? 'selected' : ''}><c:out value="${d.code}"/> (<c:choose><c:when test="${d.kind == 'PERCENT'}">-<fmt:formatNumber value="${d.value}" pattern="#,##0"/>%</c:when><c:otherwise>-<fmt:formatNumber value="${d.value}" pattern="#,##0"/> VND</c:otherwise></c:choose>)</option>
-                    </c:forEach>
-                </select>
-                <input type="text" id="typedCode" name="typedCode" maxlength="30" autocomplete="off" placeholder="Or type a code"
-                       value="<c:out value='${typedCode}'/>">
-            </div>
-
-            <div class="pos-compact-methods">
-                <label class="pos-seg-label">
-                    <input type="checkbox" id="methodCash" name="methodCash" value="1" ${not empty cashAmount && cashAmount != '0' ? 'checked' : ''}>
-                    <span class="pos-seg-btn">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle>
-                        </svg>
-                        <span>Cash</span>
-                        <svg class="pos-seg-check" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </span>
-                </label>
-                <label class="pos-seg-label">
-                    <input type="checkbox" id="methodQr" name="methodQr" value="1" ${(empty cashAmount || cashAmount == '0' || empty amount || cashAmount != amount) ? 'checked' : ''}>
-                    <span class="pos-seg-btn">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                        <span>VietQR</span>
-                        <svg class="pos-seg-check" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </span>
-                </label>
-            </div>
-
-            <div id="splitSection" class="pos-compact-split" style="${not empty cashAmount && cashAmount != '0' && cashAmount != amount ? '' : 'display: none;'}">
                 <div class="pos-compact-label-row">
-                    <label for="cashAmount" class="pos-compact-label">Cash at counter</label>
+                    <label for="amount" class="pos-compact-label" id="amountLabel">Total Order Amount</label>
                     <span class="pos-currency-pill">VND</span>
                 </div>
-                <div class="pos-compact-split-input-wrap">
-                    <input id="cashAmount" class="pos-compact-split-input" type="text" name="cashAmount" inputmode="numeric" pattern="[0-9,]*" maxlength="11" autocomplete="off"
-                           value="<c:out value='${cashAmount}'/>" placeholder="0">
+                <div class="pos-compact-input-wrap">
+                    <input id="amount" class="pos-compact-input" type="text" name="amount" inputmode="numeric" pattern="[0-9,]*" maxlength="11" autocomplete="off"
+                           value="<c:out value='${amount}'/>" placeholder="0" required autofocus>
                     <span class="pos-currency-symbol">₫</span>
                 </div>
-                <div class="pos-split-summary-inline">
-                    <span>Cash: <span id="previewCash">0 ₫</span></span>
-                    <span>QR to pay: <strong id="previewTransfer">0 ₫</strong></span>
-                </div>
-            </div>
 
-            <button class="pos-compact-submit" type="submit" id="submitBtn">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
-                </svg>
-                <span id="submitBtnText">Generate QR code</span>
-            </button>
-        </form>
+                <div class="pos-compact-presets" id="presetChipsWrap">
+                    <button type="button" class="preset-chip" data-amount="20000">20k</button>
+                    <button type="button" class="preset-chip" data-amount="50000">50k</button>
+                    <button type="button" class="preset-chip" data-amount="100000">100k</button>
+                    <button type="button" class="preset-chip" data-amount="200000">200k</button>
+                    <button type="button" class="preset-chip" data-amount="500000">500k</button>
+                </div>
+
+                <div class="pos-compact-label-row">
+                    <label for="pickedCode" class="pos-compact-label">Discount code</label>
+                </div>
+                <div class="pos-discount-row">
+                    <select id="pickedCode" name="pickedCode">
+                        <option value="">No discount</option>
+                        <c:forEach var="d" items="${sharedCodes}">
+                            <option value="<c:out value='${d.code}'/>" ${pickedCode == d.code ? 'selected' : ''}><c:out value="${d.code}"/> (<c:choose><c:when test="${d.kind == 'PERCENT'}">-<fmt:formatNumber value="${d.value}" pattern="#,##0"/>%</c:when><c:otherwise>-<fmt:formatNumber value="${d.value}" pattern="#,##0"/> VND</c:otherwise></c:choose>)</option>
+                        </c:forEach>
+                    </select>
+                    <input type="text" id="typedCode" name="typedCode" maxlength="30" autocomplete="off" placeholder="Or type a code"
+                           value="<c:out value='${typedCode}'/>">
+                </div>
+
+                <div class="pos-compact-methods">
+                    <label class="pos-seg-label">
+                        <input type="checkbox" id="methodCash" name="methodCash" value="1" ${not empty cashAmount && cashAmount != '0' ? 'checked' : ''}>
+                        <span class="pos-seg-btn">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle>
+                            </svg>
+                            <span>Cash</span>
+                            <svg class="pos-seg-check" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                    </label>
+                    <label class="pos-seg-label">
+                        <input type="checkbox" id="methodQr" name="methodQr" value="1" ${(empty cashAmount || cashAmount == '0' || empty amount || cashAmount != amount) ? 'checked' : ''}>
+                        <span class="pos-seg-btn">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                            <span>VietQR</span>
+                            <svg class="pos-seg-check" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                    </label>
+                </div>
+
+                <div id="splitSection" class="pos-compact-split" style="${not empty cashAmount && cashAmount != '0' && cashAmount != amount ? '' : 'display: none;'}">
+                    <div class="pos-compact-label-row">
+                        <label for="cashAmount" class="pos-compact-label">Cash at counter</label>
+                        <span class="pos-currency-pill">VND</span>
+                    </div>
+                    <div class="pos-compact-split-input-wrap">
+                        <input id="cashAmount" class="pos-compact-split-input" type="text" name="cashAmount" inputmode="numeric" pattern="[0-9,]*" maxlength="11" autocomplete="off"
+                               value="<c:out value='${cashAmount}'/>" placeholder="0">
+                        <span class="pos-currency-symbol">₫</span>
+                    </div>
+                    <div class="pos-split-summary-inline">
+                        <span>Cash: <span id="previewCash">0 ₫</span></span>
+                        <span>QR to pay: <strong id="previewTransfer">0 ₫</strong></span>
+                    </div>
+                </div>
+
+                <button class="pos-compact-submit" type="submit" id="submitBtn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span id="submitBtnText">Generate QR code</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- VIEW 2: PENDING ORDERS QUEUE -->
+        <div id="panelViewPending" class="pos-panel-view" style="display: none;">
+            <div class="pos-pending-panel">
+                <c:choose>
+                    <c:when test="${pendingCount == 0}">
+                        <p class="pos-mini-empty" id="emptyQueueMsg">No pending orders waiting for payment.</p>
+                        <div class="pos-queue-list" id="posQueueList" style="display: none;"></div>
+                    </c:when>
+                    <c:otherwise>
+                        <p class="pos-mini-empty" id="emptyQueueMsg" style="display: none;">No pending orders waiting for payment.</p>
+                        <div class="pos-queue-list" id="posQueueList">
+                            <c:forEach var="o" items="${recentOrders}">
+                                <c:if test="${o.status == 'PENDING'}">
+                                    <div class="pos-mini-card" id="card-${o.orderCode}" data-code="${o.orderCode}" data-status="PENDING">
+                                        <div class="pos-mini-main" onclick="window.location.href='${ctx}/orders/view?code=<c:out value='${o.orderCode}'/>'" title="Click to view order details">
+                                            <div class="pos-mini-top">
+                                                <span class="pos-mini-code"><c:out value="${o.orderCode}"/></span>
+                                                <span class="pulse-dot"></span>
+                                                <span class="pos-mini-amt"><fmt:formatNumber value="${o.amount}" pattern="#,##0"/> ₫</span>
+                                            </div>
+                                            <div class="pos-mini-sub">
+                                                <span><fmt:formatDate value="${o.createdAt}" pattern="HH:mm"/></span>
+                                                <c:choose>
+                                                    <c:when test="${o.cashAmount > 0}">
+                                                        <span>&bull; Cash: <fmt:formatNumber value="${o.cashAmount}" pattern="#,##0"/> ₫ + QR</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span>&bull; 100% VietQR</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </div>
+                                        <div class="pos-mini-actions">
+                                            <button type="button" class="btn-mini-qr"
+                                                    data-code="<c:out value='${o.orderCode}'/>"
+                                                    data-amount="<fmt:formatNumber value='${o.amount}' pattern='#,##0'/> ₫"
+                                                    data-transfer="<fmt:formatNumber value='${o.transferAmount}' pattern='#,##0'/> ₫"
+                                                    data-cash="<fmt:formatNumber value='${o.cashAmount}' pattern='#,##0'/> ₫"
+                                                    data-qr="<c:out value='${o.qrContent}'/>"
+                                                    data-remaining="${o.remainingSeconds}"
+                                                    title="Show QR code">
+                                                QR
+                                            </button>
+                                            <form method="post" action="${ctx}/orders/cancel" class="pos-mini-cancel-form"
+                                                  onsubmit="return confirm('Cancel order ${o.orderCode}?');">
+                                                <input type="hidden" name="code" value="<c:out value='${o.orderCode}'/>">
+                                                <button type="submit" class="btn-mini-action cancel" title="Cancel order">&times;</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </c:if>
+                            </c:forEach>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -305,6 +415,285 @@
         var submitBtn = document.getElementById('submitBtn');
         var submitBtnIcon = document.getElementById('submitBtnIcon');
 
+        // Panel tabs
+        var tabBtnCart = document.getElementById('tabBtnCart');
+        var tabBtnPending = document.getElementById('tabBtnPending');
+        var panelViewCart = document.getElementById('panelViewCart');
+        var panelViewPending = document.getElementById('panelViewPending');
+
+        if (tabBtnCart && tabBtnPending) {
+            tabBtnCart.addEventListener('click', function () {
+                tabBtnCart.classList.add('active');
+                tabBtnPending.classList.remove('active');
+                panelViewCart.style.display = '';
+                panelViewPending.style.display = 'none';
+            });
+            tabBtnPending.addEventListener('click', function () {
+                tabBtnPending.classList.add('active');
+                tabBtnCart.classList.remove('active');
+                panelViewCart.style.display = 'none';
+                panelViewPending.style.display = '';
+            });
+        }
+
+        // Catalog filtering & search
+        var selectedCat = 'all';
+        var selectedGrp = 'all';
+        var searchQuery = '';
+        var productCards = document.querySelectorAll('.pos-product-card');
+        var grpPills = document.querySelectorAll('.pos-grp-pill');
+        var catTabs = document.querySelectorAll('.pos-cat-tab');
+        var posSearchInput = document.getElementById('posSearchInput');
+        var posSearchClear = document.getElementById('posSearchClear');
+        var posNoProducts = document.getElementById('posNoProducts');
+
+        function applyFilters() {
+            var visibleCount = 0;
+            productCards.forEach(function (card) {
+                var matchCat = (selectedCat === 'all' || card.dataset.cat === selectedCat);
+                var matchGrp = (selectedGrp === 'all' || card.dataset.grp === selectedGrp);
+                var matchSearch = true;
+                if (searchQuery) {
+                    var name = (card.dataset.name || '').toLowerCase();
+                    var code = (card.dataset.code || '').toLowerCase();
+                    matchSearch = (name.indexOf(searchQuery) !== -1 || code.indexOf(searchQuery) !== -1);
+                }
+                if (matchCat && matchGrp && matchSearch) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            if (posNoProducts) {
+                posNoProducts.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        }
+
+        catTabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                catTabs.forEach(function (t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                selectedCat = tab.dataset.cat;
+                selectedGrp = 'all';
+
+                grpPills.forEach(function (pill) {
+                    var pillCat = pill.dataset.cat;
+                    if (selectedCat === 'all' || pillCat === 'all' || pillCat === selectedCat) {
+                        pill.style.display = '';
+                    } else {
+                        pill.style.display = 'none';
+                    }
+                    if (pill.dataset.grp === 'all') {
+                        pill.classList.add('active');
+                    } else {
+                        pill.classList.remove('active');
+                    }
+                });
+                applyFilters();
+            });
+        });
+
+        grpPills.forEach(function (pill) {
+            pill.addEventListener('click', function () {
+                grpPills.forEach(function (p) { p.classList.remove('active'); });
+                pill.classList.add('active');
+                selectedGrp = pill.dataset.grp;
+                applyFilters();
+            });
+        });
+
+        if (posSearchInput) {
+            posSearchInput.addEventListener('input', function () {
+                searchQuery = this.value.trim().toLowerCase();
+                if (posSearchClear) {
+                    posSearchClear.style.display = searchQuery ? 'inline-flex' : 'none';
+                }
+                applyFilters();
+            });
+        }
+
+        if (posSearchClear) {
+            posSearchClear.addEventListener('click', function () {
+                if (posSearchInput) posSearchInput.value = '';
+                searchQuery = '';
+                posSearchClear.style.display = 'none';
+                applyFilters();
+            });
+        }
+
+        // Cart state & management
+        var cart = [];
+        var cartList = document.getElementById('posCartList');
+        var cartEmpty = document.getElementById('posCartEmpty');
+        var cartBadge = document.getElementById('cartCountBadge');
+        var btnClearCart = document.getElementById('btnClearCart');
+        var cartItemsInput = document.getElementById('cartItems');
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function renderCart() {
+            if (!cartList) return;
+            cartList.innerHTML = '';
+            if (cart.length === 0) {
+                if (cartEmpty) cartEmpty.style.display = 'block';
+                if (btnClearCart) btnClearCart.style.display = 'none';
+                if (cartBadge) {
+                    cartBadge.style.display = 'none';
+                    cartBadge.textContent = '0';
+                }
+                if (cartItemsInput) cartItemsInput.value = '';
+                return;
+            }
+
+            if (cartEmpty) cartEmpty.style.display = 'none';
+            if (btnClearCart) btnClearCart.style.display = 'inline-block';
+
+            var totalQty = 0;
+            var totalSum = 0;
+
+            cart.forEach(function (item, idx) {
+                var subtotal = item.unitPrice * item.quantity;
+                totalQty += item.quantity;
+                totalSum += subtotal;
+
+                var row = document.createElement('div');
+                row.className = 'pos-cart-item';
+                row.innerHTML =
+                    '<div class="pos-ci-info">' +
+                        '<div class="pos-ci-name">' + escapeHtml(item.productName) + '</div>' +
+                        '<div class="pos-ci-price">' + formatDisplay(item.unitPrice) + '</div>' +
+                    '</div>' +
+                    '<div class="pos-ci-qty-wrap">' +
+                        '<button type="button" class="pos-ci-btn btn-qty-dec" data-idx="' + idx + '" title="Decrease quantity">-</button>' +
+                        '<span class="pos-ci-qty">' + item.quantity + '</span>' +
+                        '<button type="button" class="pos-ci-btn btn-qty-inc" data-idx="' + idx + '" title="Increase quantity">+</button>' +
+                    '</div>' +
+                    '<div class="pos-ci-subtotal">' + formatDisplay(subtotal) + '</div>' +
+                    '<button type="button" class="pos-ci-remove" data-idx="' + idx + '" title="Remove item">&times;</button>';
+                cartList.appendChild(row);
+            });
+
+            if (cartBadge) {
+                cartBadge.textContent = totalQty;
+                cartBadge.style.display = 'inline-block';
+            }
+
+            if (cartItemsInput) {
+                var payload = cart.map(function (it) {
+                    return {
+                        productId: it.productId,
+                        productCode: it.productCode,
+                        productName: it.productName,
+                        unitPrice: it.unitPrice,
+                        quantity: it.quantity,
+                        subtotal: it.unitPrice * it.quantity
+                    };
+                });
+                cartItemsInput.value = JSON.stringify(payload);
+            }
+
+            amountInput.value = formatNumber(totalSum);
+            updatePreview();
+        }
+
+        function addToCart(card) {
+            var id = parseInt(card.dataset.id, 10);
+            var code = card.dataset.code;
+            var name = card.dataset.name;
+            var price = parseInt(card.dataset.price, 10) || 0;
+
+            var existing = null;
+            for (var i = 0; i < cart.length; i++) {
+                if (cart[i].productId === id) {
+                    existing = cart[i];
+                    break;
+                }
+            }
+
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({
+                    productId: id,
+                    productCode: code,
+                    productName: name,
+                    unitPrice: price,
+                    quantity: 1
+                });
+            }
+
+            if (tabBtnCart && tabBtnPending && panelViewCart && panelViewPending) {
+                tabBtnCart.classList.add('active');
+                tabBtnPending.classList.remove('active');
+                panelViewCart.style.display = '';
+                panelViewPending.style.display = 'none';
+            }
+
+            document.querySelectorAll('.preset-chip').forEach(function (c) { c.classList.remove('active'); });
+            renderCart();
+        }
+
+        productCards.forEach(function (card) {
+            card.addEventListener('click', function () {
+                addToCart(this);
+            });
+        });
+
+        if (cartList) {
+            cartList.addEventListener('click', function (e) {
+                var btnInc = e.target.closest('.btn-qty-inc');
+                var btnDec = e.target.closest('.btn-qty-dec');
+                var btnRem = e.target.closest('.pos-ci-remove');
+
+                if (btnInc) {
+                    var idx = parseInt(btnInc.dataset.idx, 10);
+                    if (cart[idx]) {
+                        cart[idx].quantity++;
+                        renderCart();
+                    }
+                } else if (btnDec) {
+                    var idx = parseInt(btnDec.dataset.idx, 10);
+                    if (cart[idx]) {
+                        cart[idx].quantity--;
+                        if (cart[idx].quantity <= 0) {
+                            cart.splice(idx, 1);
+                        }
+                        renderCart();
+                    }
+                } else if (btnRem) {
+                    var idx = parseInt(btnRem.dataset.idx, 10);
+                    if (cart[idx]) {
+                        cart.splice(idx, 1);
+                        renderCart();
+                    }
+                }
+            });
+        }
+
+        if (btnClearCart) {
+            btnClearCart.addEventListener('click', function () {
+                cart = [];
+                amountInput.value = '';
+                renderCart();
+                updatePreview();
+            });
+        }
+
+        var btnCustomSale = document.getElementById('btnCustomSale');
+        if (btnCustomSale) {
+            btnCustomSale.addEventListener('click', function () {
+                cart = [];
+                renderCart();
+                amountInput.value = '';
+                amountInput.focus();
+                document.querySelectorAll('.preset-chip').forEach(function (c) { c.classList.remove('active'); });
+                updatePreview();
+            });
+        }
+
         // Modal elements
         var modal = document.getElementById('posQrModal');
         var modalClose = document.getElementById('posQrModalClose');
@@ -404,6 +793,10 @@
             btn.addEventListener('click', function () {
                 document.querySelectorAll('.preset-chip').forEach(function (c) { c.classList.remove('active'); });
                 btn.classList.add('active');
+                if (cart.length > 0) {
+                    cart = [];
+                    renderCart();
+                }
                 amountInput.value = formatNumber(parseInt(btn.dataset.amount, 10));
                 updatePreview();
             });
@@ -421,6 +814,10 @@
 
         amountInput.addEventListener('input', function () {
             document.querySelectorAll('.preset-chip').forEach(function (c) { c.classList.remove('active'); });
+            if (cart.length > 0) {
+                cart = [];
+                renderCart();
+            }
             keepDigits.call(this);
         });
         cashInput.addEventListener('input', keepDigits);
