@@ -24,6 +24,7 @@ public enum Permission {
     DEVICE_READ("DEVICE:READ"),
     DEVICE_WRITE("DEVICE:WRITE"),
     DISCOUNT_MANAGE("DISCOUNT:MANAGE"),
+    PRODUCT_MANAGE("PRODUCT:MANAGE"),
     SYSTEM_ADMIN("SYSTEM:ADMIN");
 
     private final String code;

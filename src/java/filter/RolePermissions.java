@@ -25,7 +25,7 @@ public final class RolePermissions {
         MAP.put(Role.ADMIN, EnumSet.allOf(Permission.class));
         MAP.put(Role.STORE_MANAGER, EnumSet.of(
                 DASHBOARD_READ, TRANSACTION_READ, ALERT_READ,
-                USER_READ, USER_WRITE, DEVICE_READ, SPEAKER_USE, SHIFT_USE, SHIFT_PRINT, DISCOUNT_MANAGE));
+                USER_READ, USER_WRITE, DEVICE_READ, SPEAKER_USE, SHIFT_USE, SHIFT_PRINT, DISCOUNT_MANAGE, PRODUCT_MANAGE));
         MAP.put(Role.CASHIER, EnumSet.of(
                 DASHBOARD_READ, ORDER_CREATE, SPEAKER_USE, TRANSACTION_READ, SHIFT_USE, SHIFT_PRINT));
         MAP.put(Role.AUDITOR, EnumSet.of(

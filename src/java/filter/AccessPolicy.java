@@ -34,6 +34,7 @@ public final class AccessPolicy {
             new Rule("/admin/users", USER_READ, USER_WRITE),
             new Rule("/admin/devices", DEVICE_READ, DEVICE_WRITE),
             new Rule("/admin/discounts", DISCOUNT_MANAGE, DISCOUNT_MANAGE),
+            new Rule("/admin/products", PRODUCT_MANAGE, PRODUCT_MANAGE),
             new Rule("/admin/audit", AUDIT_READ, AUDIT_READ),
             new Rule("/admin", SYSTEM_ADMIN, SYSTEM_ADMIN),
             new Rule("/shift/print", SHIFT_PRINT, SHIFT_PRINT),
