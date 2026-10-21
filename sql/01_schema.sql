@@ -90,6 +90,42 @@ GO
 IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
 GO
 
+-- TABLE 4a: CATEGORIES (retail product categories: Beverages, Snacks, Bakery, Ready to Eat)
+IF OBJECT_ID('Categories', 'U') IS NULL
+CREATE TABLE Categories (
+    category_id INT IDENTITY(1,1) PRIMARY KEY,
+    category_name NVARCHAR(50) NOT NULL UNIQUE,
+    display_order INT NOT NULL DEFAULT 0
+);
+GO
+
+-- TABLE 4b: GROUPS (sub-categories or brands: Soft Drinks, Energy Drinks, Lay's, Oishi...)
+IF OBJECT_ID('Groups', 'U') IS NULL
+CREATE TABLE [Groups] (
+    group_id INT IDENTITY(1,1) PRIMARY KEY,
+    category_id INT NOT NULL,
+    group_name NVARCHAR(50) NOT NULL,
+    display_order INT NOT NULL DEFAULT 0,
+    CONSTRAINT FK_Groups_Categories FOREIGN KEY (category_id) REFERENCES Categories(category_id),
+    CONSTRAINT UQ_Category_Group UNIQUE (category_id, group_name)
+);
+GO
+
+-- TABLE 4c: PRODUCTS (convenience store items with price and active status)
+IF OBJECT_ID('Products', 'U') IS NULL
+CREATE TABLE Products (
+    product_id INT IDENTITY(1,1) PRIMARY KEY,
+    group_id INT NOT NULL,
+    product_code NVARCHAR(30) NOT NULL UNIQUE,
+    product_name NVARCHAR(100) NOT NULL,
+    price DECIMAL(18,2) NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    display_order INT NOT NULL DEFAULT 0,
+    CONSTRAINT FK_Products_Groups FOREIGN KEY (group_id) REFERENCES [Groups](group_id),
+    CONSTRAINT CHK_Product_Price CHECK (price > 0)
+);
+GO
+
 -- TABLE 5: ORDERS (payment requests and VietQR)
 IF OBJECT_ID('Orders', 'U') IS NULL
 CREATE TABLE Orders (
@@ -152,6 +188,39 @@ IF COL_LENGTH('Orders', 'discount_code') IS NULL
 GO
 IF COL_LENGTH('Orders', 'discount_amount') IS NULL
     ALTER TABLE Orders ADD discount_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_discount_amount DEFAULT 0;
+GO
+
+-- Settings the administrator can change (vat_rate = percent of VAT already included in the prices)
+IF OBJECT_ID('Settings', 'U') IS NULL
+CREATE TABLE Settings (
+    setting_key NVARCHAR(50) NOT NULL PRIMARY KEY,
+    setting_value NVARCHAR(100) NOT NULL
+);
+GO
+
+-- VAT rate copied onto each order when it is created, so an old receipt never changes when the rate changes (0 = no VAT line)
+IF COL_LENGTH('Orders', 'vat_rate') IS NULL
+    ALTER TABLE Orders ADD vat_rate DECIMAL(5,2) NOT NULL CONSTRAINT DF_Orders_vat_rate DEFAULT 0;
+GO
+
+-- TABLE 5c: ORDER_ITEMS (itemized line items in an order with snapshot price)
+IF OBJECT_ID('OrderItems', 'U') IS NULL
+CREATE TABLE OrderItems (
+    item_id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NULL,
+    product_name NVARCHAR(100) NOT NULL,
+    unit_price DECIMAL(18,2) NOT NULL,
+    quantity INT NOT NULL,
+    subtotal DECIMAL(18,2) NOT NULL,
+    CONSTRAINT FK_OrderItems_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
+    CONSTRAINT FK_OrderItems_Products FOREIGN KEY (product_id) REFERENCES Products(product_id),
+    CONSTRAINT CHK_OrderItem_Quantity CHECK (quantity > 0)
+);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_OrderItems_OrderId' AND object_id = OBJECT_ID('OrderItems'))
+CREATE INDEX IX_OrderItems_OrderId ON OrderItems(order_id);
 GO
 
 -- TABLE 6: TRANSACTIONS (balance changes pulled from the SePay API by the polling job)

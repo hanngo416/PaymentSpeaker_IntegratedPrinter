@@ -10,11 +10,16 @@ SELECT 'Roles' AS table_name, COUNT(*) AS row_count, 5 AS expected FROM Roles
 UNION ALL SELECT 'Users', COUNT(*), 6 FROM Users
 UNION ALL SELECT 'LoginOtps', COUNT(*), 0 FROM LoginOtps
 UNION ALL SELECT 'Devices', COUNT(*), 1 FROM Devices
+UNION ALL SELECT 'Categories', COUNT(*), 4 FROM Categories
+UNION ALL SELECT 'Groups', COUNT(*), 12 FROM [Groups]
+UNION ALL SELECT 'Products', COUNT(*), 33 FROM Products
 UNION ALL SELECT 'Orders', COUNT(*), 39 FROM Orders
+UNION ALL SELECT 'OrderItems', COUNT(*), 7 FROM OrderItems
 UNION ALL SELECT 'Transactions', COUNT(*), 40 FROM Transactions
 UNION ALL SELECT 'FraudAlerts', COUNT(*), 8 FROM FraudAlerts
 UNION ALL SELECT 'AuditLogs', COUNT(*), 14 FROM AuditLogs
-UNION ALL SELECT 'DiscountCodes', COUNT(*), 3 FROM DiscountCodes;
+UNION ALL SELECT 'DiscountCodes', COUNT(*), 3 FROM DiscountCodes
+UNION ALL SELECT 'Settings', COUNT(*), 1 FROM Settings;
 GO
 
 -- CHECK 1b: the six foreign keys, child table first

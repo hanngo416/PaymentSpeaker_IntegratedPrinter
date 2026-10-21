@@ -40,6 +40,12 @@ SELECT N'PRN_01', N'PRINTER', N'Aiyin A70 Thermal 80mm', N'KEY_PRN_01_SECRET_543
 WHERE NOT EXISTS (SELECT 1 FROM Devices WHERE device_code = N'PRN_01');
 GO
 
+-- 4.3a. VAT rate: 8 percent until 31/12/2026 (Decree 174/2025/ND-CP), the administrator changes it on the Settings page
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'vat_rate', N'8'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'vat_rate');
+GO
+
 -- 4.3b. Discount codes: two shared codes for the cashier list and one personal code typed by hand.
 -- Every run puts the codes back to their start state (used_count = 0); orders keep the code as plain text, so nothing else is touched.
 DELETE FROM DiscountCodes;
@@ -47,6 +53,106 @@ INSERT INTO DiscountCodes (code, kind, value, holder, max_uses, valid_from, vali
 (N'SUMMER10', N'PERCENT', 10, NULL, NULL, '2026-10-01', '2026-12-31'),
 (N'WELCOME20K', N'FIXED', 20000, NULL, 200, '2026-10-01', '2026-12-31'),
 (N'TINKY123', N'PERCENT', 15, N'Nguyen Van An', 1, '2026-10-01', '2026-12-31');
+GO
+
+-- 4.3c. Categories
+INSERT INTO Categories (category_name, display_order)
+SELECT v.category_name, v.display_order FROM (VALUES
+(N'Beverages', 1),
+(N'Snacks', 2),
+(N'Bakery', 3),
+(N'Ready to Eat', 4)
+) AS v(category_name, display_order)
+WHERE NOT EXISTS (SELECT 1 FROM Categories c WHERE c.category_name = v.category_name);
+GO
+
+-- 4.3d. Groups
+DECLARE @cat_bev INT = (SELECT category_id FROM Categories WHERE category_name = N'Beverages');
+DECLARE @cat_snk INT = (SELECT category_id FROM Categories WHERE category_name = N'Snacks');
+DECLARE @cat_bak INT = (SELECT category_id FROM Categories WHERE category_name = N'Bakery');
+DECLARE @cat_rte INT = (SELECT category_id FROM Categories WHERE category_name = N'Ready to Eat');
+
+INSERT INTO [Groups] (category_id, group_name, display_order)
+SELECT v.category_id, v.group_name, v.display_order FROM (VALUES
+(@cat_bev, N'Soft Drinks', 1),
+(@cat_bev, N'Energy Drinks', 2),
+(@cat_bev, N'Water & Tea', 3),
+(@cat_bev, N'Canned Coffee', 4),
+(@cat_snk, N'Lay''s Chips', 1),
+(@cat_snk, N'Oishi Snacks', 2),
+(@cat_snk, N'Orion & Rice', 3),
+(@cat_snk, N'Dried Treats', 4),
+(@cat_bak, N'Sweet Bakery', 1),
+(@cat_bak, N'Savory Bakery', 2),
+(@cat_rte, N'Instant Noodles', 1),
+(@cat_rte, N'Sausages', 2)
+) AS v(category_id, group_name, display_order)
+WHERE NOT EXISTS (SELECT 1 FROM [Groups] g WHERE g.category_id = v.category_id AND g.group_name = v.group_name);
+GO
+
+-- 4.3e. Products
+DECLARE @grp_soft INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Soft Drinks');
+DECLARE @grp_ener INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Energy Drinks');
+DECLARE @grp_watr INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Water & Tea');
+DECLARE @grp_coff INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Canned Coffee');
+DECLARE @grp_lays INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Lay''s Chips');
+DECLARE @grp_oish INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Oishi Snacks');
+DECLARE @grp_orin INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Orion & Rice');
+DECLARE @grp_drie INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Dried Treats');
+DECLARE @grp_swtb INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Sweet Bakery');
+DECLARE @grp_savb INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Savory Bakery');
+DECLARE @grp_nood INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Instant Noodles');
+DECLARE @grp_saus INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Sausages');
+
+INSERT INTO Products (group_id, product_code, product_name, price, active, display_order)
+SELECT v.group_id, v.product_code, v.product_name, v.price, 1, v.display_order FROM (VALUES
+-- Soft Drinks
+(@grp_soft, N'DRK01', N'Coca-Cola Original 330ml', 12000.00, 1),
+(@grp_soft, N'DRK02', N'Pepsi Zero Lime 330ml', 12000.00, 2),
+(@grp_soft, N'DRK03', N'7Up Revive Salted Lemon 500ml', 11000.00, 3),
+(@grp_soft, N'DRK04', N'Mirinda Cream Soda 330ml', 11000.00, 4),
+-- Energy Drinks
+(@grp_ener, N'DRK05', N'Red Bull Gold Can 250ml', 15000.00, 1),
+(@grp_ener, N'DRK06', N'Sting Strawberry 330ml', 12000.00, 2),
+(@grp_ener, N'DRK07', N'Monster Energy Green 355ml', 32000.00, 3),
+-- Water & Tea
+(@grp_watr, N'DRK08', N'Aquafina Water 500ml', 7000.00, 1),
+(@grp_watr, N'DRK09', N'C2 Green Tea Lemon 455ml', 10000.00, 2),
+(@grp_watr, N'DRK10', N'Tea+ Oolong Tea 450ml', 11000.00, 3),
+-- Canned Coffee
+(@grp_coff, N'DRK11', N'Highlands Coffee Can 235ml', 17000.00, 1),
+(@grp_coff, N'DRK12', N'Nescafe Iced Black 180ml', 14000.00, 2),
+-- Lay's Chips
+(@grp_lays, N'SNK01', N'Lay''s Classic Salt 54g', 18000.00, 1),
+(@grp_lays, N'SNK02', N'Lay''s Nori Seaweed 54g', 18000.00, 2),
+(@grp_lays, N'SNK03', N'Lay''s BBQ Pork 54g', 18000.00, 3),
+-- Oishi Snacks
+(@grp_oish, N'SNK04', N'Oishi Crab Flavor 40g', 8000.00, 1),
+(@grp_oish, N'SNK05', N'Oishi Tom Yum Shrimp 40g', 8000.00, 2),
+(@grp_oish, N'SNK06', N'Oishi Pillows Choco 100g', 16000.00, 3),
+-- Orion & Rice
+(@grp_orin, N'SNK07', N'Swing Beef Steak 54g', 18000.00, 1),
+(@grp_orin, N'SNK08', N'O''Star Seaweed 54g', 18000.00, 2),
+(@grp_orin, N'SNK09', N'An Rice Crackers 150g', 22000.00, 3),
+-- Dried Treats
+(@grp_drie, N'SNK10', N'Crispy Shredded Chicken 50g', 25000.00, 1),
+(@grp_drie, N'SNK11', N'Bento Spicy Squid 20g', 16000.00, 2),
+-- Sweet Bakery
+(@grp_swtb, N'BAK01', N'Butter Croissant 60g', 22000.00, 1),
+(@grp_swtb, N'BAK02', N'Chocolate Donut', 18000.00, 2),
+(@grp_swtb, N'BAK03', N'Custard Cream Bun', 15000.00, 3),
+-- Savory Bakery
+(@grp_savb, N'BAK04', N'Pork Floss Sandwich', 25000.00, 1),
+(@grp_savb, N'BAK05', N'Sausage Roll Bread', 20000.00, 2),
+-- Instant Noodles
+(@grp_nood, N'RTE01', N'Omachi Beef Stew Cup', 16000.00, 1),
+(@grp_nood, N'RTE02', N'Hao Hao Sour Shrimp Cup', 10000.00, 2),
+(@grp_nood, N'RTE03', N'Shin Ramyun Cup', 22000.00, 3),
+-- Sausages
+(@grp_saus, N'RTE04', N'CP Smoked Sausage 100g', 18000.00, 1),
+(@grp_saus, N'RTE05', N'Vissan Pork Sausage 4x17g', 14000.00, 2)
+) AS v(group_id, product_code, product_name, price, display_order)
+WHERE NOT EXISTS (SELECT 1 FROM Products p WHERE p.product_code = v.product_code);
 GO
 
 -- Safety guard for the demo data below: it is added only to an EMPTY database, never over real transfers.
@@ -70,6 +176,33 @@ INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_
 (N'TINKY10235', @cashier_id, N'nam_cashier', 120000.00, N'PENDING',
  N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=120000&addInfo=TINKY10235&accountName=LAM%20HOANG%20AN',
  DATEADD(MINUTE, 60, SYSDATETIME()));
+GO
+
+-- 4.4b. Sample order items for demo pending orders
+DECLARE @ord1 INT = (SELECT order_id FROM Orders WHERE order_code = N'TINKY10234');
+DECLARE @ord2 INT = (SELECT order_id FROM Orders WHERE order_code = N'TINKY10235');
+
+DECLARE @p_croissant INT = (SELECT product_id FROM Products WHERE product_code = N'BAK01');
+DECLARE @p_lays INT = (SELECT product_id FROM Products WHERE product_code = N'SNK01');
+DECLARE @p_c2 INT = (SELECT product_id FROM Products WHERE product_code = N'DRK09');
+DECLARE @p_roll INT = (SELECT product_id FROM Products WHERE product_code = N'BAK05');
+
+IF @ord1 IS NOT NULL
+BEGIN
+    INSERT INTO OrderItems (order_id, product_id, product_name, unit_price, quantity, subtotal) VALUES
+    (@ord1, @p_croissant, N'Butter Croissant 60g', 22000.00, 1, 22000.00),
+    (@ord1, @p_lays, N'Lay''s Classic Salt 54g', 18000.00, 1, 18000.00),
+    (@ord1, @p_c2, N'C2 Green Tea Lemon 455ml', 10000.00, 1, 10000.00);
+END
+
+IF @ord2 IS NOT NULL
+BEGIN
+    INSERT INTO OrderItems (order_id, product_id, product_name, unit_price, quantity, subtotal) VALUES
+    (@ord2, @p_croissant, N'Butter Croissant 60g', 22000.00, 2, 44000.00),
+    (@ord2, @p_lays, N'Lay''s Classic Salt 54g', 18000.00, 2, 36000.00),
+    (@ord2, @p_roll, N'Sausage Roll Bread', 20000.00, 1, 20000.00),
+    (@ord2, @p_c2, N'C2 Green Tea Lemon 455ml', 10000.00, 2, 20000.00);
+END
 GO
 
 -- 4.5. First audit record
