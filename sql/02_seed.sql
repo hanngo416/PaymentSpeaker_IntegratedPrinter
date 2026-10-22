@@ -1,27 +1,21 @@
--- Sample data. Run AFTER 01_schema.sql
 USE PaymentSpeaker;
 GO
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
--- =====================================================================================
--- 4. SAMPLE DATA
--- =====================================================================================
 
--- 4.1. Roles (safe to run again: a row that already exists is skipped, so logins never break)
 INSERT INTO Roles (role_id, role_name, description)
 SELECT v.role_id, v.role_name, v.description FROM (VALUES
 (1, N'ADMIN', N'System administrator: full configuration and staff management rights'),
 (2, N'STORE_MANAGER', N'Store manager: manages revenue and cashier accounts'),
 (3, N'CASHIER', N'Counter cashier: creates orders, sees the payment popup and prints receipts'),
 (4, N'AUDITOR', N'Auditor: investigates fraudulent transactions and checks data integrity'),
-(5, N'TECHNICIAN', N'Technician: maintains the printer hardware')
+(5, N'TECHNICIAN', N'Technician: maintains the printer hardware'),
+(6, N'AFFILIATE', N'Affiliate: sees only own referrals, commissions and payouts')
 ) AS v(role_id, role_name, description)
 WHERE NOT EXISTS (SELECT 1 FROM Roles r WHERE r.role_id = v.role_id);
 GO
 
--- 4.2. Users
--- No password: staff log in by email OTP or Google.
 INSERT INTO Users (user_code, full_name, email, role_id, status)
 SELECT v.user_code, v.full_name, v.email, v.role_id, v.status FROM (VALUES
 (N'han_admin', N'Ngo Ngoc Gia Han', N'hanngo816@gmail.com', 1, N'ACTIVE'),
@@ -29,25 +23,61 @@ SELECT v.user_code, v.full_name, v.email, v.role_id, v.status FROM (VALUES
 (N'nam_cashier', N'Bui Van Nam', N'hanngo816+cashier@gmail.com', 3, N'ACTIVE'),
 (N'dung_auditor', N'Pham Quoc Dung', N'hanngo816+auditor@gmail.com', 4, N'ACTIVE'),
 (N'em_technician', N'Hoang Van Em', N'hanngo816+tech@gmail.com', 5, N'ACTIVE'),
-(N'ha_cashier', N'Vu Thi Ha', N'hanngo816+locked@gmail.com', 3, N'LOCKED')
+(N'ha_cashier', N'Vu Thi Ha', N'hanngo816+locked@gmail.com', 3, N'LOCKED'),
+(N'linh_affiliate', N'Linh Review', N'hanngo816+linh@gmail.com', 6, N'ACTIVE')
 ) AS v(user_code, full_name, email, role_id, status)
 WHERE NOT EXISTS (SELECT 1 FROM Users u WHERE u.user_code = v.user_code OR u.email = v.email);
 GO
 
--- 4.3. Devices
 INSERT INTO Devices (device_code, device_type, model_name, api_key, status)
 SELECT N'PRN_01', N'PRINTER', N'Aiyin A70 Thermal 80mm', N'KEY_PRN_01_SECRET_5432', N'ONLINE'
 WHERE NOT EXISTS (SELECT 1 FROM Devices WHERE device_code = N'PRN_01');
 GO
 
--- 4.3a. VAT rate: 8 percent until 31/12/2026 (Decree 174/2025/ND-CP), the administrator changes it on the Settings page
 INSERT INTO Settings (setting_key, setting_value)
 SELECT N'vat_rate', N'8'
 WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'vat_rate');
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'vat_included', N'0'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'vat_included');
 GO
 
--- 4.3b. Discount codes: two shared codes for the cashier list and one personal code typed by hand.
--- Every run puts the codes back to their start state (used_count = 0); orders keep the code as plain text, so nothing else is touched.
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'printer_name', N'A70'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'printer_name');
+GO
+
+INSERT INTO TaxRules (kind, sector, value, effective_from, effective_to, source_ref, verified)
+SELECT v.kind, v.sector, v.value, '2026-01-01', v.effective_to, v.source_ref, v.verified
+FROM (VALUES
+(N'THRESHOLD', NULL, 1000000000, NULL, N'Decree 141/2026/ND-CP Art.1 (amends Decree 68/2026/ND-CP Art.3,4)', 1),
+(N'PIT_CEILING', NULL, 3000000000, NULL, N'Decree 68/2026/ND-CP Art.4 clause 5', 1),
+(N'WARN_LEVEL', NULL, 70, NULL, N'Tinky internal warning level', 1),
+(N'WARN_LEVEL', NULL, 90, NULL, N'Tinky internal warning level', 1),
+(N'WARN_LEVEL', NULL, 100, NULL, N'Tinky internal warning level', 1),
+(N'VAT_RATE', N'GOODS', 1, NULL, N'MOF Q&A citing Circular 40/2021/TT-BTC', 0),
+(N'VAT_RATE', N'SERVICE', 5, NULL, N'MOF Q&A citing Circular 40/2021/TT-BTC', 0),
+(N'VAT_RATE', N'PRODUCTION', 3, NULL, N'MOF Q&A citing Circular 40/2021/TT-BTC', 0),
+(N'VAT_RATE', N'OTHER', 2, NULL, N'MOF Q&A citing Circular 40/2021/TT-BTC', 0),
+(N'PIT_RATE', N'GOODS', 0.5, NULL, N'PIT Law 109/2025/QH15 Art.7 clause 3', 0),
+(N'PIT_RATE', N'SERVICE', 2, NULL, N'PIT Law 109/2025/QH15 Art.7 clause 3', 0),
+(N'PIT_RATE', N'PRODUCTION', 1.5, NULL, N'PIT Law 109/2025/QH15 Art.7 clause 3', 0),
+(N'PIT_RATE', N'OTHER', 1, NULL, N'PIT Law 109/2025/QH15 Art.7 clause 3', 0),
+(N'VAT_REDUCTION', NULL, 20, '2026-12-31', N'Resolution 204/2025/QH15', 0)
+) AS v (kind, sector, value, effective_to, source_ref, verified)
+WHERE NOT EXISTS (
+    SELECT 1 FROM TaxRules t
+    WHERE t.kind = v.kind AND t.effective_from = '2026-01-01'
+      AND (t.sector = v.sector OR (t.sector IS NULL AND v.sector IS NULL))
+      AND (v.kind <> N'WARN_LEVEL' OR t.value = v.value)
+);
+GO
+
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'tax_sector', N'GOODS'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'tax_sector');
+GO
+
 DELETE FROM DiscountCodes;
 INSERT INTO DiscountCodes (code, kind, value, holder, max_uses, valid_from, valid_to) VALUES
 (N'SUMMER10', N'PERCENT', 10, NULL, NULL, '2026-10-01', '2026-12-31'),
@@ -55,7 +85,6 @@ INSERT INTO DiscountCodes (code, kind, value, holder, max_uses, valid_from, vali
 (N'TINKY123', N'PERCENT', 15, N'Nguyen Van An', 1, '2026-10-01', '2026-12-31');
 GO
 
--- 4.3c. Categories
 INSERT INTO Categories (category_name, display_order)
 SELECT v.category_name, v.display_order FROM (VALUES
 (N'Beverages', 1),
@@ -66,7 +95,6 @@ SELECT v.category_name, v.display_order FROM (VALUES
 WHERE NOT EXISTS (SELECT 1 FROM Categories c WHERE c.category_name = v.category_name);
 GO
 
--- 4.3d. Groups
 DECLARE @cat_bev INT = (SELECT category_id FROM Categories WHERE category_name = N'Beverages');
 DECLARE @cat_snk INT = (SELECT category_id FROM Categories WHERE category_name = N'Snacks');
 DECLARE @cat_bak INT = (SELECT category_id FROM Categories WHERE category_name = N'Bakery');
@@ -90,7 +118,6 @@ SELECT v.category_id, v.group_name, v.display_order FROM (VALUES
 WHERE NOT EXISTS (SELECT 1 FROM [Groups] g WHERE g.category_id = v.category_id AND g.group_name = v.group_name);
 GO
 
--- 4.3e. Products
 DECLARE @grp_soft INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Soft Drinks');
 DECLARE @grp_ener INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Energy Drinks');
 DECLARE @grp_watr INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Water & Tea');
@@ -106,57 +133,184 @@ DECLARE @grp_saus INT = (SELECT group_id FROM [Groups] WHERE group_name = N'Saus
 
 INSERT INTO Products (group_id, product_code, product_name, price, active, display_order)
 SELECT v.group_id, v.product_code, v.product_name, v.price, 1, v.display_order FROM (VALUES
--- Soft Drinks
 (@grp_soft, N'DRK01', N'Coca-Cola Original 330ml', 12000.00, 1),
 (@grp_soft, N'DRK02', N'Pepsi Zero Lime 330ml', 12000.00, 2),
 (@grp_soft, N'DRK03', N'7Up Revive Salted Lemon 500ml', 11000.00, 3),
 (@grp_soft, N'DRK04', N'Mirinda Cream Soda 330ml', 11000.00, 4),
--- Energy Drinks
 (@grp_ener, N'DRK05', N'Red Bull Gold Can 250ml', 15000.00, 1),
 (@grp_ener, N'DRK06', N'Sting Strawberry 330ml', 12000.00, 2),
 (@grp_ener, N'DRK07', N'Monster Energy Green 355ml', 32000.00, 3),
--- Water & Tea
 (@grp_watr, N'DRK08', N'Aquafina Water 500ml', 7000.00, 1),
 (@grp_watr, N'DRK09', N'C2 Green Tea Lemon 455ml', 10000.00, 2),
 (@grp_watr, N'DRK10', N'Tea+ Oolong Tea 450ml', 11000.00, 3),
--- Canned Coffee
 (@grp_coff, N'DRK11', N'Highlands Coffee Can 235ml', 17000.00, 1),
 (@grp_coff, N'DRK12', N'Nescafe Iced Black 180ml', 14000.00, 2),
--- Lay's Chips
 (@grp_lays, N'SNK01', N'Lay''s Classic Salt 54g', 18000.00, 1),
 (@grp_lays, N'SNK02', N'Lay''s Nori Seaweed 54g', 18000.00, 2),
 (@grp_lays, N'SNK03', N'Lay''s BBQ Pork 54g', 18000.00, 3),
--- Oishi Snacks
 (@grp_oish, N'SNK04', N'Oishi Crab Flavor 40g', 8000.00, 1),
 (@grp_oish, N'SNK05', N'Oishi Tom Yum Shrimp 40g', 8000.00, 2),
 (@grp_oish, N'SNK06', N'Oishi Pillows Choco 100g', 16000.00, 3),
--- Orion & Rice
 (@grp_orin, N'SNK07', N'Swing Beef Steak 54g', 18000.00, 1),
 (@grp_orin, N'SNK08', N'O''Star Seaweed 54g', 18000.00, 2),
 (@grp_orin, N'SNK09', N'An Rice Crackers 150g', 22000.00, 3),
--- Dried Treats
 (@grp_drie, N'SNK10', N'Crispy Shredded Chicken 50g', 25000.00, 1),
 (@grp_drie, N'SNK11', N'Bento Spicy Squid 20g', 16000.00, 2),
--- Sweet Bakery
 (@grp_swtb, N'BAK01', N'Butter Croissant 60g', 22000.00, 1),
 (@grp_swtb, N'BAK02', N'Chocolate Donut', 18000.00, 2),
 (@grp_swtb, N'BAK03', N'Custard Cream Bun', 15000.00, 3),
--- Savory Bakery
 (@grp_savb, N'BAK04', N'Pork Floss Sandwich', 25000.00, 1),
 (@grp_savb, N'BAK05', N'Sausage Roll Bread', 20000.00, 2),
--- Instant Noodles
 (@grp_nood, N'RTE01', N'Omachi Beef Stew Cup', 16000.00, 1),
 (@grp_nood, N'RTE02', N'Hao Hao Sour Shrimp Cup', 10000.00, 2),
 (@grp_nood, N'RTE03', N'Shin Ramyun Cup', 22000.00, 3),
--- Sausages
 (@grp_saus, N'RTE04', N'CP Smoked Sausage 100g', 18000.00, 1),
 (@grp_saus, N'RTE05', N'Vissan Pork Sausage 4x17g', 14000.00, 2)
 ) AS v(group_id, product_code, product_name, price, display_order)
 WHERE NOT EXISTS (SELECT 1 FROM Products p WHERE p.product_code = v.product_code);
 GO
 
--- Safety guard for the demo data below: it is added only to an EMPTY database, never over real transfers.
--- To start over, run 99_reset_demo.sql and 01_schema.sql first.
+INSERT INTO Categories (category_name, display_order)
+SELECT N'Demo Menu', 5
+WHERE NOT EXISTS (SELECT 1 FROM Categories WHERE category_name = N'Demo Menu');
+GO
+
+DECLARE @cat_demo INT = (SELECT category_id FROM Categories WHERE category_name = N'Demo Menu');
+INSERT INTO [Groups] (category_id, group_name, display_order)
+SELECT v.category_id, v.group_name, v.display_order FROM (VALUES
+(@cat_demo, N'Tiny Snacks', 1),
+(@cat_demo, N'Cheap Drinks', 2),
+(@cat_demo, N'Street Food', 3)
+) AS v(category_id, group_name, display_order)
+WHERE NOT EXISTS (SELECT 1 FROM [Groups] g WHERE g.category_id = v.category_id AND g.group_name = v.group_name);
+GO
+
+DECLARE @cat_demo2 INT = (SELECT category_id FROM Categories WHERE category_name = N'Demo Menu');
+DECLARE @grp_tiny INT = (SELECT group_id FROM [Groups] WHERE category_id = @cat_demo2 AND group_name = N'Tiny Snacks');
+DECLARE @grp_cdrk INT = (SELECT group_id FROM [Groups] WHERE category_id = @cat_demo2 AND group_name = N'Cheap Drinks');
+DECLARE @grp_strt INT = (SELECT group_id FROM [Groups] WHERE category_id = @cat_demo2 AND group_name = N'Street Food');
+
+INSERT INTO Products (group_id, product_code, product_name, price, active, display_order)
+SELECT v.group_id, v.product_code, v.product_name, v.price, 1, v.display_order FROM (VALUES
+(@grp_tiny, N'DEMO01', N'Bubble Gum Stick', 500.00, 1),
+(@grp_tiny, N'DEMO02', N'Strawberry Candy', 500.00, 2),
+(@grp_tiny, N'DEMO03', N'Lollipop', 1000.00, 3),
+(@grp_tiny, N'DEMO04', N'Roasted Peanut Pack', 1500.00, 4),
+(@grp_tiny, N'DEMO05', N'Mini Rice Cracker', 2000.00, 5),
+(@grp_tiny, N'DEMO06', N'Fruit Jelly Cup', 3000.00, 6),
+(@grp_cdrk, N'DEMO07', N'Cup of Ice', 500.00, 1),
+(@grp_cdrk, N'DEMO08', N'Iced Tea Cup', 2000.00, 2),
+(@grp_cdrk, N'DEMO09', N'Soy Milk Bag', 3000.00, 3),
+(@grp_cdrk, N'DEMO10', N'Lemon Tea Cup', 5000.00, 4),
+(@grp_cdrk, N'DEMO11', N'Sugarcane Juice Cup', 7000.00, 5),
+(@grp_cdrk, N'DEMO12', N'Coconut Water Cup', 10000.00, 6),
+(@grp_strt, N'DEMO13', N'Boiled Quail Egg', 1000.00, 1),
+(@grp_strt, N'DEMO14', N'Fried Dumpling', 4000.00, 2),
+(@grp_strt, N'DEMO15', N'Grilled Corn', 5000.00, 3),
+(@grp_strt, N'DEMO16', N'Rice Paper Roll', 6000.00, 4),
+(@grp_strt, N'DEMO17', N'Plain Banh Mi', 8000.00, 5),
+(@grp_strt, N'DEMO18', N'Sticky Rice Bag', 10000.00, 6)
+) AS v(group_id, product_code, product_name, price, display_order)
+WHERE NOT EXISTS (SELECT 1 FROM Products p WHERE p.product_code = v.product_code);
+GO
+
+UPDATE Products SET cost_price = ROUND(price * 0.6, 0) WHERE cost_price = 0;
+GO
+
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'sell_channels', N'STORE'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'sell_channels');
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'onboarded', N'0'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'onboarded');
+GO
+
+INSERT INTO Affiliates (name, rate, active)
+SELECT v.name, v.rate, 1 FROM (VALUES
+(N'Linh Review', 8.00),
+(N'Minh Unbox', 5.00),
+(N'Hana Daily', 10.00)
+) AS v(name, rate)
+WHERE NOT EXISTS (SELECT 1 FROM Affiliates a WHERE a.name = v.name);
+GO
+
+UPDATE Affiliates SET referral_code = CASE name WHEN N'Linh Review' THEN N'LINH08' WHEN N'Minh Unbox' THEN N'MINH05' WHEN N'Hana Daily' THEN N'HANA10' END
+WHERE referral_code IS NULL AND name IN (N'Linh Review', N'Minh Unbox', N'Hana Daily');
+UPDATE Affiliates SET email = N'hanngo816+linh@gmail.com', phone = N'0903112481', bank_name = N'Vietcombank', bank_account = N'0071001234', bank_holder = N'PHAM THI LINH'
+WHERE name = N'Linh Review' AND email IS NULL;
+UPDATE Affiliates SET email = N'minh.unbox@example.com', phone = N'0912778204', bank_name = N'TPBank', bank_account = N'0213445589', bank_holder = N'NGUYEN VAN MINH'
+WHERE name = N'Minh Unbox' AND email IS NULL;
+GO
+
+INSERT INTO Affiliates (name, rate, referral_code, phone, email, bank_name, bank_account, bank_holder, status, active)
+SELECT v.name, 0, v.referral_code, v.phone, v.email, v.bank_name, v.bank_account, v.bank_holder, v.status,
+       CASE WHEN v.status = N'ACTIVE' THEN 1 ELSE 0 END
+FROM (VALUES
+(N'Bao Chau', N'BAO31', N'0944100233', N'bao.chau@example.com', NULL, NULL, NULL, N'PENDING'),
+(N'Quan Bui', N'QUAN99', N'0905667118', N'quan.bui@example.com', N'VPBank', N'3300118820', N'BUI MINH QUAN', N'SUSPENDED')
+) AS v(name, referral_code, phone, email, bank_name, bank_account, bank_holder, status)
+WHERE NOT EXISTS (SELECT 1 FROM Affiliates a WHERE a.name = v.name);
+GO
+
+INSERT INTO Campaigns (name, description, commission_type, commission_value, min_order, start_date, end_date, status, created_by)
+SELECT v.name, v.description, v.commission_type, v.commission_value, v.min_order,
+       CAST(DATEADD(DAY, v.start_off, GETDATE()) AS DATE), CAST(DATEADD(DAY, v.end_off, GETDATE()) AS DATE), v.status,
+       (SELECT user_id FROM Users WHERE user_code = N'han_admin')
+FROM (VALUES
+(N'Autumn Push', N'Percent commission for every referred order.', N'PERCENT', 10.00, 50000.00, -30, 60, N'ACTIVE'),
+(N'Weekend Fixed Bonus', N'A fixed bonus for every referred order.', N'FIXED', 10000.00, 50000.00, -30, 90, N'ACTIVE'),
+(N'Holiday Draft', N'Planned holiday campaign, not published.', N'PERCENT', 12.00, 150000.00, 40, 100, N'DRAFT')
+) AS v(name, description, commission_type, commission_value, min_order, start_off, end_off, status)
+WHERE NOT EXISTS (SELECT 1 FROM Campaigns c WHERE c.name = v.name);
+GO
+
+
+IF NOT EXISTS (SELECT 1 FROM ChannelSales)
+BEGIN
+    DECLARE @admin_id INT = (SELECT user_id FROM Users WHERE user_code = N'han_admin');
+    DECLARE @aff1 INT = (SELECT affiliate_id FROM Affiliates WHERE name = N'Linh Review');
+    DECLARE @aff2 INT = (SELECT affiliate_id FROM Affiliates WHERE name = N'Minh Unbox');
+    DECLARE @aff3 INT = (SELECT affiliate_id FROM Affiliates WHERE name = N'Hana Daily');
+    DECLARE @d INT = 13;
+    DECLARE @i INT;
+    DECLARE @channel NVARCHAR(20);
+    DECLARE @goods DECIMAL(18,2);
+    DECLARE @fee DECIMAL(18,2);
+    DECLARE @aff INT;
+    DECLARE @rate DECIMAL(5,2);
+    DECLARE @status NVARCHAR(20);
+    DECLARE @cost DECIMAL(18,2);
+    DECLARE @day DATETIME2(3);
+    WHILE @d >= 0
+    BEGIN
+        SET @day = CAST(CAST(DATEADD(DAY, -@d, SYSDATETIME()) AS DATE) AS DATETIME2(3));
+        SET @i = 1;
+        WHILE @i <= 4
+        BEGIN
+            SET @channel = CASE WHEN @i % 2 = 1 THEN N'SHOPEE' ELSE N'TIKTOK' END;
+            SET @goods = 150000 + ((@d * 7 + @i * 13) % 10) * 40000;
+            SET @fee = ROUND(@goods * CASE WHEN @channel = N'SHOPEE' THEN 0.08 ELSE 0.06 END, 0);
+            SET @aff = CASE (@d + @i) % 3 WHEN 0 THEN @aff1 WHEN 1 THEN @aff2 ELSE NULL END;
+            SET @rate = CASE WHEN @aff = @aff1 THEN 8 WHEN @aff = @aff2 THEN 5 ELSE 0 END;
+            SET @status = CASE
+                WHEN (@d = 9 AND @i = 3) OR (@d = 2 AND @i = 1) THEN N'CANCELLED'
+                WHEN (@d = 5 AND @i = 2) THEN N'RETURNED'
+                ELSE N'COMPLETED' END;
+            SET @cost = CASE WHEN @d = 7 THEN ROUND(@goods * 1.3, 0) ELSE ROUND(@goods * 0.6, 0) END;
+            INSERT INTO ChannelSales (channel, external_ref, sold_at, status, goods_amount, platform_fee, shipping_fee,
+                                      affiliate_id, affiliate_commission, cost_amount, note, created_by)
+            VALUES (@channel, CASE WHEN @channel = N'SHOPEE' THEN N'SP-' ELSE N'TT-' END
+                              + RIGHT(N'00' + CAST(14 - @d AS NVARCHAR(3)), 2) + N'-' + CAST(@i AS NVARCHAR(2)),
+                    DATEADD(HOUR, 8 + @i * 3, @day), @status, @goods, @fee, CASE WHEN @i = 4 THEN 0 ELSE 15000 END,
+                    @aff, ROUND(@goods * @rate / 100, 0), @cost,
+                    CASE WHEN @d = 7 THEN N'Flash sale below cost' ELSE NULL END, @admin_id);
+            SET @i = @i + 1;
+        END
+        SET @d = @d - 1;
+    END
+END
+GO
+
 IF EXISTS (SELECT 1 FROM Orders) OR EXISTS (SELECT 1 FROM Transactions)
 BEGIN
     PRINT N'>>> Orders or transactions already exist - demo data skipped (roles, users, devices and discount codes were checked).';
@@ -164,21 +318,17 @@ BEGIN
 END
 GO
 
--- 4.4. Sample orders
--- Order 1: a valid pending payment
 DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
 
 INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at) VALUES
 (N'TINKY10234', @cashier_id, N'nam_cashier', 50000.00, N'PENDING',
  N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=50000&addInfo=TINKY10234&accountName=LAM%20HOANG%20AN',
  DATEADD(MINUTE, 60, SYSDATETIME())),
--- Order 2: a second pending payment
 (N'TINKY10235', @cashier_id, N'nam_cashier', 120000.00, N'PENDING',
  N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=120000&addInfo=TINKY10235&accountName=LAM%20HOANG%20AN',
  DATEADD(MINUTE, 60, SYSDATETIME()));
 GO
 
--- 4.4b. Sample order items for demo pending orders
 DECLARE @ord1 INT = (SELECT order_id FROM Orders WHERE order_code = N'TINKY10234');
 DECLARE @ord2 INT = (SELECT order_id FROM Orders WHERE order_code = N'TINKY10235');
 
@@ -205,22 +355,16 @@ BEGIN
 END
 GO
 
--- 4.5. First audit record
 INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at) VALUES
 (N'SYSTEM', N'INIT_SYSTEM', N'SYSTEM', N'0', N'{"message": "System initialized."}',
  CAST(CAST(DATEADD(DAY, -6, SYSDATETIME()) AS DATE) AS DATETIME2(3)));
 GO
 
--- 4.6. Demo data: transfers, their orders and the alerts the rules engine would raise
--- 34 transfers over the last 7 days (today included), 8 alerts (6 NEW, 1 RESOLVED, 1 DISMISSED).
 DECLARE @demo TABLE (
     n INT, days_ago INT, hh INT, mm INT, ss INT, amount DECIMAL(18,2), kind NVARCHAR(30),
     order_amount DECIMAL(18,2), cname NVARCHAR(60), content NVARCHAR(200)
 );
 
--- kind: LEGIT, NO_ORDER (no TINKY code in the note), DUP_TRANS, HIGH_AMOUNT, BURST_RATE,
---       AMOUNT_MISMATCH (order exists, other amount than the QR), ORDER_CLOSED (paid after the order expired)
--- content NULL = the order code alone, as typed from the QR.
 INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, content) VALUES
 (1,  6,  8, 12, 41,   45000, N'LEGIT',           45000, N'NGUYEN VAN BINH',   NULL),
 (2,  6, 10, 37, 18,  128000, N'LEGIT',          128000, N'TRAN THI LAN',      NULL),
@@ -249,7 +393,6 @@ INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, c
 (25, 1, 18,  9, 36,   45000, N'LEGIT',           45000, N'HUYNH NGOC TRAN',   NULL),
 (26, 0,  8, 35, 11,  105000, N'LEGIT',          105000, N'LAM GIA KIET',      NULL),
 (27, 0,  9, 20, 48,  122000, N'LEGIT',          122000, N'TO THI BICH',       NULL),
--- Rush hour: 5 transfers inside one minute, the 5th one triggers BURST_RATE
 (28, 0, 10, 41,  4,   48000, N'LEGIT',           48000, N'VAN THANH DAT',     NULL),
 (29, 0, 10, 41, 15,   65000, N'LEGIT',           65000, N'KIEU MY DUYEN',     NULL),
 (30, 0, 10, 41, 27,   39000, N'LEGIT',           39000, N'DUONG TUAN KIET',   NULL),
@@ -261,8 +404,6 @@ INSERT INTO @demo (n, days_ago, hh, mm, ss, amount, kind, order_amount, cname, c
 DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
 DECLARE @auditor_id INT = (SELECT user_id FROM Users WHERE user_code = N'dung_auditor');
 
--- The cashier creates each order about 3 minutes before the customer pays; the QR lives 15 minutes.
--- The ORDER_CLOSED order was created 20 minutes before the transfer, so its QR was already dead.
 INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at)
 SELECT N'TINKY' + CAST(20100 + n AS NVARCHAR(10)),
        @cashier_id,
@@ -319,7 +460,6 @@ JOIN Transactions t ON t.bank_trans_id = N'FT26' + CAST(10200000 + d.n * 3917 AS
 WHERE d.kind <> N'LEGIT';
 GO
 
--- 4.6. Real SePay transactions (2026-10-12)
 DECLARE @cashier_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
 
 INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at) VALUES
@@ -339,7 +479,6 @@ INSERT INTO Transactions (bank_trans_id, order_id, amount, content, bank_account
 (N'89274782', (SELECT order_id FROM Orders WHERE order_code = N'TINKY16282'), 2000.00, N'151327617041 0901675018 TINKY16282', N'77884268888', N'TPBank', N'COMPLETED', '2026-10-12 16:35:04', '2026-10-12 16:35:08', 1, 0);
 GO
 
--- 4.7. Shift history: one shift per past day (07:00-21:00, cash counted 0), day 4 closed by force, today's shift still open
 DECLARE @events TABLE (seq INT IDENTITY(1,1), actor NVARCHAR(50), action NVARCHAR(50), shift_id NVARCHAR(50), detail NVARCHAR(200), event_time DATETIME2(3));
 DECLARE @day INT = 6;
 WHILE @day >= 0
@@ -356,6 +495,120 @@ END
 
 INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at)
 SELECT actor, action, N'SHIFT', shift_id, detail, event_time FROM @events ORDER BY seq;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Commissions)
+BEGIN
+    DECLARE @camp1 INT = (SELECT campaign_id FROM Campaigns WHERE name = N'Autumn Push');
+    DECLARE @camp2 INT = (SELECT campaign_id FROM Campaigns WHERE name = N'Weekend Fixed Bonus');
+    DECLARE @pick TABLE (rn INT, order_id INT, amount DECIMAL(18,2), code NVARCHAR(30), camp INT, pct DECIMAL(5,2), fixed_amount DECIMAL(18,2), st NVARCHAR(12), age INT, reason NVARCHAR(200));
+    INSERT INTO @pick (rn, order_id, amount, code, camp, pct, fixed_amount, st, age, reason)
+    SELECT p.rn, o.order_id, o.amount, p.code, p.camp, p.pct, p.fixed_amount, p.st, p.age, p.reason
+    FROM (SELECT order_id, amount, ROW_NUMBER() OVER (ORDER BY order_id) AS rn FROM Orders WHERE status IN (N'COMPLETED', N'PAID')) o
+    JOIN (VALUES
+    (1, N'LINH08', @camp1, 10.00, 0.00, N'PAID', 40, NULL),
+    (2, N'LINH08', @camp1, 10.00, 0.00, N'PAID', 36, NULL),
+    (3, N'MINH05', @camp1, 10.00, 0.00, N'APPROVED', 9, NULL),
+    (4, N'HANA10', @camp1, 10.00, 0.00, N'PENDING', 1, NULL),
+    (5, N'HANA10', @camp1, 10.00, 0.00, N'AVAILABLE', 20, NULL),
+    (6, N'MINH05', @camp2, 0.00, 10000.00, N'PENDING', 2, NULL),
+    (7, N'QUAN99', @camp1, 10.00, 0.00, N'ON_HOLD', 26, N'Held for review: repeated orders from the same customer.'),
+    (8, N'LINH08', @camp1, 10.00, 0.00, N'AVAILABLE', 25, NULL),
+    (9, N'LINH08', @camp1, 10.00, 0.00, N'AVAILABLE', 24, NULL),
+    (11, N'LINH08', @camp1, 10.00, 0.00, N'AVAILABLE', 23, NULL),
+    (10, N'MINH05', @camp2, 0.00, 10000.00, N'AVAILABLE', 21, NULL),
+    (12, N'MINH05', @camp2, 0.00, 10000.00, N'AVAILABLE', 19, NULL),
+    (14, N'MINH05', @camp2, 0.00, 10000.00, N'AVAILABLE', 18, NULL),
+    (15, N'MINH05', @camp2, 0.00, 10000.00, N'AVAILABLE', 17, NULL),
+    (16, N'MINH05', @camp2, 0.00, 10000.00, N'AVAILABLE', 16, NULL)
+    ) AS p(rn, code, camp, pct, fixed_amount, st, age, reason) ON p.rn = o.rn;
+
+    UPDATE o SET referred_by_affiliate_id = a.affiliate_id, referral_campaign_id = k.camp
+    FROM Orders o JOIN @pick k ON k.order_id = o.order_id JOIN Affiliates a ON a.referral_code = k.code;
+
+    INSERT INTO Commissions (affiliate_id, order_id, campaign_id, order_amount, eligible_amount, rate_text, original_amount, amount, status, rule_snapshot, reason, created_at, updated_at)
+    SELECT a.affiliate_id, k.order_id, k.camp, k.amount, k.amount,
+           CASE WHEN k.pct > 0 THEN CAST(CAST(k.pct AS DECIMAL(5,1)) AS NVARCHAR(10)) + N'%' ELSE N'10,000 VND per order' END,
+           CASE WHEN k.pct > 0 THEN ROUND(k.amount * k.pct / 100, 0) ELSE CASE WHEN k.fixed_amount > k.amount THEN k.amount ELSE k.fixed_amount END END,
+           CASE WHEN k.pct > 0 THEN ROUND(k.amount * k.pct / 100, 0) ELSE CASE WHEN k.fixed_amount > k.amount THEN k.amount ELSE k.fixed_amount END END,
+           k.st,
+           (SELECT name FROM Campaigns WHERE campaign_id = k.camp) + N' | ' + CASE WHEN k.pct > 0 THEN CAST(CAST(k.pct AS DECIMAL(5,1)) AS NVARCHAR(10)) + N'% of eligible amount' ELSE N'10,000 VND per order' END,
+           k.reason, DATEADD(DAY, -k.age, SYSDATETIME()), DATEADD(DAY, -k.age, SYSDATETIME())
+    FROM @pick k JOIN Affiliates a ON a.referral_code = k.code;
+
+    DECLARE @aff_linh INT = (SELECT affiliate_id FROM Affiliates WHERE referral_code = N'LINH08');
+    DECLARE @gross DECIMAL(18,2) = (SELECT SUM(amount) FROM Commissions WHERE affiliate_id = @aff_linh AND status = N'PAID');
+    INSERT INTO Payouts (affiliate_id, batch_code, gross, deduction, net, status, bank_info, reference, requested_at, paid_at, paid_by)
+    VALUES (@aff_linh, N'BATCH-01', @gross, CASE WHEN @gross >= 60000 THEN ROUND(@gross * 0.1, 0) ELSE 0 END,
+            @gross - CASE WHEN @gross >= 60000 THEN ROUND(@gross * 0.1, 0) ELSE 0 END, N'PAID', N'Demo bank 0071 0012 3456',
+            N'FT26DEMO0001', DATEADD(DAY, -30, SYSDATETIME()), DATEADD(DAY, -29, SYSDATETIME()), (SELECT user_id FROM Users WHERE user_code = N'han_admin'));
+    UPDATE Commissions SET payout_id = SCOPE_IDENTITY() WHERE affiliate_id = @aff_linh AND status = N'PAID';
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM TaxObligations)
+BEGIN
+    DECLARE @admin INT = (SELECT user_id FROM Users WHERE user_code = N'han_admin');
+    DECLARE @mgr INT = (SELECT user_id FROM Users WHERE user_code = N'mai_manager');
+    DECLARE @cur DATE = DATEFROMPARTS(YEAR(GETDATE()), (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 1, 1);
+    DECLARE @prev DATE = DATEADD(QUARTER, -1, @cur);
+    DECLARE @prevLabel NVARCHAR(40) = N'Q' + CAST(DATEPART(QUARTER, @prev) AS NVARCHAR(1)) + N' ' + CAST(YEAR(@prev) AS NVARCHAR(4));
+    DECLARE @curLabel NVARCHAR(40) = N'Q' + CAST(DATEPART(QUARTER, @cur) AS NVARCHAR(1)) + N' ' + CAST(YEAR(@cur) AS NVARCHAR(4));
+    INSERT INTO TaxObligations (kind, period_label, due_date, status, responsible_user, estimated_amount, declared_amount, confirmed_amount, submission_ref, notes)
+    VALUES
+    (N'VAT', @prevLabel, EOMONTH(DATEADD(MONTH, 3, @prev)), N'AWAITING_PAYMENT', @mgr, 1200000, 1200000, 1200000, N'DECL-DEMO-001', N'Declared, payment in progress.'),
+    (N'PIT', @prevLabel, EOMONTH(DATEADD(MONTH, 3, @prev)), N'SUBMITTED', @mgr, 450000, 450000, NULL, N'DECL-DEMO-002', N'Waiting for the confirmed amount.'),
+    (N'VAT', @curLabel, EOMONTH(DATEADD(MONTH, 3, @cur)), N'PREPARATION', @mgr, 900000, NULL, NULL, NULL, NULL),
+    (N'EINVOICE', N'Year ' + CAST(YEAR(GETDATE()) AS NVARCHAR(4)), DATEADD(DAY, 14, CAST(GETDATE() AS DATE)), N'NEEDS_INFO', @admin, 0, NULL, NULL, NULL, N'Check the e-invoice provider registration.'),
+    (N'BOOKKEEPING', N'Month ' + FORMAT(GETDATE(), 'yyyy-MM'), EOMONTH(GETDATE()), N'APPLICABLE', @mgr, 0, NULL, NULL, NULL, NULL);
+
+    INSERT INTO TaxObligationHistory (obligation_id, from_status, to_status, note, changed_by)
+    SELECT obligation_id, N'SUBMITTED', N'AWAITING_PAYMENT', N'Amount confirmed by the tax office notice.', @mgr FROM TaxObligations WHERE kind = N'VAT' AND status = N'AWAITING_PAYMENT';
+
+    INSERT INTO TaxPayments (obligation_id, paid_on, amount, method, reference, receipt_name, recorded_by)
+    SELECT obligation_id, DATEADD(DAY, -3, CAST(GETDATE() AS DATE)), 500000, N'Bank transfer', N'FT26DEMO5001', N'receipt-demo.jpg', @mgr
+    FROM TaxObligations WHERE kind = N'VAT' AND status = N'AWAITING_PAYMENT';
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Expenses)
+BEGIN
+    DECLARE @uid INT = (SELECT user_id FROM Users WHERE user_code = N'mai_manager');
+    INSERT INTO Expenses (spent_on, supplier, supplier_tax_code, category, amount, payment_method, invoice_no, has_document, tax_treatment, created_by)
+    VALUES
+    (DATEADD(DAY, -2, CAST(GETDATE() AS DATE)), N'Hat Viet Coffee', N'0312345601', N'Ingredients', 4200000, N'Bank transfer', N'INV-1001', 1, N'MAY_COUNT', @uid),
+    (DATEADD(DAY, -6, CAST(GETDATE() AS DATE)), N'Green Milk Co', N'0301234502', N'Ingredients', 2650000, N'Bank transfer', N'INV-1002', 1, N'UNCLASSIFIED', @uid),
+    (DATEADD(DAY, -9, CAST(GETDATE() AS DATE)), N'Minh Phat Packaging', N'0309988703', N'Packaging', 1350000, N'Cash', NULL, 0, N'UNCLASSIFIED', @uid),
+    (DATEADD(DAY, -12, CAST(GETDATE() AS DATE)), N'Landlord', NULL, N'Rent', 18000000, N'Bank transfer', NULL, 1, N'UNCLASSIFIED', @uid),
+    (DATEADD(DAY, -15, CAST(GETDATE() AS DATE)), N'City Power (sample)', N'0100100104', N'Utilities', 2300000, N'Bank transfer', N'INV-1003', 1, N'MAY_COUNT', @uid),
+    (DATEADD(DAY, -20, CAST(GETDATE() AS DATE)), N'Social Ads', NULL, N'Marketing', 1500000, N'Card', NULL, 0, N'UNCLASSIFIED', @uid),
+    (DATEADD(DAY, -27, CAST(GETDATE() AS DATE)), N'Hat Viet Coffee', N'0312345601', N'Ingredients', 3900000, N'Bank transfer', N'INV-0998', 1, N'UNCLASSIFIED', @uid),
+    (DATEADD(DAY, -35, CAST(GETDATE() AS DATE)), N'Kitchen Tools Store', NULL, N'Equipment', 5200000, N'Cash', NULL, 0, N'NOT_COUNTED', @uid);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM ChannelCommissions)
+BEGIN
+    DECLARE @mgr INT = (SELECT user_id FROM Users WHERE user_code = N'mai_manager');
+    DECLARE @adm INT = (SELECT user_id FROM Users WHERE user_code = N'han_admin');
+    DECLARE @linh INT = (SELECT affiliate_id FROM Affiliates WHERE name = N'Linh Review');
+    DECLARE @minh INT = (SELECT affiliate_id FROM Affiliates WHERE name = N'Minh Unbox');
+    DECLARE @pay INT;
+    INSERT INTO ChannelPayouts (reference, affiliate_id, total_amount, payment_method, payment_reference, payment_date, status, created_by, confirmed_by, confirmed_at)
+    VALUES (N'CP-0001', @minh, 15000, N'BANK_TRANSFER', N'FT26100100771', DATEADD(DAY, -5, CAST(GETDATE() AS DATE)), N'CONFIRMED', @mgr, @adm, DATEADD(DAY, -5, SYSDATETIME()));
+    SET @pay = SCOPE_IDENTITY();
+    INSERT INTO ChannelCommissions (affiliate_id, channel, external_ref, platform_order_id, order_date, base_amount, commission_type, commission_rate,
+        calculated_amount, reported_amount, approved_amount, status, data_source, attribution, reject_reason, payout_id, created_by, approved_by, approved_at)
+    VALUES
+    (@linh, N'SHOPEE', N'SPC-1001', N'SPC-1001', DATEADD(DAY, -3, CAST(GETDATE() AS DATE)), 400000, N'PERCENT', 8, 32000, 32000, NULL, N'PENDING', N'CSV_IMPORT', N'LINH08', NULL, NULL, @mgr, NULL, NULL),
+    (@linh, N'SHOPEE', N'SPC-1002', N'SPC-1002', DATEADD(DAY, -8, CAST(GETDATE() AS DATE)), 250000, N'PERCENT', 8, 20000, 20000, 20000, N'APPROVED', N'CSV_IMPORT', N'LINH08', NULL, NULL, @mgr, @mgr, DATEADD(DAY, -6, SYSDATETIME())),
+    (@minh, N'TIKTOK', N'TTC-2001', N'TTC-2001', DATEADD(DAY, -9, CAST(GETDATE() AS DATE)), 600000, N'PERCENT', 5, 30000, 30000, 30000, N'APPROVED', N'CSV_IMPORT', N'MINH05', NULL, NULL, @mgr, @mgr, DATEADD(DAY, -6, SYSDATETIME())),
+    (@minh, N'TIKTOK', N'TTC-2002', N'TTC-2002', DATEADD(DAY, -10, CAST(GETDATE() AS DATE)), 180000, N'PERCENT', 5, 9000, 9000, NULL, N'REJECTED', N'CSV_IMPORT', N'MINH05', N'Order returned by the buyer', NULL, @mgr, @mgr, DATEADD(DAY, -7, SYSDATETIME())),
+    (@linh, N'SHOPEE', N'SPC-1003', N'SPC-1003', DATEADD(DAY, -2, CAST(GETDATE() AS DATE)), 500000, N'PERCENT', 8, 40000, NULL, NULL, N'PENDING', N'MANUAL', N'Typed by the store', NULL, NULL, @mgr, NULL, NULL),
+    (@minh, N'TIKTOK', N'TTC-2003', N'TTC-2003', DATEADD(DAY, -14, CAST(GETDATE() AS DATE)), 300000, N'PERCENT', 5, 15000, 15000, 15000, N'PAID', N'CSV_IMPORT', N'MINH05', NULL, @pay, @mgr, @mgr, DATEADD(DAY, -10, SYSDATETIME()));
+    INSERT INTO ChannelPayoutItems (payout_id, commission_id, amount)
+    SELECT @pay, commission_id, 15000 FROM ChannelCommissions WHERE external_ref = N'TTC-2003';
+END
 GO
 
 PRINT N'>>> Database and sample data for PaymentSpeaker loaded successfully!';

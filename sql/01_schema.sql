@@ -1,13 +1,7 @@
--- =====================================================================================
--- SMART PAYMENT NOTIFICATION SPEAKER WITH INTEGRATED RECEIPT PRINTER
--- Database Setup Script (SQL Server 2019)
--- PRJ301 project - 3NF design, idempotency and audit log
--- =====================================================================================
 
 USE master;
 GO
 
--- 1. CREATE THE DATABASE IF IT DOES NOT EXIST
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'PaymentSpeaker')
 BEGIN
     CREATE DATABASE PaymentSpeaker;
@@ -21,33 +15,25 @@ SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
--- Tables are only created when they do not exist yet, so re-running this script keeps real data.
--- To wipe everything (demo reset), run 99_reset_demo.sql first.
 GO
 
--- =====================================================================================
--- 2. TABLE DEFINITIONS (DDL)
--- =====================================================================================
-
--- TABLE 1: ROLES (RBAC)
 IF OBJECT_ID('Roles', 'U') IS NULL
 CREATE TABLE Roles (
     role_id INT PRIMARY KEY,
-    role_name NVARCHAR(50) NOT NULL UNIQUE,      -- ADMIN, STORE_MANAGER, CASHIER, AUDITOR, TECHNICIAN
+    role_name NVARCHAR(50) NOT NULL UNIQUE,
     description NVARCHAR(255) NULL
 );
 GO
 
--- TABLE 2: USERS (staff accounts)
 IF OBJECT_ID('Users', 'U') IS NULL
 CREATE TABLE Users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_code NVARCHAR(50) NOT NULL UNIQUE,       -- Staff code for display and logs, unique to guarantee audit trail integrity; self-registered accounts get the part of the email before @, plus a number when it is already taken
+    user_code NVARCHAR(50) NOT NULL UNIQUE,
     full_name NVARCHAR(100) NOT NULL,
     email NVARCHAR(256) NOT NULL UNIQUE,
     google_id NVARCHAR(64) NULL,
     role_id INT NOT NULL,
-    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- ACTIVE, LOCKED, PENDING (self-registered with Google, waits for an admin to approve and give a role)
+    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT FK_Users_Roles FOREIGN KEY (role_id) REFERENCES Roles(role_id)
 );
@@ -57,7 +43,6 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UX_Users_google_id' AND o
 CREATE UNIQUE INDEX UX_Users_google_id ON Users(google_id) WHERE google_id IS NOT NULL;
 GO
 
--- TABLE 2B: LOGIN_OTPS (one-time login codes sent by email)
 IF OBJECT_ID('LoginOtps', 'U') IS NULL
 CREATE TABLE LoginOtps (
     otp_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -72,25 +57,22 @@ CREATE TABLE LoginOtps (
 );
 GO
 
--- TABLE 3: DEVICES (printers at the counter)
 IF OBJECT_ID('Devices', 'U') IS NULL
 CREATE TABLE Devices (
     device_id INT IDENTITY(1,1) PRIMARY KEY,
-    device_code NVARCHAR(50) NOT NULL UNIQUE,    -- PRN_01
-    device_type NVARCHAR(20) NOT NULL,           -- PRINTER
-    model_name NVARCHAR(100) NOT NULL,           -- "Aiyin A70"
-    api_key NVARCHAR(100) NOT NULL UNIQUE,       -- Secret key identifying the device
-    status NVARCHAR(20) NOT NULL DEFAULT 'ONLINE', -- ONLINE, OFFLINE, MAINTENANCE
+    device_code NVARCHAR(50) NOT NULL UNIQUE,
+    device_type NVARCHAR(20) NOT NULL,
+    model_name NVARCHAR(100) NOT NULL,
+    api_key NVARCHAR(100) NOT NULL UNIQUE,
+    status NVARCHAR(20) NOT NULL DEFAULT 'ONLINE',
     last_ping DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT CHK_Device_Type CHECK (device_type IN ('PRINTER'))
 );
 GO
 
--- Databases created before the tickets were removed
 IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
 GO
 
--- TABLE 4a: CATEGORIES (retail product categories: Beverages, Snacks, Bakery, Ready to Eat)
 IF OBJECT_ID('Categories', 'U') IS NULL
 CREATE TABLE Categories (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -99,7 +81,6 @@ CREATE TABLE Categories (
 );
 GO
 
--- TABLE 4b: GROUPS (sub-categories or brands: Soft Drinks, Energy Drinks, Lay's, Oishi...)
 IF OBJECT_ID('Groups', 'U') IS NULL
 CREATE TABLE [Groups] (
     group_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -111,7 +92,6 @@ CREATE TABLE [Groups] (
 );
 GO
 
--- TABLE 4c: PRODUCTS (convenience store items with price and active status)
 IF OBJECT_ID('Products', 'U') IS NULL
 CREATE TABLE Products (
     product_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -126,32 +106,29 @@ CREATE TABLE Products (
 );
 GO
 
--- TABLE 5: ORDERS (payment requests and VietQR)
 IF OBJECT_ID('Orders', 'U') IS NULL
 CREATE TABLE Orders (
     order_id INT IDENTITY(1,1) PRIMARY KEY,
-    order_code NVARCHAR(50) NOT NULL UNIQUE,     -- VietQR reference code, for example TINKY10234
-    created_by INT NOT NULL,                     -- Cashier who created the order
-    created_by_code NVARCHAR(50) NOT NULL,       -- Copy of that cashier user_code at creation time, so a plain SELECT on Orders shows who made it
-    amount DECIMAL(18,2) NOT NULL,               -- Amount requested (total order amount)
-    cash_amount DECIMAL(18,2) NOT NULL DEFAULT 0, -- Portion paid in cash at counter; the VietQR asks for amount - cash_amount
-    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, COMPLETED, CANCELLED, EXPIRED
-    qr_content NVARCHAR(500) NULL,               -- Payload string used to build the VietQR code
-    expires_at DATETIME2(3) NOT NULL,            -- Scan deadline (usually 10-15 minutes)
+    order_code NVARCHAR(50) NOT NULL UNIQUE,
+    created_by INT NOT NULL,
+    created_by_code NVARCHAR(50) NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    cash_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    qr_content NVARCHAR(500) NULL,
+    expires_at DATETIME2(3) NOT NULL,
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT FK_Orders_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
     CONSTRAINT CHK_Order_Status CHECK (status IN ('PENDING', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'PAID'))
 );
 GO
 
--- Databases created before the cash portion existed: add cash_amount
 IF COL_LENGTH('Orders', 'cash_amount') IS NULL
 BEGIN
     ALTER TABLE Orders ADD cash_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_cash_amount DEFAULT 0;
 END
 GO
 
--- Databases that still have paid_amount (part payments were removed: the QR amount is fixed, a customer pays the rest in cash)
 IF COL_LENGTH('Orders', 'paid_amount') IS NOT NULL
 BEGIN
     DECLARE @df NVARCHAR(200) = (SELECT dc.name FROM sys.default_constraints dc
@@ -162,18 +139,17 @@ BEGIN
 END
 GO
 
--- TABLE 5b: DISCOUNT CODES (holder NULL = shared code the cashier picks from a list; holder set = personal code typed by hand)
 IF OBJECT_ID('DiscountCodes', 'U') IS NULL
 CREATE TABLE DiscountCodes (
     code_id INT IDENTITY(1,1) PRIMARY KEY,
     code NVARCHAR(30) NOT NULL UNIQUE,
-    kind NVARCHAR(10) NOT NULL,                  -- PERCENT or FIXED
-    value DECIMAL(18,2) NOT NULL,                -- Percent (1-100) or amount in VND
-    holder NVARCHAR(100) NULL,                   -- Person the personal code was issued to
-    max_uses INT NULL,                           -- NULL = unlimited
+    kind NVARCHAR(10) NOT NULL,
+    value DECIMAL(18,2) NOT NULL,
+    holder NVARCHAR(100) NULL,
+    max_uses INT NULL,
     used_count INT NOT NULL DEFAULT 0,
     valid_from DATE NOT NULL,
-    valid_to DATE NOT NULL,                      -- Usable through the end of this day
+    valid_to DATE NOT NULL,
     active BIT NOT NULL DEFAULT 1,
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT CHK_Discount_Kind CHECK (kind IN ('PERCENT', 'FIXED')),
@@ -182,7 +158,6 @@ CREATE TABLE DiscountCodes (
 );
 GO
 
--- Databases created before discount codes existed: store the code and the amount taken off on each order
 IF COL_LENGTH('Orders', 'discount_code') IS NULL
     ALTER TABLE Orders ADD discount_code NVARCHAR(30) NULL;
 GO
@@ -190,7 +165,6 @@ IF COL_LENGTH('Orders', 'discount_amount') IS NULL
     ALTER TABLE Orders ADD discount_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_discount_amount DEFAULT 0;
 GO
 
--- Settings the administrator can change (vat_rate = percent of VAT already included in the prices)
 IF OBJECT_ID('Settings', 'U') IS NULL
 CREATE TABLE Settings (
     setting_key NVARCHAR(50) NOT NULL PRIMARY KEY,
@@ -198,12 +172,35 @@ CREATE TABLE Settings (
 );
 GO
 
--- VAT rate copied onto each order when it is created, so an old receipt never changes when the rate changes (0 = no VAT line)
+IF OBJECT_ID('TaxRules', 'U') IS NULL
+CREATE TABLE TaxRules (
+    rule_id INT IDENTITY(1,1) PRIMARY KEY,
+    kind NVARCHAR(20) NOT NULL,
+    sector NVARCHAR(20) NULL,
+    value DECIMAL(18,4) NOT NULL,
+    effective_from DATE NOT NULL,
+    effective_to DATE NULL,
+    source_ref NVARCHAR(200) NOT NULL,
+    verified BIT NOT NULL DEFAULT 0,
+    active BIT NOT NULL DEFAULT 1,
+    updated_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT CHK_TaxRules_Kind CHECK (kind IN ('THRESHOLD', 'PIT_CEILING', 'VAT_RATE', 'PIT_RATE', 'VAT_REDUCTION', 'WARN_LEVEL')),
+    CONSTRAINT CHK_TaxRules_Sector CHECK (sector IS NULL OR sector IN ('GOODS', 'SERVICE', 'PRODUCTION', 'OTHER')),
+    CONSTRAINT CHK_TaxRules_Value CHECK (value >= 0),
+    CONSTRAINT CHK_TaxRules_Dates CHECK (effective_to IS NULL OR effective_to >= effective_from)
+);
+GO
+
 IF COL_LENGTH('Orders', 'vat_rate') IS NULL
     ALTER TABLE Orders ADD vat_rate DECIMAL(5,2) NOT NULL CONSTRAINT DF_Orders_vat_rate DEFAULT 0;
 GO
+IF COL_LENGTH('Orders', 'vat_amount') IS NULL
+    ALTER TABLE Orders ADD vat_amount DECIMAL(18,2) NOT NULL CONSTRAINT DF_Orders_vat_amount DEFAULT 0;
+GO
+IF COL_LENGTH('Orders', 'vat_included') IS NULL
+    ALTER TABLE Orders ADD vat_included BIT NOT NULL CONSTRAINT DF_Orders_vat_included DEFAULT 1;
+GO
 
--- TABLE 5c: ORDER_ITEMS (itemized line items in an order with snapshot price)
 IF OBJECT_ID('OrderItems', 'U') IS NULL
 CREATE TABLE OrderItems (
     item_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -223,27 +220,25 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_OrderItems_OrderId' AN
 CREATE INDEX IX_OrderItems_OrderId ON OrderItems(order_id);
 GO
 
--- TABLE 6: TRANSACTIONS (balance changes pulled from the SePay API by the polling job)
 IF OBJECT_ID('Transactions', 'U') IS NULL
 CREATE TABLE Transactions (
     trans_id INT IDENTITY(1,1) PRIMARY KEY,
-    bank_trans_id NVARCHAR(100) NOT NULL UNIQUE, -- Bank transaction id (idempotency key against the same transaction pulled again)
-    order_id INT NULL,                           -- Matched order (if a TINKY... code was found)
-    amount DECIMAL(18,2) NOT NULL,               -- Amount actually received
-    content NVARCHAR(500) NOT NULL,              -- Transfer note typed by the customer
-    bank_account NVARCHAR(50) NULL,              -- Receiving account number
+    bank_trans_id NVARCHAR(100) NOT NULL UNIQUE,
+    order_id INT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    content NVARCHAR(500) NOT NULL,
+    bank_account NVARCHAR(50) NULL,
     gateway NVARCHAR(50) NOT NULL DEFAULT 'SEPAY',
-    status NVARCHAR(50) NOT NULL DEFAULT 'COMPLETED', -- COMPLETED, CANCELLED, LEGIT, DUPLICATE, NO_ORDER, ORDER_CLOSED
-    trans_time DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Time recorded by the bank
-    received_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),-- Time the server received the transaction
-    announced BIT NOT NULL DEFAULT 0,            -- 0: payment popup not yet confirmed by the cashier, 1: confirmed (prevents repeats)
-    printed BIT NOT NULL DEFAULT 0,              -- 0: receipt not printed, 1: receipt printed
+    status NVARCHAR(50) NOT NULL DEFAULT 'COMPLETED',
+    trans_time DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    received_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    announced BIT NOT NULL DEFAULT 0,
+    printed BIT NOT NULL DEFAULT 0,
     CONSTRAINT FK_Transactions_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
     CONSTRAINT CHK_Trans_Status CHECK (status IN ('COMPLETED', 'CANCELLED', 'LEGIT', 'DUPLICATE', 'NO_ORDER', 'ORDER_CLOSED'))
 );
 GO
 
--- Databases created with older status names: ensure COMPLETED and CANCELLED are allowed
 IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Trans_Status'
            AND definition NOT LIKE '%COMPLETED%')
 BEGIN
@@ -255,7 +250,6 @@ BEGIN
 END
 GO
 
--- Databases that still have the speaker device: the computer speaker replaced it, so drop the device column of Transactions and the SPEAKER devices
 IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Device_Time' AND object_id = OBJECT_ID('Transactions'))
     DROP INDEX IX_Transactions_Device_Time ON Transactions;
 IF COL_LENGTH('Transactions', 'device_id') IS NOT NULL
@@ -276,17 +270,16 @@ BEGIN
 END
 GO
 
--- TABLE 7: FRAUD_ALERTS (fraud alerts raised by the rules engine)
 IF OBJECT_ID('FraudAlerts', 'U') IS NULL
 CREATE TABLE FraudAlerts (
     alert_id INT IDENTITY(1,1) PRIMARY KEY,
     trans_id INT NOT NULL,
-    rule_code NVARCHAR(50) NOT NULL,             -- DUP_TRANS, NO_ORDER, AMOUNT_MISMATCH, ORDER_NOT_PENDING, HIGH_AMOUNT, BURST_RATE
-    reason NVARCHAR(500) NOT NULL,               -- Detailed reason for the alert
-    severity NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM', -- LOW, MEDIUM, HIGH
-    status NVARCHAR(20) NOT NULL DEFAULT 'NEW',  -- NEW, IN_PROGRESS, RESOLVED, DISMISSED
-    resolved_by INT NULL,                        -- Auditor who handled it
-    resolved_notes NVARCHAR(500) NULL,           -- How it was resolved
+    rule_code NVARCHAR(50) NOT NULL,
+    reason NVARCHAR(500) NOT NULL,
+    severity NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+    status NVARCHAR(20) NOT NULL DEFAULT 'NEW',
+    resolved_by INT NULL,
+    resolved_notes NVARCHAR(500) NULL,
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT FK_Alerts_Transactions FOREIGN KEY (trans_id) REFERENCES Transactions(trans_id),
     CONSTRAINT FK_Alerts_Users FOREIGN KEY (resolved_by) REFERENCES Users(user_id),
@@ -295,26 +288,21 @@ CREATE TABLE FraudAlerts (
 );
 GO
 
--- Databases that still have Refunds: money that does not match an order is only flagged now, nothing is sent back from the system
 IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 GO
 
--- TABLE 8: AUDIT_LOGS (audit trail: who did what, when)
 IF OBJECT_ID('AuditLogs', 'U') IS NULL
 CREATE TABLE AuditLogs (
     log_id INT IDENTITY(1,1) PRIMARY KEY,
     actor_username NVARCHAR(50) NOT NULL,
-    action NVARCHAR(50) NOT NULL,                -- LOGIN, LOGOUT, CREATE_ORDER, TRANSACTION_INGEST, UPDATE_STATUS
-    target_entity NVARCHAR(50) NOT NULL,         -- USER, ORDER, TRANSACTION, DEVICE
+    action NVARCHAR(50) NOT NULL,
+    target_entity NVARCHAR(50) NOT NULL,
     entity_id NVARCHAR(50) NOT NULL,
-    detail_json NVARCHAR(MAX) NULL,              -- Changed content as a JSON diff
+    detail_json NVARCHAR(MAX) NULL,
     created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
--- =====================================================================================
--- 3. INDEXES FOR FREQUENT OPERATIONS
--- =====================================================================================
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_BankTransId' AND object_id = OBJECT_ID('Transactions'))
 CREATE INDEX IX_Transactions_BankTransId ON Transactions(bank_trans_id);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Announced' AND object_id = OBJECT_ID('Transactions'))
@@ -323,4 +311,400 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Transactions_Time' AND
 CREATE INDEX IX_Transactions_Time ON Transactions(trans_time);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Orders_OrderCode' AND object_id = OBJECT_ID('Orders'))
 CREATE INDEX IX_Orders_OrderCode ON Orders(order_code);
+GO
+
+IF COL_LENGTH('Products', 'cost_price') IS NULL
+ALTER TABLE Products ADD cost_price DECIMAL(18,2) NOT NULL CONSTRAINT DF_Products_Cost DEFAULT 0;
+GO
+
+IF OBJECT_ID('Affiliates', 'U') IS NULL
+CREATE TABLE Affiliates (
+    affiliate_id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(100) NOT NULL UNIQUE,
+    rate DECIMAL(5,2) NOT NULL,
+    active BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT CHK_Affiliate_Rate CHECK (rate >= 0 AND rate <= 100)
+);
+GO
+
+IF OBJECT_ID('ChannelSales', 'U') IS NULL
+CREATE TABLE ChannelSales (
+    sale_id INT IDENTITY(1,1) PRIMARY KEY,
+    channel NVARCHAR(20) NOT NULL,
+    external_ref NVARCHAR(60) NOT NULL,
+    sold_at DATETIME2(3) NOT NULL,
+    status NVARCHAR(20) NOT NULL DEFAULT 'COMPLETED',
+    goods_amount DECIMAL(18,2) NOT NULL,
+    platform_fee DECIMAL(18,2) NOT NULL DEFAULT 0,
+    shipping_fee DECIMAL(18,2) NOT NULL DEFAULT 0,
+    affiliate_id INT NULL,
+    affiliate_commission DECIMAL(18,2) NOT NULL DEFAULT 0,
+    cost_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+    note NVARCHAR(200) NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT UQ_ChannelSales_Ref UNIQUE (channel, external_ref),
+    CONSTRAINT FK_ChannelSales_Affiliates FOREIGN KEY (affiliate_id) REFERENCES Affiliates(affiliate_id),
+    CONSTRAINT FK_ChannelSales_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_ChannelSales_Channel CHECK (channel IN ('SHOPEE', 'TIKTOK')),
+    CONSTRAINT CHK_ChannelSales_Status CHECK (status IN ('COMPLETED', 'CANCELLED', 'RETURNED'))
+);
+GO
+
+IF OBJECT_ID('Invoices', 'U') IS NULL
+CREATE TABLE Invoices (
+    invoice_id INT IDENTITY(1,1) PRIMARY KEY,
+    invoice_no NVARCHAR(20) NOT NULL UNIQUE,
+    source_type NVARCHAR(20) NOT NULL,
+    source_id INT NOT NULL,
+    buyer_name NVARCHAR(100) NOT NULL,
+    buyer_tax_code NVARCHAR(20) NULL,
+    buyer_address NVARCHAR(200) NULL,
+    total_amount DECIMAL(18,2) NOT NULL,
+    vat_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+    status NVARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    provider_invoice_no NVARCHAR(30) NULL,
+    provider_lookup_code NVARCHAR(40) NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Invoices_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_Invoice_Source CHECK (source_type IN ('ORDER', 'CHANNEL_SALE')),
+    CONSTRAINT CHK_Invoice_Status CHECK (status IN ('DRAFT', 'SENT_TO_PROVIDER', 'ISSUED'))
+);
+GO
+
+IF OBJECT_ID('InvoiceLines', 'U') IS NULL
+CREATE TABLE InvoiceLines (
+    line_id INT IDENTITY(1,1) PRIMARY KEY,
+    invoice_id INT NOT NULL,
+    name NVARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(18,2) NOT NULL,
+    subtotal DECIMAL(18,2) NOT NULL,
+    CONSTRAINT FK_InvoiceLines_Invoices FOREIGN KEY (invoice_id) REFERENCES Invoices(invoice_id) ON DELETE CASCADE
+);
+GO
+
+IF COL_LENGTH('Affiliates', 'referral_code') IS NULL
+ALTER TABLE Affiliates ADD
+    referral_code NVARCHAR(30) NULL,
+    phone NVARCHAR(20) NULL,
+    email NVARCHAR(100) NULL,
+    bank_name NVARCHAR(60) NULL,
+    bank_account NVARCHAR(30) NULL,
+    bank_holder NVARCHAR(100) NULL,
+    status NVARCHAR(12) NOT NULL CONSTRAINT DF_Affiliates_Status DEFAULT 'ACTIVE';
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Affiliate_Status')
+ALTER TABLE Affiliates ADD CONSTRAINT CHK_Affiliate_Status CHECK (status IN ('ACTIVE', 'PENDING', 'SUSPENDED'));
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UX_Affiliates_Code' AND object_id = OBJECT_ID('Affiliates'))
+CREATE UNIQUE INDEX UX_Affiliates_Code ON Affiliates(referral_code) WHERE referral_code IS NOT NULL;
+GO
+
+IF OBJECT_ID('Campaigns', 'U') IS NULL
+CREATE TABLE Campaigns (
+    campaign_id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(80) NOT NULL UNIQUE,
+    description NVARCHAR(300) NULL,
+    commission_type NVARCHAR(10) NOT NULL,
+    commission_value DECIMAL(18,2) NOT NULL DEFAULT 0,
+    min_order DECIMAL(18,2) NOT NULL DEFAULT 0,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status NVARCHAR(10) NOT NULL DEFAULT 'DRAFT',
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Campaigns_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_Campaign_Type CHECK (commission_type IN ('PERCENT', 'FIXED')),
+    CONSTRAINT CHK_Campaign_Status CHECK (status IN ('DRAFT', 'ACTIVE', 'PAUSED', 'ENDED')),
+    CONSTRAINT CHK_Campaign_Dates CHECK (end_date >= start_date),
+    CONSTRAINT CHK_Campaign_Values CHECK (commission_value > 0 AND min_order >= 0)
+);
+GO
+
+IF COL_LENGTH('Orders', 'referred_by_affiliate_id') IS NULL
+ALTER TABLE Orders ADD referred_by_affiliate_id INT NULL, referral_campaign_id INT NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Orders_Affiliates')
+ALTER TABLE Orders ADD CONSTRAINT FK_Orders_Affiliates FOREIGN KEY (referred_by_affiliate_id) REFERENCES Affiliates(affiliate_id);
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Orders_Campaigns')
+ALTER TABLE Orders ADD CONSTRAINT FK_Orders_Campaigns FOREIGN KEY (referral_campaign_id) REFERENCES Campaigns(campaign_id);
+GO
+
+IF OBJECT_ID('Commissions', 'U') IS NULL
+CREATE TABLE Commissions (
+    commission_id INT IDENTITY(1,1) PRIMARY KEY,
+    affiliate_id INT NOT NULL,
+    order_id INT NOT NULL UNIQUE,
+    campaign_id INT NOT NULL,
+    order_amount DECIMAL(18,2) NOT NULL,
+    eligible_amount DECIMAL(18,2) NOT NULL,
+    rate_text NVARCHAR(40) NOT NULL,
+    original_amount DECIMAL(18,2) NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    status NVARCHAR(12) NOT NULL DEFAULT 'PENDING',
+    rule_snapshot NVARCHAR(300) NOT NULL,
+    reason NVARCHAR(200) NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    updated_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Commissions_Affiliates FOREIGN KEY (affiliate_id) REFERENCES Affiliates(affiliate_id),
+    CONSTRAINT FK_Commissions_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    CONSTRAINT FK_Commissions_Campaigns FOREIGN KEY (campaign_id) REFERENCES Campaigns(campaign_id),
+    CONSTRAINT CHK_Commission_Status CHECK (status IN ('PENDING', 'APPROVED', 'AVAILABLE', 'ON_HOLD', 'REJECTED', 'PAID', 'REVERSED')),
+    CONSTRAINT CHK_Commission_Amount CHECK (amount >= 0 AND original_amount >= 0)
+);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Commissions_Affiliate' AND object_id = OBJECT_ID('Commissions'))
+CREATE INDEX IX_Commissions_Affiliate ON Commissions(affiliate_id, status);
+GO
+
+IF OBJECT_ID('Payouts', 'U') IS NULL
+CREATE TABLE Payouts (
+    payout_id INT IDENTITY(1,1) PRIMARY KEY,
+    affiliate_id INT NOT NULL,
+    batch_code NVARCHAR(20) NULL,
+    gross DECIMAL(18,2) NOT NULL,
+    deduction DECIMAL(18,2) NOT NULL DEFAULT 0,
+    net DECIMAL(18,2) NOT NULL,
+    status NVARCHAR(10) NOT NULL DEFAULT 'REQUESTED',
+    bank_info NVARCHAR(200) NULL,
+    reference NVARCHAR(60) NULL,
+    requested_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    paid_at DATETIME2(3) NULL,
+    paid_by INT NULL,
+    CONSTRAINT FK_Payouts_Affiliates FOREIGN KEY (affiliate_id) REFERENCES Affiliates(affiliate_id),
+    CONSTRAINT FK_Payouts_Users FOREIGN KEY (paid_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_Payout_Status CHECK (status IN ('REQUESTED', 'PAID')),
+    CONSTRAINT CHK_Payout_Amounts CHECK (deduction >= 0)
+);
+GO
+
+IF COL_LENGTH('Commissions', 'payout_id') IS NULL
+ALTER TABLE Commissions ADD payout_id INT NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_Commissions_Payouts')
+ALTER TABLE Commissions ADD CONSTRAINT FK_Commissions_Payouts FOREIGN KEY (payout_id) REFERENCES Payouts(payout_id);
+GO
+
+IF OBJECT_ID('CommissionAdjustments', 'U') IS NULL
+CREATE TABLE CommissionAdjustments (
+    adjustment_id INT IDENTITY(1,1) PRIMARY KEY,
+    commission_id INT NOT NULL,
+    affiliate_id INT NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    reason NVARCHAR(200) NOT NULL,
+    payout_id INT NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_CommAdj_Commissions FOREIGN KEY (commission_id) REFERENCES Commissions(commission_id),
+    CONSTRAINT FK_CommAdj_Affiliates FOREIGN KEY (affiliate_id) REFERENCES Affiliates(affiliate_id),
+    CONSTRAINT FK_CommAdj_Payouts FOREIGN KEY (payout_id) REFERENCES Payouts(payout_id),
+    CONSTRAINT FK_CommAdj_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_CommAdj_Amount CHECK (amount <> 0)
+);
+GO
+
+IF OBJECT_ID('TaxAssessments', 'U') IS NULL
+CREATE TABLE TaxAssessments (
+    assessment_id INT IDENTITY(1,1) PRIMARY KEY,
+    assessed_on DATE NOT NULL,
+    period_label NVARCHAR(40) NOT NULL,
+    summary NVARCHAR(500) NOT NULL,
+    verification NVARCHAR(20) NOT NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxAssessments_Users FOREIGN KEY (created_by) REFERENCES Users(user_id)
+);
+GO
+
+IF OBJECT_ID('TaxCalculations', 'U') IS NULL
+CREATE TABLE TaxCalculations (
+    calc_id INT IDENTITY(1,1) PRIMARY KEY,
+    calc_date DATE NOT NULL,
+    period_label NVARCHAR(40) NOT NULL,
+    period_from DATE NOT NULL,
+    period_to DATE NOT NULL,
+    sector NVARCHAR(20) NOT NULL,
+    revenue DECIMAL(18,2) NOT NULL,
+    adjustment DECIMAL(18,2) NOT NULL DEFAULT 0,
+    vat_amount DECIMAL(18,2) NOT NULL,
+    pit_amount DECIMAL(18,2) NOT NULL,
+    total_amount DECIMAL(18,2) NOT NULL,
+    rule_stamp NVARCHAR(300) NOT NULL,
+    verified_rules BIT NOT NULL DEFAULT 0,
+    note NVARCHAR(200) NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxCalculations_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_TaxCalc_Adjustment CHECK (adjustment >= 0 AND adjustment <= revenue)
+);
+GO
+
+IF OBJECT_ID('TaxObligations', 'U') IS NULL
+CREATE TABLE TaxObligations (
+    obligation_id INT IDENTITY(1,1) PRIMARY KEY,
+    kind NVARCHAR(20) NOT NULL,
+    period_label NVARCHAR(40) NOT NULL,
+    due_date DATE NOT NULL,
+    status NVARCHAR(20) NOT NULL DEFAULT 'NOT_ASSESSED',
+    responsible_user INT NULL,
+    estimated_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+    declared_amount DECIMAL(18,2) NULL,
+    confirmed_amount DECIMAL(18,2) NULL,
+    submission_ref NVARCHAR(60) NULL,
+    completed_on DATE NULL,
+    notes NVARCHAR(300) NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxObligations_Users FOREIGN KEY (responsible_user) REFERENCES Users(user_id),
+    CONSTRAINT CHK_TaxObl_Kind CHECK (kind IN ('VAT', 'PIT', 'EINVOICE', 'BOOKKEEPING')),
+    CONSTRAINT CHK_TaxObl_Status CHECK (status IN ('NOT_ASSESSED', 'NEEDS_INFO', 'APPLICABLE', 'NOT_APPLICABLE', 'PREPARATION', 'READY_FOR_REVIEW', 'SUBMITTED', 'AWAITING_PAYMENT', 'PAID', 'OVERDUE', 'NEEDS_ADJUSTMENT'))
+);
+GO
+
+IF OBJECT_ID('TaxObligationHistory', 'U') IS NULL
+CREATE TABLE TaxObligationHistory (
+    history_id INT IDENTITY(1,1) PRIMARY KEY,
+    obligation_id INT NOT NULL,
+    from_status NVARCHAR(20) NOT NULL,
+    to_status NVARCHAR(20) NOT NULL,
+    note NVARCHAR(300) NOT NULL,
+    changed_by INT NOT NULL,
+    changed_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxHist_Obligations FOREIGN KEY (obligation_id) REFERENCES TaxObligations(obligation_id),
+    CONSTRAINT FK_TaxHist_Users FOREIGN KEY (changed_by) REFERENCES Users(user_id)
+);
+GO
+
+IF OBJECT_ID('TaxPayments', 'U') IS NULL
+CREATE TABLE TaxPayments (
+    payment_id INT IDENTITY(1,1) PRIMARY KEY,
+    obligation_id INT NOT NULL,
+    paid_on DATE NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    method NVARCHAR(30) NOT NULL,
+    reference NVARCHAR(60) NULL,
+    receipt_name NVARCHAR(100) NULL,
+    recorded_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxPayments_Obligations FOREIGN KEY (obligation_id) REFERENCES TaxObligations(obligation_id),
+    CONSTRAINT FK_TaxPayments_Users FOREIGN KEY (recorded_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_TaxPay_Amount CHECK (amount > 0),
+    CONSTRAINT CHK_TaxPay_Evidence CHECK (reference IS NOT NULL OR receipt_name IS NOT NULL)
+);
+GO
+
+IF OBJECT_ID('Expenses', 'U') IS NULL
+CREATE TABLE Expenses (
+    expense_id INT IDENTITY(1,1) PRIMARY KEY,
+    spent_on DATE NOT NULL,
+    supplier NVARCHAR(100) NOT NULL,
+    supplier_tax_code NVARCHAR(20) NULL,
+    category NVARCHAR(30) NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    payment_method NVARCHAR(30) NOT NULL,
+    invoice_no NVARCHAR(40) NULL,
+    has_document BIT NOT NULL DEFAULT 0,
+    tax_treatment NVARCHAR(20) NOT NULL DEFAULT 'UNCLASSIFIED',
+    note NVARCHAR(200) NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_Expenses_Users FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_Expense_Amount CHECK (amount > 0),
+    CONSTRAINT CHK_Expense_Treatment CHECK (tax_treatment IN ('UNCLASSIFIED', 'MAY_COUNT', 'NOT_COUNTED'))
+);
+GO
+
+IF OBJECT_ID('TaxReconNotes', 'U') IS NULL
+CREATE TABLE TaxReconNotes (
+    note_id INT IDENTITY(1,1) PRIMARY KEY,
+    ref_key NVARCHAR(40) NOT NULL UNIQUE,
+    note NVARCHAR(300) NOT NULL,
+    resolved BIT NOT NULL DEFAULT 0,
+    updated_by INT NOT NULL,
+    updated_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxRecon_Users FOREIGN KEY (updated_by) REFERENCES Users(user_id)
+);
+GO
+
+IF OBJECT_ID('ChannelPayouts', 'U') IS NULL
+CREATE TABLE ChannelPayouts (
+    payout_id INT IDENTITY(1,1) PRIMARY KEY,
+    reference NVARCHAR(20) NOT NULL UNIQUE,
+    affiliate_id INT NOT NULL,
+    total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+    payment_method NVARCHAR(20) NOT NULL DEFAULT 'BANK_TRANSFER',
+    payment_reference NVARCHAR(60) NULL,
+    payment_date DATE NULL,
+    status NVARCHAR(10) NOT NULL DEFAULT 'DRAFT',
+    notes NVARCHAR(200) NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    confirmed_by INT NULL,
+    confirmed_at DATETIME2(3) NULL,
+    CONSTRAINT FK_ChPayouts_Affiliates FOREIGN KEY (affiliate_id) REFERENCES Affiliates(affiliate_id),
+    CONSTRAINT FK_ChPayouts_Creator FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT FK_ChPayouts_Confirmer FOREIGN KEY (confirmed_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_ChPayouts_Status CHECK (status IN ('DRAFT', 'CONFIRMED', 'CANCELLED')),
+    CONSTRAINT CHK_ChPayouts_Method CHECK (payment_method IN ('BANK_TRANSFER', 'CASH', 'OTHER')),
+    CONSTRAINT CHK_ChPayouts_Total CHECK (total_amount >= 0)
+);
+GO
+
+IF OBJECT_ID('ChannelCommissions', 'U') IS NULL
+CREATE TABLE ChannelCommissions (
+    commission_id INT IDENTITY(1,1) PRIMARY KEY,
+    affiliate_id INT NOT NULL,
+    channel NVARCHAR(20) NOT NULL,
+    external_ref NVARCHAR(60) NOT NULL,
+    platform_order_id NVARCHAR(60) NOT NULL,
+    order_date DATE NOT NULL,
+    base_amount DECIMAL(18,2) NOT NULL,
+    commission_type NVARCHAR(10) NOT NULL,
+    commission_rate DECIMAL(18,2) NOT NULL,
+    calculated_amount DECIMAL(18,2) NOT NULL,
+    reported_amount DECIMAL(18,2) NULL,
+    approved_amount DECIMAL(18,2) NULL,
+    status NVARCHAR(10) NOT NULL DEFAULT 'PENDING',
+    data_source NVARCHAR(12) NOT NULL,
+    attribution NVARCHAR(100) NULL,
+    notes NVARCHAR(200) NULL,
+    reject_reason NVARCHAR(200) NULL,
+    payout_id INT NULL,
+    created_by INT NOT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    approved_by INT NULL,
+    approved_at DATETIME2(3) NULL,
+    CONSTRAINT UQ_ChCommissions_Ref UNIQUE (channel, external_ref),
+    CONSTRAINT FK_ChCommissions_Affiliates FOREIGN KEY (affiliate_id) REFERENCES Affiliates(affiliate_id),
+    CONSTRAINT FK_ChCommissions_Payouts FOREIGN KEY (payout_id) REFERENCES ChannelPayouts(payout_id),
+    CONSTRAINT FK_ChCommissions_Creator FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    CONSTRAINT FK_ChCommissions_Approver FOREIGN KEY (approved_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_ChCommissions_Channel CHECK (channel IN ('SHOPEE', 'TIKTOK')),
+    CONSTRAINT CHK_ChCommissions_Type CHECK (commission_type IN ('PERCENT', 'FIXED')),
+    CONSTRAINT CHK_ChCommissions_Status CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED', 'PAID', 'CANCELLED')),
+    CONSTRAINT CHK_ChCommissions_Source CHECK (data_source IN ('MANUAL', 'CSV_IMPORT')),
+    CONSTRAINT CHK_ChCommissions_Amounts CHECK (base_amount > 0 AND commission_rate >= 0 AND calculated_amount >= 0)
+);
+GO
+
+IF OBJECT_ID('ChannelPayoutItems', 'U') IS NULL
+CREATE TABLE ChannelPayoutItems (
+    item_id INT IDENTITY(1,1) PRIMARY KEY,
+    payout_id INT NOT NULL,
+    commission_id INT NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    CONSTRAINT FK_ChPayItems_Payouts FOREIGN KEY (payout_id) REFERENCES ChannelPayouts(payout_id),
+    CONSTRAINT FK_ChPayItems_Commissions FOREIGN KEY (commission_id) REFERENCES ChannelCommissions(commission_id),
+    CONSTRAINT UQ_ChPayItems UNIQUE (payout_id, commission_id),
+    CONSTRAINT CHK_ChPayItems_Amount CHECK (amount > 0)
+);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChCommissions_Affiliate' AND object_id = OBJECT_ID('ChannelCommissions'))
+CREATE INDEX IX_ChCommissions_Affiliate ON ChannelCommissions(affiliate_id, status);
 GO

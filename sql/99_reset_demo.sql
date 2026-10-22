@@ -1,23 +1,35 @@
--- =====================================================================================
--- RESET DEMO - DANGER: DELETES ALL DATA (users, orders, real transactions, audit logs)
--- Only run this when you really want a clean database for a demo.
--- Order after reset: 99_reset_demo.sql -> 01_schema.sql -> 02_seed.sql
--- Back up first: BACKUP DATABASE PaymentSpeaker TO DISK = 'D:\backup\ps.bak'
--- =====================================================================================
 USE PaymentSpeaker;
 GO
 
--- Drop existing tables (children first, then parents)
 IF OBJECT_ID('AuditLogs', 'U') IS NOT NULL DROP TABLE AuditLogs;
 IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 IF OBJECT_ID('FraudAlerts', 'U') IS NOT NULL DROP TABLE FraudAlerts;
 IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
+IF OBJECT_ID('TaxReconNotes', 'U') IS NOT NULL DROP TABLE TaxReconNotes;
+IF OBJECT_ID('TaxPayments', 'U') IS NOT NULL DROP TABLE TaxPayments;
+IF OBJECT_ID('TaxObligationHistory', 'U') IS NOT NULL DROP TABLE TaxObligationHistory;
+IF OBJECT_ID('TaxObligations', 'U') IS NOT NULL DROP TABLE TaxObligations;
+IF OBJECT_ID('TaxCalculations', 'U') IS NOT NULL DROP TABLE TaxCalculations;
+IF OBJECT_ID('TaxAssessments', 'U') IS NOT NULL DROP TABLE TaxAssessments;
+IF OBJECT_ID('Expenses', 'U') IS NOT NULL DROP TABLE Expenses;
+IF OBJECT_ID('CommissionAdjustments', 'U') IS NOT NULL DROP TABLE CommissionAdjustments;
+IF OBJECT_ID('Commissions', 'U') IS NOT NULL DROP TABLE Commissions;
+IF OBJECT_ID('Payouts', 'U') IS NOT NULL DROP TABLE Payouts;
 IF OBJECT_ID('OrderItems', 'U') IS NOT NULL DROP TABLE OrderItems;
 IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
+IF OBJECT_ID('Campaigns', 'U') IS NOT NULL DROP TABLE Campaigns;
+IF OBJECT_ID('InvoiceLines', 'U') IS NOT NULL DROP TABLE InvoiceLines;
+IF OBJECT_ID('Invoices', 'U') IS NOT NULL DROP TABLE Invoices;
+IF OBJECT_ID('ChannelPayoutItems', 'U') IS NOT NULL DROP TABLE ChannelPayoutItems;
+IF OBJECT_ID('ChannelCommissions', 'U') IS NOT NULL DROP TABLE ChannelCommissions;
+IF OBJECT_ID('ChannelPayouts', 'U') IS NOT NULL DROP TABLE ChannelPayouts;
+IF OBJECT_ID('ChannelSales', 'U') IS NOT NULL DROP TABLE ChannelSales;
+IF OBJECT_ID('Affiliates', 'U') IS NOT NULL DROP TABLE Affiliates;
 IF OBJECT_ID('Products', 'U') IS NOT NULL DROP TABLE Products;
 IF OBJECT_ID('Groups', 'U') IS NOT NULL DROP TABLE [Groups];
 IF OBJECT_ID('Categories', 'U') IS NOT NULL DROP TABLE Categories;
 IF OBJECT_ID('DiscountCodes', 'U') IS NOT NULL DROP TABLE DiscountCodes;
+IF OBJECT_ID('TaxRules', 'U') IS NOT NULL DROP TABLE TaxRules;
 IF OBJECT_ID('Settings', 'U') IS NOT NULL DROP TABLE Settings;
 IF OBJECT_ID('MaintenanceTickets', 'U') IS NOT NULL DROP TABLE MaintenanceTickets;
 IF OBJECT_ID('Devices', 'U') IS NOT NULL DROP TABLE Devices;
