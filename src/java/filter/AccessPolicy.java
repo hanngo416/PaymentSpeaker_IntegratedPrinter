@@ -35,7 +35,10 @@ public final class AccessPolicy {
             new Rule("/admin/devices", DEVICE_READ, DEVICE_WRITE),
             new Rule("/admin/discounts", DISCOUNT_MANAGE, DISCOUNT_MANAGE),
             new Rule("/admin/products", PRODUCT_MANAGE, PRODUCT_MANAGE),
+            new Rule("/admin/categories", PRODUCT_MANAGE, PRODUCT_MANAGE),
+            new Rule("/admin/groups", PRODUCT_MANAGE, PRODUCT_MANAGE),
             new Rule("/admin/audit", AUDIT_READ, AUDIT_READ),
+            new Rule("/admin/taxes", TAX_READ, TAX_MANAGE),
             new Rule("/admin", SYSTEM_ADMIN, SYSTEM_ADMIN),
             new Rule("/shift/print", SHIFT_PRINT, SHIFT_PRINT),
             new Rule("/shift", SHIFT_USE, SHIFT_USE),
@@ -45,6 +48,9 @@ public final class AccessPolicy {
             new Rule("/printer", SPEAKER_USE, SPEAKER_USE),
             new Rule("/transactions", TRANSACTION_READ, TRANSACTION_READ),
             new Rule("/alerts", ALERT_READ, ALERT_WRITE),
+            new Rule("/tax", TAX_READ, TAX_READ),
+            new Rule("/bot/chat", DASHBOARD_READ, DASHBOARD_READ),
+            new Rule("/bot", TAX_READ, TAX_READ),
             new Rule("/settings", DASHBOARD_READ, DASHBOARD_READ),
             new Rule("/home", DASHBOARD_READ, DASHBOARD_READ),
             new Rule("/dashboard", DASHBOARD_READ, DASHBOARD_READ)
@@ -66,7 +72,7 @@ public final class AccessPolicy {
     }
 
     public static boolean isAjax(String path) {
-        return path.startsWith("/speaker/poll") || path.startsWith("/orders/status");
+        return path.startsWith("/speaker/poll") || path.startsWith("/orders/status") || path.startsWith("/bot/feed") || path.startsWith("/bot/chat");
     }
 
     public static Permission requiredFor(String path, String method) {
@@ -76,11 +82,9 @@ public final class AccessPolicy {
                 return readOnly ? rule.read : rule.write;
             }
         }
-        // Fail closed: a path nobody listed above is for admins only, until it gets its own rule
         return isOpenToSignedIn(path) ? null : SYSTEM_ADMIN;
     }
 
-    // Pages every signed-in user may open whatever the role
     private static boolean isOpenToSignedIn(String path) {
         return path.equals("/") || path.equals("/index.html") || path.equals("/profile") || path.equals("/logout");
     }
