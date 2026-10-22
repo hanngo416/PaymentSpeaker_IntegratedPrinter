@@ -184,7 +184,6 @@ p { line-height: 1.5; }
     box-shadow: 0 0 8px #ec4899;
 }
 
-/* Collapsed Sidebar Styles (Desktop only) */
 @media (min-width: 861px) {
     html.sidebar-collapsed .sidebar {
         width: 68px;
@@ -475,7 +474,6 @@ tbody tr:hover { background: rgba(241, 243, 246, 0.6); }
 .actions form, form.inline { display: inline-flex; margin: 0; }
 .actions { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 
-/* Table Action Buttons */
 .btn-action {
     display: inline-flex;
     align-items: center;
@@ -735,9 +733,6 @@ svg.chart { width: 100%; height: auto; max-width: 760px; }
 
 @keyframes flash { from { background: #5eead4; } to { background: var(--ok); } }
 
-/* ==========================================================================
-   Modern Order View & Receipt Confirmation
-   ========================================================================== */
 .order-view-wrapper {
     max-width: 500px;
     margin: 12px auto 40px;
@@ -1121,8 +1116,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     dl { grid-template-columns: 110px 1fr; }
 }
 
-/* Speaker styling */
-
 .speaker-log {
     margin: 0;
     padding: 0;
@@ -1156,7 +1149,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     border-bottom: none;
 }
 
-/* Banner shown on every page when transactions need checking */
 .alert-banner {
     display: flex;
     flex-wrap: wrap;
@@ -1173,9 +1165,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
 }
 .alert-banner a { color: inherit; }
 
-/* ==========================================================================
-   Thermal Receipt (80mm POS Roll)
-   ========================================================================== */
 @page {
     size: 80mm 200mm;
     margin: 0;
@@ -1468,7 +1457,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     letter-spacing: 0.06em;
 }
 
-/* Thermal Report Print Extensions */
 .receipt-period-text {
     font-size: 11px;
     font-weight: 700;
@@ -1532,7 +1520,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     color: #64748b;
 }
 
-/* Print Rules */
 @media print {
     @page {
         size: 80mm auto;
@@ -1612,8 +1599,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     }
 }
 
-/* POS Order Creation Styles */
-
 .pos-field-label {
     display: block;
     font-size: var(--fs-xs);
@@ -1674,10 +1659,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     color: #fff;
     box-shadow: 0 3px 10px rgba(190, 24, 93, 0.3);
 }
-
-/* ==========================================================================
-   Alert Action Button Variants (Synchronized with .btn-action system)
-   ========================================================================== */
 
 .btn-action.btn-review {
     color: #2563eb;
@@ -1774,10 +1755,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     box-shadow: 0 4px 12px rgba(190, 24, 93, 0.08);
 }
 
-/* ==========================================================================
-   Settings Page & Pill Toggle Switch
-   ========================================================================== */
-
 .setting-item {
     display: flex;
     align-items: center;
@@ -1826,7 +1803,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     flex-shrink: 0;
 }
 
-/* Pill Toggle Switch */
 .toggle-switch {
     position: relative;
     display: inline-flex;
@@ -2034,7 +2010,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     margin-top: 16px;
 }
 
-/* Shift Close & Reconciliation Panel */
 .shift-close-section {
     margin-top: 24px;
     padding: 22px;
@@ -2137,7 +2112,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     border-color: var(--bad);
 }
 
-/* Home hero & Quick actions */
 .home-welcome-card {
     padding: 22px 24px;
     margin-bottom: 20px;
@@ -2298,9 +2272,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     }
 }
 
-/* =====================================================================
-   POS Dual-Column Layout (Spread to 2 sides & Generous Height)
-   ===================================================================== */
 .pos-dual-layout {
     display: grid;
     grid-template-columns: 1fr 370px;
@@ -2316,7 +2287,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     }
 }
 
-/* Frameless Left Column - Pending Orders Queue */
 .pos-pending-panel {
     width: 100% !important;
     max-width: 100% !important;
@@ -2365,7 +2335,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     overflow-y: auto;
 }
 
-/* Pending Cards */
 .pos-mini-card {
     display: flex;
     align-items: center;
@@ -2495,7 +2464,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     border-radius: 10px;
 }
 
-/* Spacious, Taller Form on Right (Width: 480px, Taller controls) */
 .pos-create-panel {
     width: 100% !important;
     max-width: 480px !important;
@@ -2572,8 +2540,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     gap: 8px;
     margin-bottom: 14px;
 }
-.pos-discount-row input { text-transform: uppercase; }
-.pos-discount-row input::placeholder { text-transform: none; }
 
 .pos-compact-presets {
     display: flex;
@@ -2590,7 +2556,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     border-radius: 7px;
 }
 
-/* Payment Method Selectors */
 .pos-compact-methods {
     display: flex;
     gap: 10px;
@@ -2779,9 +2744,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     justify-content: center;
 }
 
-/* ==========================================================================
-   Shift Closing & Reconciliation Card
-   ========================================================================== */
 .shift-close-section {
     margin-top: 24px;
     padding: 24px;
@@ -2938,9 +2900,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     background: #ffe4e6;
 }
 
-/* =====================================================================
-   POS Product Catalog & Cart Section
-   ===================================================================== */
 .pos-catalog-panel {
     display: flex;
     flex-direction: column;
@@ -3010,7 +2969,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     color: #ffffff;
 }
 
-/* Category Tabs */
 .pos-cat-tabs {
     display: flex;
     gap: 8px;
@@ -3048,7 +3006,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     box-shadow: 0 2px 8px rgba(25, 28, 30, 0.25);
 }
 
-/* Group Sub-pills */
 .pos-grp-bar {
     display: flex;
     gap: 6px;
@@ -3078,7 +3035,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     box-shadow: 0 2px 6px rgba(190, 24, 93, 0.25);
 }
 
-/* Product Grid */
 .pos-product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -3177,7 +3133,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     font-size: 13px;
 }
 
-/* Panel Switcher (Cart vs Pending Queue) */
 .pos-panel-tabs {
     display: flex;
     gap: 8px;
@@ -3227,7 +3182,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     animation: pulse 1.6s infinite;
 }
 
-/* Cart Items List */
 .pos-cart-section {
     margin-bottom: 16px;
     padding: 12px;
@@ -3373,7 +3327,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     margin: 0;
 }
 
-/* Receipt items table */
 .receipt-items-table {
     width: 100%;
     border-collapse: collapse;
@@ -3396,7 +3349,6 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
 .rit-price { text-align: right; width: 60px; }
 .rit-total { text-align: right; width: 65px; font-weight: 700; }
 
-/* Order view items box */
 .order-items-box {
     margin: 16px 0;
     padding: 14px;
@@ -3521,3 +3473,33 @@ body.auth { display: flex; align-items: center; justify-content: center; min-hei
     .modal { max-width: calc(100vw - 24px); }
     td.wrap { min-width: 140px; }
 }
+
+.tax-progress { width: 100%; height: 14px; border: 0; border-radius: 999px; overflow: hidden; background: var(--surface-soft); accent-color: var(--ok); }
+.tax-progress::-webkit-progress-bar { background: var(--surface-soft); }
+.tax-progress::-webkit-progress-value { background: var(--ok); }
+.tax-progress::-moz-progress-bar { background: var(--ok); }
+.tax-progress.level1::-webkit-progress-value, .tax-progress.level2::-webkit-progress-value { background: var(--warn); }
+.tax-progress.level1::-moz-progress-bar, .tax-progress.level2::-moz-progress-bar { background: var(--warn); }
+.tax-progress.level3::-webkit-progress-value { background: var(--bad); }
+.tax-progress.level3::-moz-progress-bar { background: var(--bad); }
+
+.tax-bot { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.bot-toggle { position: relative; width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; background: var(--ok); box-shadow: 0 8px 24px rgba(25, 28, 30, 0.22); }
+.tax-bot.level1 .bot-toggle, .tax-bot.level2 .bot-toggle { background: var(--warn); }
+.tax-bot.level3 .bot-toggle { background: var(--bad); }
+.bot-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--bad); border: 2px solid #fff; }
+.bot-dot[hidden] { display: none; }
+.bot-panel { width: 320px; max-width: calc(100vw - 32px); max-height: 60vh; overflow-y: auto; padding: 14px 16px; border-radius: 16px; background: #fff; border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(25, 28, 30, 0.2); }
+.bot-panel[hidden] { display: none; }
+.bot-head { font-weight: 800; margin-bottom: 6px; }
+.bot-status { margin: 0 0 10px; font-size: var(--fs-sm); color: var(--gray); }
+.bot-msg { padding: 10px 0; border-top: 1px solid var(--line); }
+.bot-msg p { margin: 0 0 8px; font-size: var(--fs-md); }
+.bot-chat { margin-top: 6px; }
+.bot-line { padding: 6px 0; }
+.bot-line p { margin: 0; padding: 8px 10px; border-radius: 12px; font-size: var(--fs-md); white-space: pre-wrap; }
+.bot-line.me p { background: var(--ok); color: #fff; margin-left: 32px; }
+.bot-line.bot p { background: #f1f3f5; margin-right: 32px; }
+.bot-line small { display: block; margin-top: 2px; font-size: var(--fs-sm); color: var(--gray); }
+.bot-form { display: flex; gap: 6px; margin-top: 10px; }
+.bot-form input { flex: 1; min-width: 0; }
