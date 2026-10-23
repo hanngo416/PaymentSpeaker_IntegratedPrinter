@@ -4,18 +4,6 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Random;
 
-/*
- * Fills the Transactions table with generated rows so the transaction list,
- * paging and chart can be tested with a large table.
- *
- * Compile and run from the project folder:
- *     javac -cp web/WEB-INF/lib/sqljdbc4.jar -d build/tools src/java/util/DBUtil.java tools/GenerateTransactions.java
- *     java  -cp "build/tools;web/WEB-INF/lib/sqljdbc4.jar" GenerateTransactions 20000
- *     java  -cp "build/tools;web/WEB-INF/lib/sqljdbc4.jar" GenerateTransactions clear
- *
- * Generated rows have a bank_trans_id starting with GEN, are already marked as
- * announced so the speaker stays quiet, and never create alerts or orders.
- */
 public class GenerateTransactions {
 
     private static final int DAYS = 90;
