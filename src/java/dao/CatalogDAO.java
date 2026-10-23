@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Category;
 import model.Group;
 import model.Page;
@@ -42,7 +44,7 @@ public class CatalogDAO {
     }
 
     public List<Product> findActiveProducts() throws SQLException {
-        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.active, p.display_order, "
+        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.active, p.display_order, "
                 + "g.group_name, g.category_id, c.category_name "
                 + "FROM Products p "
                 + "JOIN [Groups] g ON p.group_id = g.group_id "
@@ -60,6 +62,7 @@ public class CatalogDAO {
                 p.setProductCode(rs.getString("product_code"));
                 p.setProductName(rs.getString("product_name"));
                 p.setPrice(rs.getBigDecimal("price"));
+                p.setCostPrice(rs.getBigDecimal("cost_price"));
                 p.setActive(rs.getBoolean("active"));
                 p.setDisplayOrder(rs.getInt("display_order"));
                 p.setGroupName(rs.getString("group_name"));
@@ -72,7 +75,7 @@ public class CatalogDAO {
     }
 
     public Product findProductById(int productId) throws SQLException {
-        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.active, p.display_order, "
+        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.active, p.display_order, "
                 + "g.group_name, g.category_id, c.category_name "
                 + "FROM Products p "
                 + "JOIN [Groups] g ON p.group_id = g.group_id "
@@ -89,6 +92,7 @@ public class CatalogDAO {
                     p.setProductCode(rs.getString("product_code"));
                     p.setProductName(rs.getString("product_name"));
                     p.setPrice(rs.getBigDecimal("price"));
+                    p.setCostPrice(rs.getBigDecimal("cost_price"));
                     p.setActive(rs.getBoolean("active"));
                     p.setDisplayOrder(rs.getInt("display_order"));
                     p.setGroupName(rs.getString("group_name"));
@@ -118,7 +122,7 @@ public class CatalogDAO {
                     total = rs.getInt(1);
                 }
             }
-            String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.active, p.display_order, "
+            String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.active, p.display_order, "
                     + "g.group_name, g.category_id, c.category_name " + from
                     + "ORDER BY c.display_order, g.display_order, p.display_order, p.product_name "
                     + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
@@ -134,6 +138,7 @@ public class CatalogDAO {
                         p.setProductCode(rs.getString("product_code"));
                         p.setProductName(rs.getString("product_name"));
                         p.setPrice(rs.getBigDecimal("price"));
+                        p.setCostPrice(rs.getBigDecimal("cost_price"));
                         p.setActive(rs.getBoolean("active"));
                         p.setDisplayOrder(rs.getInt("display_order"));
                         p.setGroupName(rs.getString("group_name"));
@@ -161,30 +166,32 @@ public class CatalogDAO {
     }
 
     public void insertProduct(Product p) throws SQLException {
-        String sql = "INSERT INTO Products (group_id, product_code, product_name, price, active, display_order) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Products (group_id, product_code, product_name, price, cost_price, active, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, p.getGroupId());
             ps.setString(2, p.getProductCode());
             ps.setString(3, p.getProductName());
             ps.setBigDecimal(4, p.getPrice());
-            ps.setBoolean(5, p.isActive());
-            ps.setInt(6, p.getDisplayOrder());
+            ps.setBigDecimal(5, p.getCostPrice());
+            ps.setBoolean(6, p.isActive());
+            ps.setInt(7, p.getDisplayOrder());
             ps.executeUpdate();
         }
     }
 
     public void updateProduct(Product p) throws SQLException {
-        String sql = "UPDATE Products SET group_id = ?, product_code = ?, product_name = ?, price = ?, active = ?, display_order = ? WHERE product_id = ?";
+        String sql = "UPDATE Products SET group_id = ?, product_code = ?, product_name = ?, price = ?, cost_price = ?, active = ?, display_order = ? WHERE product_id = ?";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, p.getGroupId());
             ps.setString(2, p.getProductCode());
             ps.setString(3, p.getProductName());
             ps.setBigDecimal(4, p.getPrice());
-            ps.setBoolean(5, p.isActive());
-            ps.setInt(6, p.getDisplayOrder());
-            ps.setInt(7, p.getProductId());
+            ps.setBigDecimal(5, p.getCostPrice());
+            ps.setBoolean(6, p.isActive());
+            ps.setInt(7, p.getDisplayOrder());
+            ps.setInt(8, p.getProductId());
             ps.executeUpdate();
         }
     }
@@ -205,6 +212,107 @@ public class CatalogDAO {
             ps.setInt(1, productId);
             ps.setInt(2, productId);
             return ps.executeUpdate() == 1;
+        }
+    }
+
+    private static final String PRODUCTS_OF_CATEGORY
+            = "SELECT p.product_id FROM Products p JOIN [Groups] g ON g.group_id = p.group_id WHERE g.category_id = ?";
+
+    public Map<Integer, Integer> countGroupsByCategory() throws SQLException {
+        return counts("SELECT category_id, COUNT(*) FROM [Groups] GROUP BY category_id");
+    }
+
+    public Map<Integer, Integer> countProductsByCategory() throws SQLException {
+        return counts("SELECT g.category_id, COUNT(*) FROM Products p JOIN [Groups] g ON g.group_id = p.group_id GROUP BY g.category_id");
+    }
+
+    public Map<Integer, Integer> countProductsByGroup() throws SQLException {
+        return counts("SELECT group_id, COUNT(*) FROM Products GROUP BY group_id");
+    }
+
+    private Map<Integer, Integer> counts(String sql) throws SQLException {
+        Map<Integer, Integer> map = new HashMap<>();
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                map.put(rs.getInt(1), rs.getInt(2));
+            }
+        }
+        return map;
+    }
+
+    public void insertCategory(String name, int displayOrder) throws SQLException {
+        update("INSERT INTO Categories (category_name, display_order) VALUES (?, ?)", name, displayOrder);
+    }
+
+    public void updateCategory(int categoryId, String name, int displayOrder) throws SQLException {
+        update("UPDATE Categories SET category_name = ?, display_order = ? WHERE category_id = ?", name, displayOrder, categoryId);
+    }
+
+    public boolean deleteEmptyCategory(int categoryId) throws SQLException {
+        return update("DELETE FROM Categories WHERE category_id = ? AND NOT EXISTS (SELECT 1 FROM [Groups] WHERE category_id = ?)",
+                categoryId, categoryId) == 1;
+    }
+
+    public void insertGroup(int categoryId, String name, int displayOrder) throws SQLException {
+        update("INSERT INTO [Groups] (category_id, group_name, display_order) VALUES (?, ?, ?)", categoryId, name, displayOrder);
+    }
+
+    public void updateGroup(int groupId, int categoryId, String name, int displayOrder) throws SQLException {
+        update("UPDATE [Groups] SET category_id = ?, group_name = ?, display_order = ? WHERE group_id = ?", categoryId, name, displayOrder, groupId);
+    }
+
+    public int forceDeleteGroup(int groupId) throws SQLException {
+        try (Connection con = DBUtil.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                run(con, "UPDATE OrderItems SET product_id = NULL WHERE product_id IN (SELECT product_id FROM Products WHERE group_id = ?)", groupId);
+                int products = run(con, "DELETE FROM Products WHERE group_id = ?", groupId);
+                run(con, "DELETE FROM [Groups] WHERE group_id = ?", groupId);
+                con.commit();
+                return products;
+            } catch (SQLException | RuntimeException e) {
+                con.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public boolean deleteEmptyGroup(int groupId) throws SQLException {
+        return update("DELETE FROM [Groups] WHERE group_id = ? AND NOT EXISTS (SELECT 1 FROM Products WHERE group_id = ?)",
+                groupId, groupId) == 1;
+    }
+
+    public int[] forceDeleteCategory(int categoryId) throws SQLException {
+        try (Connection con = DBUtil.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                int products = run(con, "UPDATE OrderItems SET product_id = NULL WHERE product_id IN (" + PRODUCTS_OF_CATEGORY + ")", categoryId);
+                products = run(con, "DELETE FROM Products WHERE product_id IN (" + PRODUCTS_OF_CATEGORY + ")", categoryId);
+                int groups = run(con, "DELETE FROM [Groups] WHERE category_id = ?", categoryId);
+                run(con, "DELETE FROM Categories WHERE category_id = ?", categoryId);
+                con.commit();
+                return new int[]{groups, products};
+            } catch (SQLException | RuntimeException e) {
+                con.rollback();
+                throw e;
+            }
+        }
+    }
+
+    private int update(String sql, Object... params) throws SQLException {
+        try (Connection con = DBUtil.getConnection()) {
+            return run(con, sql, params);
+        }
+    }
+
+    private int run(Connection con, String sql, Object... params) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+            return ps.executeUpdate();
         }
     }
 }

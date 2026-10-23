@@ -9,6 +9,7 @@ public class Product {
     private String productCode;
     private String productName;
     private BigDecimal price;
+    private BigDecimal costPrice;
     private boolean active;
     private int displayOrder;
     private String groupName;
@@ -88,6 +89,14 @@ public class Product {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
     }
 
     public String getCategoryName() {

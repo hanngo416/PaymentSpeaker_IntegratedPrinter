@@ -50,6 +50,7 @@ public class ProductServlet extends HttpServlet {
                 if (p != null) {
                     request.setAttribute("form", p);
                     request.setAttribute("formPrice", p.getPrice().toBigInteger().toString());
+                    request.setAttribute("formCost", p.getCostPrice().toBigInteger().toString());
                 }
             }
         } catch (SQLException e) {
@@ -133,6 +134,17 @@ public class ProductServlet extends HttpServlet {
             p.setPrice(new BigDecimal(rawPrice));
         }
 
+        String rawCost = trim(request.getParameter("costPrice")).replaceAll("[.,\\s]", "");
+        if (rawCost.isEmpty()) {
+            rawCost = "0";
+        }
+        if (!rawCost.matches("\\d{1,9}")
+                || (p.getPrice() != null && new BigDecimal(rawCost).compareTo(p.getPrice()) > 0)) {
+            errors.put("costPrice", "Cost must be a whole number from 0 up to the price.");
+        } else {
+            p.setCostPrice(new BigDecimal(rawCost));
+        }
+
         String rawOrder = trim(request.getParameter("displayOrder"));
         if (rawOrder.isEmpty()) {
             p.setDisplayOrder(0);
@@ -165,6 +177,7 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("errors", errors);
         request.setAttribute("form", p);
         request.setAttribute("formPrice", trim(request.getParameter("price")));
+        request.setAttribute("formCost", trim(request.getParameter("costPrice")));
         request.setAttribute("formOrder", rawOrder);
         show(request, response);
     }
@@ -184,7 +197,6 @@ public class ProductServlet extends HttpServlet {
         try {
             page = Math.max(1, Integer.parseInt(request.getParameter("page")));
         } catch (NumberFormatException e) {
-            // no or bad page number: first page
         }
         String q = trim(request.getParameter("q"));
         String rawGroup = trim(request.getParameter("group"));

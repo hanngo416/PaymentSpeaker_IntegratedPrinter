@@ -1,0 +1,15 @@
+<p>${result.total} record(s), page ${result.page} of ${result.totalPages}</p>
+<div class="pages">
+    <c:if test="${result.page > 1}">
+        <a href="${pagerBase}page=${result.page - 1}" title="Previous page">&laquo;</a>
+    </c:if>
+    <c:forEach begin="1" end="${result.totalPages}" var="pg">
+        <c:choose>
+            <c:when test="${pg == result.page}"><span>${pg}</span></c:when>
+            <c:otherwise><a href="${pagerBase}page=${pg}">${pg}</a></c:otherwise>
+        </c:choose>
+    </c:forEach>
+    <c:if test="${result.page < result.totalPages}">
+        <a href="${pagerBase}page=${result.page + 1}" title="Next page">&raquo;</a>
+    </c:if>
+</div>
