@@ -92,17 +92,18 @@ public class UserActionServlet extends HttpServlet {
     }
 
     private static String failure(UserService.Result result) {
-        switch (result) {
-            case SELF:
-                return "self";
-            case LAST_ADMIN:
-                return "lastadmin";
-            case HAS_HISTORY:
-                return "history";
-            case PENDING:
-                return "pending";
-            default:
-                return "notfound";
+        if (result == UserService.Result.SELF) {
+            return "self";
         }
+        if (result == UserService.Result.LAST_ADMIN) {
+            return "lastadmin";
+        }
+        if (result == UserService.Result.HAS_HISTORY) {
+            return "history";
+        }
+        if (result == UserService.Result.PENDING) {
+            return "pending";
+        }
+        return "notfound";
     }
 }

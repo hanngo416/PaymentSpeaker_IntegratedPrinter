@@ -32,7 +32,6 @@ public class AuditDAO {
         }
     }
 
-    // q matches the actor, the entity id or the detail; actions (any of), from and to may be null or empty
     public Page<AuditRow> search(int page, int pageSize, String q, List<String> actions, java.sql.Date from, java.sql.Date to)
             throws SQLException {
         StringBuilder where = new StringBuilder("WHERE 1 = 1 ");

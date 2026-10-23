@@ -37,12 +37,10 @@ public final class Verdict {
         return new Verdict(label, ruleCode, reason, severity, true, NONE);
     }
 
-    // The payment is valid (order paid, popup shown) but an alert is still raised for the auditor to review
     public static Verdict legitWithAlert(String ruleCode, String reason, String severity) {
         return new Verdict(TxLabel.LEGIT, ruleCode, reason, severity, true, NONE);
     }
 
-    // Alerts raised besides the main result (for example a high amount on top of a closed order)
     public Verdict withExtras(List<Verdict> more) {
         return new Verdict(label, ruleCode, reason, severity, alert, Collections.unmodifiableList(more));
     }

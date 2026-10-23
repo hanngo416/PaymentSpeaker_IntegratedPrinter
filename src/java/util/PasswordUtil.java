@@ -10,32 +10,24 @@ import java.security.SecureRandom;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-/**
- * Hashes and verifies passwords with PBKDF2 (built into the JDK, no external library).
- * A password is NEVER stored as plain text; the DB only stores (salt, hash).
- *
- * @author PC
- */
 public final class PasswordUtil {
 
     private static final String ALGORITHM = "PBKDF2WithHmacSHA256";
-    private static final int ITERATIONS = 65536;   // more iterations = slower for an attacker guessing passwords
-    private static final int KEY_BITS = 256;       // 256 bits = 32 bytes = 64 hex characters
-    private static final int SALT_BYTES = 16;      // 16 bytes = 32 hex characters
+    private static final int ITERATIONS = 65536;
+    private static final int KEY_BITS = 256;
+    private static final int SALT_BYTES = 16;
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private PasswordUtil() {
     }
 
-    /** Generates a random salt and returns it as a hex string. */
     public static String newSalt() {
         byte[] salt = new byte[SALT_BYTES];
         RANDOM.nextBytes(salt);
         return toHex(salt);
     }
 
-    /** Hashes a password with the given salt and returns the result as a hex string. */
     public static String hash(String password, String saltHex) {
         try {
             PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), fromHex(saltHex), ITERATIONS, KEY_BITS);
@@ -46,10 +38,8 @@ public final class PasswordUtil {
         }
     }
 
-    /** Checks the password the user typed against the stored hash. */
     public static boolean verify(String password, String saltHex, String expectedHashHex) {
         String actual = hash(password, saltHex);
-        // isEqual compares in constant time, so the comparison time leaks nothing about the hash
         return MessageDigest.isEqual(actual.getBytes(), expectedHashHex.getBytes());
     }
 

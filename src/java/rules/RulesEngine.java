@@ -10,8 +10,6 @@ public class RulesEngine {
     private final List<Rule> rules;
     private final Rule watcher;
 
-    // rules decide what happens to the money, the first one that has an opinion wins.
-    // The watcher never changes that result: it only adds its alert on top (high amount, burst).
     public RulesEngine(List<Rule> rules, Rule watcher) {
         this.rules = Collections.unmodifiableList(new ArrayList<>(rules));
         this.watcher = watcher;

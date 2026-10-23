@@ -57,6 +57,10 @@ public class DashboardServlet extends HttpServlet {
             return;
         }
         User actor = (User) request.getSession().getAttribute(LoginServlet.SESSION_USER);
+        if (actor.getRole() == model.enums.Role.AFFILIATE) {
+            response.sendRedirect(request.getContextPath() + "/affiliate/portal");
+            return;
+        }
         boolean canTransactions = RolePermissions.has(actor.getRole(), Permission.TRANSACTION_READ);
         boolean canAlerts = RolePermissions.has(actor.getRole(), Permission.ALERT_READ);
         request.setAttribute("canTransactions", canTransactions);

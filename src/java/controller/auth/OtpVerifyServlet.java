@@ -79,21 +79,17 @@ public class OtpVerifyServlet extends HttpServlet {
                     ? OtpService.VerifyResult.EXPIRED_OR_MISSING
                     : otpService.verify(user, code);
 
-            switch (result) {
-                case OK:
-                    LOG.log(Level.INFO, "OTP_LOGIN_OK user={0} ip={1}",
-                            new Object[]{user.getUserCode(), request.getRemoteAddr()});
-                    LoginServlet.startSession(request, authService.forSession(user));
-                    response.sendRedirect(request.getContextPath() + "/home");
-                    return;
-                case WRONG_CODE:
-                    showForm(request, response, "Wrong code. Please try again.");
-                    return;
-                case TOO_MANY_TRIES:
-                    showForm(request, response, "Too many wrong tries. Please go back and request a new code.");
-                    return;
-                default:
-                    showForm(request, response, "The code is invalid or has expired. Please go back and request a new code.");
+            if (result == OtpService.VerifyResult.OK) {
+                LOG.log(Level.INFO, "OTP_LOGIN_OK user={0} ip={1}",
+                        new Object[]{user.getUserCode(), request.getRemoteAddr()});
+                LoginServlet.startSession(request, authService.forSession(user));
+                response.sendRedirect(request.getContextPath() + "/home");
+            } else if (result == OtpService.VerifyResult.WRONG_CODE) {
+                showForm(request, response, "Wrong code. Please try again.");
+            } else if (result == OtpService.VerifyResult.TOO_MANY_TRIES) {
+                showForm(request, response, "Too many wrong tries. Please go back and request a new code.");
+            } else {
+                showForm(request, response, "The code is invalid or has expired. Please go back and request a new code.");
             }
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Database error while checking the login code", e);

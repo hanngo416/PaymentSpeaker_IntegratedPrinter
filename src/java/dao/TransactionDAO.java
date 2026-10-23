@@ -29,7 +29,6 @@ public class TransactionDAO {
             + "(bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ISNULL(?, SYSDATETIME()))";
 
-    // Closes the order as COMPLETED. The WHERE part refuses a transfer the order can no longer take (closed in the meantime).
     private static final String CREDIT_ORDER
             = "UPDATE Orders SET status = N'COMPLETED' WHERE order_id = ? AND status IN (N'PENDING', N'EXPIRED')";
 
@@ -48,8 +47,6 @@ public class TransactionDAO {
     private static final String EXISTS_BANK_ID
             = "SELECT 1 FROM Transactions WHERE bank_trans_id = ?";
 
-    // The payment popup only shows valid transactions the cashier has not confirmed yet that were received recently AND happened at the bank recently
-    // (so old payments are not shown when a page is opened late, or when an old bank transaction is pulled in for the first time)
     private static final String SELECT_TO_ANNOUNCE
             = "SELECT TOP (?) t.trans_id, t.amount, t.trans_time, o.order_code FROM Transactions t "
             + "LEFT JOIN Orders o ON o.order_id = t.order_id "
@@ -65,7 +62,6 @@ public class TransactionDAO {
             = " FROM Transactions t "
             + "LEFT JOIN Orders o ON o.order_id = t.order_id";
 
-    // Same amount and note within the given seconds of the bank time (before or after, so the order we read them in does not matter)
     public int countSimilarRecent(BigDecimal amount, String content, Timestamp at, int seconds)
             throws SQLException {
         try (Connection con = DBUtil.getConnection();
@@ -81,7 +77,6 @@ public class TransactionDAO {
         }
     }
 
-    // Bank time of the newest stored transaction, where the next poll starts reading from; null on an empty table
     public Timestamp findLatestTransTime() throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement("SELECT MAX(trans_time) FROM Transactions");
@@ -170,7 +165,7 @@ public class TransactionDAO {
 
     private static final String RECEIPT_SELECT
             = "SELECT t.trans_id, t.bank_trans_id, o.order_id, o.order_code, o.created_by_code, t.amount, o.amount AS order_amount, "
-            + "ISNULL(o.cash_amount, 0) AS cash_amount, o.vat_rate, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
+            + "ISNULL(o.cash_amount, 0) AS cash_amount, o.vat_rate, o.vat_amount, o.vat_included, o.discount_code, ISNULL(o.discount_amount, 0) AS discount_amount, (SELECT referral_code FROM Affiliates WHERE affiliate_id = o.referred_by_affiliate_id) AS affiliate_code, t.trans_time, t.printed FROM Transactions t JOIN Orders o ON o.order_id = t.order_id "
             + "WHERE t.status IN (N'COMPLETED', N'LEGIT') ";
 
     public ReceiptRow findReceipt(int transId, Integer cashierId) throws SQLException {
@@ -189,7 +184,7 @@ public class TransactionDAO {
 
     public ReceiptRow findReceiptByOrder(int orderId, Integer cashierId) throws SQLException {
         String sql = "SELECT ISNULL(t.trans_id, 0) AS trans_id, t.bank_trans_id, o.order_id, o.order_code, o.created_by_code, "
-                + "ISNULL(t.amount, 0) AS amount, o.amount AS order_amount, ISNULL(o.cash_amount, 0) AS cash_amount, o.vat_rate, "
+                + "ISNULL(t.amount, 0) AS amount, o.amount AS order_amount, ISNULL(o.cash_amount, 0) AS cash_amount, o.vat_rate, o.vat_amount, o.vat_included, o.discount_code, ISNULL(o.discount_amount, 0) AS discount_amount, (SELECT referral_code FROM Affiliates WHERE affiliate_id = o.referred_by_affiliate_id) AS affiliate_code, "
                 + "ISNULL(t.trans_time, o.created_at) AS trans_time, ISNULL(t.printed, 0) AS printed "
                 + "FROM Orders o LEFT JOIN Transactions t ON t.order_id = o.order_id AND t.status IN (N'COMPLETED', N'LEGIT') "
                 + "WHERE o.order_id = ? AND o.status IN (N'COMPLETED', N'PAID') "
@@ -227,6 +222,11 @@ public class TransactionDAO {
             r.setCashAmount(rs.getBigDecimal("cash_amount"));
         } catch (SQLException ignored) { }
         r.setVatRate(rs.getBigDecimal("vat_rate"));
+        r.setStoredVat(rs.getBigDecimal("vat_amount"));
+        r.setVatIncluded(rs.getBoolean("vat_included"));
+        r.setDiscountCode(rs.getString("discount_code"));
+        r.setDiscountAmount(rs.getBigDecimal("discount_amount"));
+        r.setAffiliateCode(rs.getString("affiliate_code"));
         r.setTransTime(rs.getTimestamp("trans_time"));
         r.setPrinted(rs.getBoolean("printed"));
         return r;

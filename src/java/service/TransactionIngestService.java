@@ -117,7 +117,6 @@ public class TransactionIngestService {
         return amount.setScale(2, RoundingMode.HALF_UP);
     }
 
-    // SePay times are Vietnam time. Turn them into the real instant so they compare correctly with the server clock
     private static Timestamp parseTime(String raw) {
         if (raw == null) {
             return null;

@@ -7,7 +7,7 @@
 <div class="card">
     <h1>Discount codes</h1>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
-    <p class="hint">A shared code (no holder) appears in the cashier's list. A personal code has a holder, is typed by hand and works once.</p>
+    <p class="hint">A shared code (no holder) appears in the cashier's discount dropdown on the POS counter. A personal code is assigned to a specific holder.</p>
 </div>
 
 <div class="card narrow">
@@ -31,7 +31,7 @@
         </label>
         <label>Holder (personal code only)
             <input type="text" name="holder" maxlength="100" value="<c:out value='${form.holder}'/>">
-            <span class="hint">Leave empty for a shared code. A personal code can be used once.</span>
+            <span class="hint">Leave empty for a shared code that appears on the POS counter.</span>
             <c:if test="${not empty errors.holder}"><div class="field-error"><c:out value="${errors.holder}"/></div></c:if>
         </label>
         <label>Maximum uses (shared code)

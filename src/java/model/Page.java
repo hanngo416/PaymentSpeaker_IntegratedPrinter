@@ -16,6 +16,13 @@ public class Page<T> {
         this.pageSize = pageSize;
     }
 
+    public static <T> Page<T> of(List<T> all, int page, int pageSize) {
+        int pages = Math.max(1, (all.size() + pageSize - 1) / pageSize);
+        int p = Math.min(Math.max(1, page), pages);
+        int from = Math.min((p - 1) * pageSize, all.size());
+        return new Page<>(new java.util.ArrayList<>(all.subList(from, Math.min(all.size(), from + pageSize))), all.size(), p, pageSize);
+    }
+
     public List<T> getItems() {
         return items;
     }

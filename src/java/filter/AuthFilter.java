@@ -36,6 +36,7 @@ public class AuthFilter implements Filter {
 
     private final UserDAO userDAO = new UserDAO();
     private final FraudAlertDAO fraudAlertDAO = new FraudAlertDAO();
+    private final dao.AffiliateDAO affiliateDAO = new dao.AffiliateDAO();
     private final AuthService authService = new AuthService();
 
     @Override
@@ -100,7 +101,6 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        // Transactions that need checking: a banner for admin, manager and cashier on every normal page
         Role who = user.getRole();
         if ((who == Role.ADMIN || who == Role.STORE_MANAGER || who == Role.CASHIER)
                 && "GET".equals(request.getMethod()) && !AccessPolicy.isAjax(path)) {
@@ -108,6 +108,14 @@ public class AuthFilter implements Filter {
                 request.setAttribute("newAlertCount", fraudAlertDAO.countNew());
             } catch (SQLException e) {
                 LOG.log(Level.WARNING, "ALERT_COUNT_FAILED {0}", e.getMessage());
+            }
+        }
+
+        if ("GET".equals(request.getMethod()) && !AccessPolicy.isAjax(path)) {
+            try {
+                request.setAttribute("myAffiliate", affiliateDAO.findForEmail(user.getEmail()));
+            } catch (SQLException e) {
+                LOG.log(Level.WARNING, "AFFILIATE_LOOKUP_FAILED {0}", e.getMessage());
             }
         }
 

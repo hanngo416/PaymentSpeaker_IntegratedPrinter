@@ -43,7 +43,6 @@ public class PaymentPollListener implements ServletContextListener {
         LOG.log(Level.INFO, "Payment polling started: every {0} seconds", period);
     }
 
-    // poll.seconds in sepay.properties; anything missing or below 5 falls back, so SePay is never hammered
     private static int periodSeconds() {
         try {
             int value = Integer.parseInt(ConfigUtil.load("sepay.properties").getProperty("poll.seconds", "").trim());

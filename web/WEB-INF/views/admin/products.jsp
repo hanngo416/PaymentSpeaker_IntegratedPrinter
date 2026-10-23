@@ -7,6 +7,11 @@
 <c:set var="editing" value="${form.productId > 0}"/>
 <div class="card">
     <h1>Products</h1>
+    <div>
+        <a class="btn primary" href="${ctx}/admin/products">Products</a>
+        <a class="btn" href="${ctx}/admin/categories">Categories</a>
+        <a class="btn" href="${ctx}/admin/groups">Groups</a>
+    </div>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
     <p class="hint">Products appear on the cashier's order screen under their group. A hidden product is not shown to the cashier; a product that is on an order cannot be deleted.</p>
 </div>
@@ -43,6 +48,11 @@
             <input type="text" name="price" required inputmode="numeric" maxlength="11" value="<c:out value='${formPrice}'/>">
             <c:if test="${not empty errors.price}"><div class="field-error"><c:out value="${errors.price}"/></div></c:if>
         </label>
+        <label>Cost price (VND)
+            <input type="text" name="costPrice" inputmode="numeric" maxlength="11" value="<c:out value='${formCost}'/>">
+            <span class="hint">What the product costs you. Leave empty for 0. Cannot be more than the price.</span>
+            <c:if test="${not empty errors.costPrice}"><div class="field-error"><c:out value="${errors.costPrice}"/></div></c:if>
+        </label>
         <label>Display order
             <input type="text" name="displayOrder" inputmode="numeric" maxlength="4" value="<c:out value='${empty formOrder ? (editing ? form.displayOrder : "") : formOrder}'/>">
             <span class="hint">Smaller numbers show first. Leave empty for 0.</span>
@@ -74,7 +84,7 @@
     </form>
     <table>
         <thead>
-        <tr><th>Code</th><th>Name</th><th>Category / group</th><th>Price</th><th>Status</th><th>Action</th></tr>
+        <tr><th>Code</th><th>Name</th><th>Category / group</th><th>Price</th><th>Cost</th><th>Status</th><th>Action</th></tr>
         </thead>
         <tbody>
         <c:forEach var="p" items="${result.items}">
@@ -83,6 +93,7 @@
                 <td><c:out value="${p.productName}"/></td>
                 <td><c:out value="${p.categoryName}"/> / <c:out value="${p.groupName}"/></td>
                 <td><fmt:formatNumber value="${p.price}" pattern="#,##0"/> VND</td>
+                <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0"/> VND</td>
                 <td><span class="pill ${p.active ? 'ACTIVE' : 'CANCELLED'}">${p.active ? 'ON SALE' : 'HIDDEN'}</span></td>
                 <td>
                     <a class="btn" href="${ctx}/admin/products?edit=${p.productId}">Edit</a>
@@ -100,7 +111,7 @@
             </tr>
         </c:forEach>
         <c:if test="${empty result.items}">
-            <tr><td colspan="6">No products found.</td></tr>
+            <tr><td colspan="7">No products found.</td></tr>
         </c:if>
         </tbody>
     </table>

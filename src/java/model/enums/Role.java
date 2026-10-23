@@ -14,5 +14,6 @@ public enum Role {
     STORE_MANAGER,
     CASHIER,
     AUDITOR,
-    TECHNICIAN
+    TECHNICIAN,
+    AFFILIATE
 }

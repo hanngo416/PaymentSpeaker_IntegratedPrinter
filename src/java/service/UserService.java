@@ -25,7 +25,6 @@ public class UserService {
 
     private static final Logger LOG = Logger.getLogger(UserService.class.getName());
 
-    // One background thread sends the notice mails, so a slow SMTP server never blocks the manager.
     private static final ExecutorService MAIL_POOL = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "user-notice-mail");
         t.setDaemon(true);
@@ -67,7 +66,6 @@ public class UserService {
         return errors;
     }
 
-    // The user code is the part of the email before the @, kept to letters, digits, dot and underscore; a number is added when it is taken
     private String uniqueCodeFromEmail(String email) throws SQLException {
         String code = email.substring(0, email.indexOf('@')).toLowerCase().replaceAll("[^a-z0-9_.]", "_");
         if (code.length() > 45) {
@@ -83,7 +81,6 @@ public class UserService {
         return candidate;
     }
 
-    /** A manager only manages CASHIER accounts; an admin manages everyone. */
     public static boolean canManage(User actor, User target) {
         if (actor.getRole() == Role.ADMIN) {
             return true;
@@ -93,7 +90,6 @@ public class UserService {
                 && target.getRole() == Role.CASHIER;
     }
 
-    /** For a manager the role comes from the session, never from the form. */
     public static void applyScope(User actor, User u) {
         if (actor.getRole() == Role.STORE_MANAGER) {
             u.setRole(Role.CASHIER);
@@ -136,7 +132,7 @@ public class UserService {
             return Result.FORBIDDEN;
         }
         if (target.getStatus() == UserStatus.PENDING) {
-            return Result.PENDING;   // approve or delete it instead; unlocking must not skip the approval
+            return Result.PENDING;
         }
         if (lock) {
             Result blocked = checkProtected(target, actor);
@@ -174,7 +170,6 @@ public class UserService {
         }
     }
 
-    /** Admin gives the role to a self-registered account and opens it. */
     public Result approve(int userId, Role role, User actor) throws SQLException {
         User target = userDAO.findById(userId);
         if (target == null) {
@@ -203,7 +198,6 @@ public class UserService {
         return Result.OK;
     }
 
-    // Notice mails: only when a manager changes a cashier. Admin changes send nothing.
     private void notifyEdited(User actor, User before, User after) {
         if (actor.getRole() != Role.STORE_MANAGER) {
             return;

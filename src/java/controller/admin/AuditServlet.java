@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Audit trail: /admin/audit lists the records, newest first. */
 @WebServlet(name = "AuditServlet", urlPatterns = {"/admin/audit"})
 public class AuditServlet extends HttpServlet {
 
@@ -26,7 +24,6 @@ public class AuditServlet extends HttpServlet {
         try {
             page = Math.max(1, Integer.parseInt(request.getParameter("page")));
         } catch (NumberFormatException e) {
-            // no or bad page number: first page
         }
         try {
             String q = trimToNull(request.getParameter("q"));

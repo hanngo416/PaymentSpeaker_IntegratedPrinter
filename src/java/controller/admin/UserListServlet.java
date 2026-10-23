@@ -63,7 +63,7 @@ public class UserListServlet extends HttpServlet {
         f.setPage(page == null || page < 1 ? 1 : page);
 
         if (actor.getRole() != Role.ADMIN) {
-            f.setRole(Role.CASHIER.name());   // a manager only sees cashier accounts
+            f.setRole(Role.CASHIER.name());
         }
 
         try {

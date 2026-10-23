@@ -19,14 +19,25 @@
 </c:if>
 <div class="tax-bot level0" id="taxBot" data-feed-url="<c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">${ctx}/bot/feed</c:if>" data-chat-url="${ctx}/bot/chat" data-ctx="${ctx}">
     <div class="bot-panel" id="botPanel" hidden>
-        <div class="bot-head">Assistant</div>
-        <p class="bot-status" id="botStatus"></p>
-        <div class="bot-messages" id="botMessages"></div>
-        <div class="bot-chat" id="botChat"></div>
+        <div class="bot-head">
+            <div class="bot-head-meta">
+                <span class="bot-head-title">Assistant</span>
+                <p class="bot-status" id="botStatus"></p>
+            </div>
+            <button type="button" class="bot-close" id="botClose" aria-label="Close" title="Close">&times;</button>
+        </div>
+        <div class="bot-body" id="botBody">
+            <div class="bot-messages" id="botMessages"></div>
+            <div class="bot-chat" id="botChat"></div>
+        </div>
         <form class="bot-form" id="botForm" autocomplete="off">
             <input type="text" id="botInput" maxlength="500" placeholder="Ask about sales, orders, tax...">
-            <button type="submit" class="primary" id="botSend">Send</button>
-            <button type="button" class="btn" id="botClear">Clear</button>
+            <button type="submit" class="primary" id="botSend" title="Send">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+            <button type="button" class="btn" id="botClear" title="Clear chat">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
         </form>
     </div>
     <button type="button" class="bot-toggle" id="botToggle" aria-label="Assistant" title="Assistant">
@@ -34,4 +45,4 @@
         <span class="bot-dot" id="botDot" hidden></span>
     </button>
 </div>
-<script src="${ctx}/assets/js/bot.js?v=4" charset="UTF-8"></script>
+<script src="${ctx}/assets/js/bot.js?v=7" charset="UTF-8"></script>

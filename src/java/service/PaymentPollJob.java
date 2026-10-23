@@ -27,9 +27,6 @@ public class PaymentPollJob implements Runnable {
     private final TransactionIngestService ingestService = new TransactionIngestService();
     private final TransactionDAO transactionDAO = new TransactionDAO();
 
-    // Reads from a little before the newest transaction we already hold, so a server that was off for hours or days
-    // catches up on everything it missed (the unique bank id drops the overlap). The first run on an empty database
-    // looks back window.minutes. Never further back than a week.
     private Date startOfRead() throws SQLException {
         long now = System.currentTimeMillis();
         Timestamp latest = transactionDAO.findLatestTransTime();
@@ -55,7 +52,6 @@ public class PaymentPollJob implements Runnable {
                     bad++;
                     LOG.log(Level.WARNING, "POLL_BAD_TRANSACTION id={0}", String.valueOf(item.get("id")).replaceAll("[\\r\\n]", "_"));
                 } catch (SQLException | RuntimeException e) {
-                    // One broken transaction must not stop the ones after it; it is retried at the next poll
                     failed++;
                     LOG.log(Level.WARNING, "POLL_TRANSACTION_FAILED id=" + String.valueOf(item.get("id")).replaceAll("[\\r\\n]", "_")
                             + " " + e.getClass().getSimpleName() + ": " + e.getMessage());

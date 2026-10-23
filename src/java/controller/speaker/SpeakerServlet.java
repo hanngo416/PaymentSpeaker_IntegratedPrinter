@@ -12,10 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.view.SpeakItem;
 
-/**
- * Payment popup: /speaker/poll (JSON of payments to show), /speaker/ack (cashier confirms one).
- * Every page of a cashier polls /speaker/poll (assets/js/announcer.js), so the popup and the computer speaker work on any page.
- */
 @WebServlet(name = "SpeakerServlet", urlPatterns = {"/speaker/poll", "/speaker/ack"})
 public class SpeakerServlet extends HttpServlet {
 

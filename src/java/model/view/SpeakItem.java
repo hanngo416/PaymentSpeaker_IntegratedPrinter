@@ -2,9 +2,6 @@ package model.view;
 
 import java.sql.Timestamp;
 
-/**
- * One payment waiting for the cashier to confirm in the popup: id to confirm, amount, order code and bank time to show.
- */
 public class SpeakItem {
 
     private final int transId;

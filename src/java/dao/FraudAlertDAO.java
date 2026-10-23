@@ -65,7 +65,6 @@ public class FraudAlertDAO {
         return new Page<>(items, total, f.getPage(), f.getPageSize());
     }
 
-    // Alerts nobody has handled yet, shown as a banner on every page
     public int countNew() throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM FraudAlerts WHERE status = N'NEW'");
@@ -100,7 +99,6 @@ public class FraudAlertDAO {
         }
     }
 
-    // The auditor takes the alert: it leaves the NEW counter and shows who is looking at it
     public boolean startReview(int alertId, int userId) throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(

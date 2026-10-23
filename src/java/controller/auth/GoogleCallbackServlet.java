@@ -72,27 +72,22 @@ public class GoogleCallbackServlet extends HttpServlet {
             return;
         }
 
-        switch (result.getStatus()) {
-            case OK:
-                LOG.log(Level.INFO, "GOOGLE_LOGIN_OK user={0} ip={1}",
-                        new Object[]{result.getUser().getUserCode(), request.getRemoteAddr()});
-                LoginServlet.startSession(request, result.getUser());
-                response.sendRedirect(request.getContextPath() + "/home");
-                return;
-            case NOT_REGISTERED:
-                showLogin(request, response, "This Google account is not registered. Please contact an administrator.");
-                return;
-            case PENDING:
-                showLogin(request, response, "Your account is waiting for an administrator to approve it and give it a role. Please try again later.");
-                return;
-            case LOCKED:
-                showLogin(request, response, "This account is locked. Please contact an administrator.");
-                return;
-            case EMAIL_NOT_VERIFIED:
-                showLogin(request, response, "Your Google email is not verified.");
-                return;
-            default:
-                showLogin(request, response, "This account is linked to a different Google account. Please contact an administrator.");
+        AuthService.Status status = result.getStatus();
+        if (status == AuthService.Status.OK) {
+            LOG.log(Level.INFO, "GOOGLE_LOGIN_OK user={0} ip={1}",
+                    new Object[]{result.getUser().getUserCode(), request.getRemoteAddr()});
+            LoginServlet.startSession(request, result.getUser());
+            response.sendRedirect(request.getContextPath() + "/home");
+        } else if (status == AuthService.Status.NOT_REGISTERED) {
+            showLogin(request, response, "This Google account is not registered. Please contact an administrator.");
+        } else if (status == AuthService.Status.PENDING) {
+            showLogin(request, response, "Your account is waiting for an administrator to approve it and give it a role. Please try again later.");
+        } else if (status == AuthService.Status.LOCKED) {
+            showLogin(request, response, "This account is locked. Please contact an administrator.");
+        } else if (status == AuthService.Status.EMAIL_NOT_VERIFIED) {
+            showLogin(request, response, "Your Google email is not verified.");
+        } else {
+            showLogin(request, response, "This account is linked to a different Google account. Please contact an administrator.");
         }
     }
 

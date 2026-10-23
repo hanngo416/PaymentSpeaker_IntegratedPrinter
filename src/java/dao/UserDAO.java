@@ -17,11 +17,6 @@ import model.enums.Role;
 import model.enums.UserStatus;
 import util.DBUtil;
 
-/**
- * Holds only the SQL for the Users table. No business rules here.
- *
- * @author PC
- */
 public class UserDAO {
 
     private static final String SELECT_BY_ID
@@ -159,7 +154,6 @@ public class UserDAO {
         }
     }
 
-    // Gives the role and opens the account; false when the account is no longer PENDING
     public boolean approve(int userId, Role role) throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(APPROVE_USER)) {
@@ -179,6 +173,31 @@ public class UserDAO {
             ps.setInt(5, u.getUserId());
             ps.executeUpdate();
         }
+    }
+
+    public List<String> findActiveEmails(Role... roles) throws SQLException {
+        List<String> emails = new ArrayList<>();
+        if (roles.length == 0) {
+            return emails;
+        }
+        StringBuilder marks = new StringBuilder();
+        for (int i = 0; i < roles.length; i++) {
+            marks.append(i == 0 ? "?" : ", ?");
+        }
+        String sql = "SELECT u.email FROM Users u JOIN Roles r ON r.role_id = u.role_id "
+                + "WHERE u.status = N'ACTIVE' AND r.role_name IN (" + marks + ")";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int i = 0; i < roles.length; i++) {
+                ps.setString(i + 1, roles[i].name());
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    emails.add(rs.getString(1));
+                }
+            }
+        }
+        return emails;
     }
 
     public void setStatus(int userId, UserStatus status) throws SQLException {

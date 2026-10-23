@@ -46,7 +46,6 @@ public class SepayClient {
         return Integer.parseInt(config.getProperty("window.minutes", "30").trim());
     }
 
-    // Everything since the given time, oldest first, so the transactions are stored and announced in the order they happened
     public List<Map<String, String>> fetchSince(Date since) throws IOException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         format.setTimeZone(AppConfig.BANK_ZONE);
@@ -68,7 +67,6 @@ public class SepayClient {
                 result.add(toPayload(element.getAsJsonObject()));
             }
         }
-        // SePay lists the newest first; sort by bank time (ids break ties) so the oldest is stored and announced first
         Collections.sort(result, new Comparator<Map<String, String>>() {
             @Override
             public int compare(Map<String, String> a, Map<String, String> b) {

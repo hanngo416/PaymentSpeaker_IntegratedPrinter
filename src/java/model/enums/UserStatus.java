@@ -11,5 +11,5 @@ package model.enums;
 public enum UserStatus {
     ACTIVE,
     LOCKED,
-    PENDING   // signed in with Google but no account yet: waits for an admin to give a role
+    PENDING
 }

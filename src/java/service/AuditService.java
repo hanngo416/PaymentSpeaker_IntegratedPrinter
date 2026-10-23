@@ -7,9 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.User;
 
-/**
- * Writes the audit trail (who did what, when). A failure to write never breaks the action being logged.
- */
 public class AuditService {
 
     public static final String SYSTEM = "SYSTEM";
@@ -17,7 +14,6 @@ public class AuditService {
     private static final Logger LOG = Logger.getLogger(AuditService.class.getName());
     private static final AuditDAO DAO = new AuditDAO();
 
-    // actor null = the system itself (for example the polling job). details are name, value, name, value...
     public static void log(User actor, String action, String entity, Object entityId, String... details) {
         JsonObject json = new JsonObject();
         for (int i = 0; i + 1 < details.length; i += 2) {

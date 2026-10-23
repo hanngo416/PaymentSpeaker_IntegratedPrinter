@@ -15,11 +15,11 @@ public final class AppConfig {
 
     public static final String ORDER_PREFIX = "TINKY";
     public static final int ORDER_MINUTES = 10;
+    public static final int ORDER_GRACE_MINUTES = 2;
     public static final long MIN_AMOUNT = 1000L;
     public static final long MAX_AMOUNT = 50000000L;
 
     public static final String QR_TEMPLATE = "qr_only";
 
-    // SePay writes transaction times in Vietnam time, whatever time zone the server runs in
     public static final java.util.TimeZone BANK_ZONE = java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
 }
