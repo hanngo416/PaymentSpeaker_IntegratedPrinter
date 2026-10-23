@@ -1,0 +1,13 @@
+<div class="card">
+    <h1>Affiliate program</h1>
+    <div>
+        <a class="btn ${affTab == 'overview' ? 'primary' : ''}" href="${ctx}/admin/affiliate-overview">Overview</a>
+        <a class="btn ${affTab == 'affiliates' ? 'primary' : ''}" href="${ctx}/admin/affiliates">Affiliates</a>
+        <a class="btn ${affTab == 'campaigns' ? 'primary' : ''}" href="${ctx}/admin/campaigns">Campaigns</a>
+        <a class="btn ${affTab == 'referrals' ? 'primary' : ''}" href="${ctx}/admin/referrals">Referral tracking</a>
+        <a class="btn ${affTab == 'commissions' ? 'primary' : ''}" href="${ctx}/admin/commissions">Commissions</a>
+        <a class="btn ${affTab == 'payouts' ? 'primary' : ''}" href="${ctx}/admin/payouts">Wallet &amp; payouts</a>
+        <a class="btn" href="${ctx}/admin/channel-commissions">Platform commissions</a>
+    </div>
+    <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
+</div>
