@@ -11,22 +11,15 @@ import util.DBUtil;
 
 public class DeviceDAO {
 
-    // A device that has not pinged for this long is shown OFFLINE
-    public static final int OFFLINE_AFTER_SECONDS = 90;
-
     private static final String SELECT_ALL
             = "SELECT device_id, device_code, device_type, model_name, last_ping, "
-            + "CASE WHEN status = N'MAINTENANCE' THEN N'MAINTENANCE' "
-            + "WHEN last_ping < DATEADD(SECOND, -" + OFFLINE_AFTER_SECONDS + ", SYSDATETIME()) THEN N'OFFLINE' "
-            + "ELSE N'ONLINE' END AS shown_status "
+            + "CASE WHEN status = N'MAINTENANCE' THEN N'MAINTENANCE' ELSE N'ONLINE' END AS shown_status "
             + "FROM Devices ORDER BY device_code";
-
 
     private static final String PING
             = "UPDATE Devices SET last_ping = SYSDATETIME(), status = N'ONLINE' "
             + "WHERE device_type = ? AND status <> N'MAINTENANCE'";
 
-    // Each time the printer page opens, it counts as a heartbeat
     public void ping(String deviceType) throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(PING)) {
@@ -35,7 +28,6 @@ public class DeviceDAO {
         }
     }
 
-    // True when a technician put every device of this type into maintenance
     public boolean isInMaintenance(String deviceType) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Devices WHERE device_type = ? "
                 + "AND NOT EXISTS (SELECT 1 FROM Devices d2 WHERE d2.device_type = ? AND d2.status <> N'MAINTENANCE')";
@@ -59,7 +51,6 @@ public class DeviceDAO {
         return null;
     }
 
-    // Maintenance is set by hand; ONLINE puts the device back to work (the next ping keeps it fresh)
     public boolean setMaintenance(int deviceId, boolean maintenance) throws SQLException {
         String sql = "UPDATE Devices SET status = ?, last_ping = SYSDATETIME() WHERE device_id = ?";
         try (Connection con = DBUtil.getConnection();

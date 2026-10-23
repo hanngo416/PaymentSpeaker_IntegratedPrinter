@@ -3,7 +3,9 @@ package controller.printer;
 import controller.auth.LoginServlet;
 import dao.DeviceDAO;
 import dao.OrderItemDAO;
+import dao.SettingDAO;
 import dao.TransactionDAO;
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -15,10 +17,9 @@ import model.User;
 import model.enums.Role;
 import model.view.ReceiptRow;
 import service.AuditService;
+import service.PrinterStatusService;
+import service.ReceiptPrinter;
 
-/**
- * Receipt printer: POST /printer/print marks the receipt of one transfer as printed, GET /printer/print shows it. The buttons are on the transactions page.
- */
 @WebServlet(name = "PrinterServlet", urlPatterns = {"/printer/print"})
 public class PrinterServlet extends HttpServlet {
 
@@ -27,6 +28,8 @@ public class PrinterServlet extends HttpServlet {
     private final TransactionDAO transactionDAO = new TransactionDAO();
     private final DeviceDAO deviceDAO = new DeviceDAO();
     private final OrderItemDAO orderItemDAO = new OrderItemDAO();
+    private final SettingDAO settingDAO = new SettingDAO();
+    private final ReceiptPrinter receiptPrinter = new ReceiptPrinter();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -64,12 +67,31 @@ public class PrinterServlet extends HttpServlet {
                 return;
             }
             boolean reprint = receipt.isPrinted();
-            if (receipt.getTransId() > 0) {
-                transactionDAO.markPrinted(receipt.getTransId());
+            boolean sent = false;
+            String reason = "";
+            try {
+                receiptPrinter.print(settingDAO.get(PrinterStatusService.SETTING_KEY, ""),
+                        ReceiptPrinter.receipt(receipt, orderItemDAO.findByOrderId(receipt.getOrderId()), reprint));
+                sent = true;
+            } catch (PrinterException | RuntimeException e) {
+                reason = String.valueOf(e.getMessage());
             }
-            AuditService.log(actor, reprint ? "REPRINT_RECEIPT" : "PRINT_RECEIPT", byOrder ? "ORDER" : "TRANSACTION", id,
-                    "order", receipt.getOrderCode());
-            response.sendRedirect(request.getContextPath() + "/printer/print?" + (byOrder ? "order=" : "id=") + id + (reprint ? "&copy=1" : ""));
+            if (sent) {
+                if (receipt.getTransId() > 0) {
+                    transactionDAO.markPrinted(receipt.getTransId());
+                }
+                AuditService.log(actor, reprint ? "REPRINT_RECEIPT" : "PRINT_RECEIPT", byOrder ? "ORDER" : "TRANSACTION", id,
+                        "order", receipt.getOrderCode());
+            } else {
+                AuditService.log(actor, "PRINT_FAILED", byOrder ? "ORDER" : "TRANSACTION", id,
+                        "order", receipt.getOrderCode(), "reason", reason);
+            }
+            if ("1".equals(request.getParameter("silent"))) {
+                response.setStatus(sent ? HttpServletResponse.SC_NO_CONTENT : HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                return;
+            }
+            response.sendRedirect(request.getContextPath() + "/printer/print?" + (byOrder ? "order=" : "id=") + id
+                    + (reprint ? "&copy=1" : "") + "&sent=" + (sent ? "1" : "0"));
         } catch (SQLException e) {
             throw new ServletException("Cannot print the receipt", e);
         }
@@ -101,7 +123,6 @@ public class PrinterServlet extends HttpServlet {
         }
     }
 
-    // A cashier only prints receipts of the orders they created
     private static Integer cashierScope(User actor) {
         return actor.getRole() == Role.CASHIER ? actor.getUserId() : null;
     }

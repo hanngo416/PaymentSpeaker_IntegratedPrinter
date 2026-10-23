@@ -10,6 +10,7 @@ public class Device {
     private String modelName;
     private String status;
     private Timestamp lastPing;
+    private String detail;
 
     public int getDeviceId() {
         return deviceId;
@@ -43,13 +44,20 @@ public class Device {
         this.modelName = modelName;
     }
 
-    // What the device is doing right now: MAINTENANCE when set by hand, OFFLINE when it has not pinged lately, else ONLINE
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
     public Timestamp getLastPing() {

@@ -16,7 +16,7 @@
     var css = '@page{size:' + paper.page + ';margin:' + (key === 'a4' ? '10mm' : '0') + '}'
         + '@media print{.receipt-slip{width:' + paper.slip + ' !important;padding:' + paper.pad + ' !important;'
         + (paper.font ? 'font-size:' + paper.font + ' !important;' : '')
-        + (key === '76' || key === '80' ? 'height:126mm !important;max-height:126mm !important;display:flex !important;flex-direction:column !important;justify-content:space-between !important;' : '')
+        + (key === '76' || key === '80' ? 'min-height:124mm !important;display:flex !important;flex-direction:column !important;justify-content:space-between !important;' : '')
         + 'border:none !important;box-shadow:none !important;border-radius:0 !important;}}';
     var style = document.createElement('style');
     style.appendChild(document.createTextNode(css));
@@ -29,6 +29,4 @@
     if (again) {
         again.addEventListener('click', function () { window.print(); });
     }
-    // Opens the print dialog as soon as the receipt is shown
-    window.print();
 })();

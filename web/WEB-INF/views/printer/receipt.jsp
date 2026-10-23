@@ -18,10 +18,10 @@
 
         :root {
             color-scheme: light only;
-            --paper-w: 320px;
-            --paper-h: 546px; /* 76:130 aspect ratio on screen */
+            --paper-w: 295px;
+            --paper-h: 510px;
             --rc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --rc-mono: "SF Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            --rc-mono: Consolas, "Courier New", Courier, monospace;
         }
 
         body.receipt-screen-body {
@@ -46,13 +46,12 @@
             max-width: var(--paper-w);
         }
 
-        /* Non-printable top action toolbar */
         .receipt-toolbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             gap: 10px;
         }
 
@@ -117,261 +116,213 @@
             transform: translateY(-1px);
         }
 
-        /* The 76x130mm Thermal Receipt Slip (Full-bleed distributed height) */
+        /* Authentic Physical Slip */
         .receipt-slip {
             width: var(--paper-w);
             min-height: var(--paper-h);
             background: #ffffff;
-            padding: 22px 18px 20px;
-            border-radius: 4px;
+            padding: 16px 14px 14px;
+            border-radius: 2px;
             box-sizing: border-box;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             font-family: var(--rc-font);
             font-size: 11px;
+            line-height: 1.35;
             color: #000000;
             position: relative;
         }
 
-        /* Brand Header */
-        .receipt-brand-block {
-            text-align: center;
-        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .bold { font-weight: 700; }
 
-        .receipt-brand-title {
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: 0.08em;
+        .store-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            line-height: 1.1;
-            margin-bottom: 4px;
-        }
-
-        .receipt-brand-sub {
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #334155;
-            margin: 0 0 3px;
-        }
-
-        .receipt-brand-contact {
-            font-size: 9.5px;
-            color: #64748b;
-            margin: 0;
-        }
-
-        /* Separators */
-        .rc-line-solid {
-            width: 100%;
-            height: 0;
-            border-top: 1.5px solid #000000;
-            margin: 10px 0 8px;
-        }
-
-        .rc-line-thin {
-            width: 100%;
-            height: 0;
-            border-top: 1px solid #000000;
-            margin: 8px 0;
-        }
-
-        /* Metadata */
-        .receipt-meta-block {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 11px;
-        }
-
-        .meta-headline {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 2px;
+            line-height: 1.2;
         }
 
-        .order-title {
-            font-size: 12px;
+        .store-address {
+            font-size: 9.5px;
+            line-height: 1.35;
+            color: #000000;
+        }
+
+        .dashed-sep {
+            border: none;
+            border-top: 1px dashed #000000;
+            margin: 7px 0;
+            width: 100%;
+        }
+
+        .receipt-type {
+            font-size: 13.5px;
             font-weight: 800;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
+            margin-top: 1px;
         }
 
-        .order-code-badge {
-            font-size: 12.5px;
-            font-weight: 800;
-            font-family: var(--rc-mono);
-            letter-spacing: 0.04em;
-        }
-
-        .reprint-badge {
-            font-size: 9px;
-            font-weight: 800;
-            color: #dc2626;
-            border: 1px solid #dc2626;
-            border-radius: 3px;
-            padding: 1px 4px;
-            margin-left: 6px;
-            letter-spacing: 0.04em;
+        .receipt-no {
+            font-size: 10.5px;
+            font-weight: 700;
+            margin-bottom: 3px;
         }
 
         .meta-row {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            font-size: 9.5px;
             line-height: 1.35;
         }
 
-        .meta-label {
-            color: #475569;
-            font-size: 10.5px;
+        .reprint-badge {
+            font-size: 8px;
+            font-weight: 800;
+            color: #dc2626;
+            border: 1px solid #dc2626;
+            border-radius: 2px;
+            padding: 0 3px;
+            margin-left: 3px;
         }
 
-        .meta-val {
-            font-weight: 600;
-            text-align: right;
-        }
-
-        .meta-val-mono {
-            font-family: var(--rc-mono);
-            font-size: 10px;
-        }
-
-        /* Items Table */
-        .receipt-table-block {
-            margin: 2px 0;
-        }
-
+        /* 4-column Items Table */
         .items-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 10px;
+            margin: 2px 0;
         }
 
         .items-table th {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 5px 0;
-            border-top: 1px solid #000000;
-            border-bottom: 1px solid #000000;
+            font-weight: 700;
+            padding: 3px 0;
+            color: #000000;
         }
 
         .items-table td {
-            padding: 5px 0;
-            vertical-align: top;
-            font-size: 11px;
-            line-height: 1.3;
+            padding: 3px 0;
+            vertical-align: baseline;
+            color: #000000;
         }
 
-        .col-name {
-            text-align: left;
-            padding-right: 6px;
-            word-break: break-word;
-        }
+        .col-item { text-align: left; width: 44%; word-break: break-word; }
+        .col-qty { text-align: center; width: 12%; }
+        .col-price { text-align: right; width: 22%; font-variant-numeric: tabular-nums; }
+        .col-amt { text-align: right; width: 22%; font-variant-numeric: tabular-nums; font-weight: 600; }
 
-        .col-qty {
-            text-align: center;
-            width: 30px;
-            font-weight: 700;
-        }
-
-        .col-price {
-            text-align: right;
-            width: 60px;
-            font-variant-numeric: tabular-nums;
-            color: #334155;
-        }
-
-        .col-total {
-            text-align: right;
-            width: 65px;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* Totals Block */
-        .receipt-totals-block {
+        /* Summary Section */
+        .summary-wrap {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            font-size: 11px;
-        }
-
-        .total-sub-row {
-            display: flex;
-            justify-content: space-between;
-            color: #475569;
+            gap: 2.5px;
             font-size: 10.5px;
-            padding-left: 6px;
-        }
-
-        .total-grand-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
             margin-top: 2px;
         }
 
-        .total-grand-label {
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
+        .sum-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
         }
 
-        .total-grand-val {
-            font-size: 18.5px;
-            font-weight: 900;
+        .sum-val {
             font-variant-numeric: tabular-nums;
-            letter-spacing: -0.01em;
         }
 
-        /* Status Stamp Box */
-        .receipt-status-stamp {
-            border: 1.5px solid #000000;
-            padding: 6px 10px;
-            text-align: center;
-            font-size: 10.5px;
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin: 1px 0;
+        }
+
+        .total-lbl {
+            font-size: 13.5px;
             font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin: 6px 0 2px;
-            background: #fafafa;
+            letter-spacing: 0.02em;
         }
 
-        /* Footer */
-        .receipt-footer-block {
-            text-align: center;
-            line-height: 1.4;
+        .total-val {
+            font-size: 14.5px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
         }
 
-        .footer-thank {
-            font-size: 11px;
+        /* Footer Section */
+        .footer-wrap {
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .thanks-msg {
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1.35;
+            margin-bottom: 5px;
+        }
+
+        .codes-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 4px;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .barcode-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .barcode-svg {
+            width: 100%;
+            max-width: 175px;
+            height: 38px;
+        }
+
+        .barcode-digits {
+            font-family: var(--rc-mono);
+            font-size: 8px;
+            letter-spacing: 1px;
+            margin-top: 1px;
+        }
+
+        .qr-wrap {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-svg {
+            width: 44px;
+            height: 44px;
+        }
+
+        .internal-note {
+            font-size: 8px;
             font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .footer-policy {
-            font-size: 9px;
-            color: #64748b;
-            margin-bottom: 4px;
-        }
-
-        .footer-brandmark {
-            font-size: 8.5px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: #94a3b8;
-            margin: 0;
+            margin-top: 5px;
+            color: #000000;
         }
 
-        /* Print Media Styles strictly for 76mm x 130mm Thermal Printing */
         @media print {
             @page {
                 size: 76mm 130mm;
@@ -401,11 +352,10 @@
 
             .receipt-slip {
                 width: 72mm !important;
-                height: 126mm !important;
+                min-height: 124mm !important;
                 max-width: 72mm !important;
-                max-height: 126mm !important;
                 margin: 0 auto !important;
-                padding: 4mm 3mm 4mm !important;
+                padding: 2.5mm 3mm 2.5mm !important;
                 box-shadow: none !important;
                 border: none !important;
                 border-radius: 0 !important;
@@ -417,34 +367,14 @@
                 break-inside: avoid !important;
             }
 
-            .receipt-brand-title, .order-title, .total-grand-label, .total-grand-val, .footer-thank {
-                color: #000000 !important;
-            }
-
-            .receipt-brand-sub, .receipt-brand-contact, .meta-label, .col-price, .total-sub-row, .footer-policy, .footer-brandmark {
-                color: #000000 !important;
-            }
-
-            .rc-line-solid, .items-table th {
+            .dashed-sep {
                 border-color: #000000 !important;
-            }
-
-            .receipt-status-stamp {
-                background: transparent !important;
-                border-color: #000000 !important;
-                color: #000000 !important;
-            }
-
-            .reprint-badge {
-                border-color: #000000 !important;
-                color: #000000 !important;
             }
         }
     </style>
 </head>
 <body class="receipt-screen-body">
 <div class="receipt-screen-wrap">
-    <!-- Non-printable top action toolbar -->
     <div class="receipt-toolbar no-print">
         <a href="${ctx}/transactions" class="btn-receipt-back">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -473,126 +403,219 @@
         </div>
     </div>
 
-    <!-- The 76x130mm Thermal Receipt Slip -->
     <div class="receipt-slip">
-        <!-- 1. Brand Header -->
-        <div class="receipt-brand-block">
-            <div class="receipt-brand-title">TINKY POS</div>
-            <p class="receipt-brand-sub">Smart Payment Speaker &amp; Cashier Register</p>
-            <p class="receipt-brand-contact">Hotline: 1900 8888 &bull; store.tinky.vn</p>
-        </div>
+        <div>
+            <!-- Store Header -->
+            <div class="text-center">
+                <div class="store-title">TINKY</div>
+                <div class="store-address">
+                    Address: 123 Hoang huu Nam,<br>
+                    Thu Duc, Ho Chi Minh City<br>
+                    Phone: (+84) 28 1234 5678
+                </div>
+            </div>
 
-        <div class="rc-line-solid"></div>
+            <div class="dashed-sep"></div>
 
-        <!-- 2. Order Metadata -->
-        <div class="receipt-meta-block">
-            <div class="meta-headline">
-                <span class="order-title">
-                    SALES RECEIPT
-                    <c:if test="${reprint}">
-                        <span class="reprint-badge">REPRINT</span>
-                    </c:if>
-                </span>
-                <span class="order-code-badge"><c:out value="${receipt.orderCode}"/></span>
+            <!-- Receipt Meta -->
+            <div class="text-center">
+                <div class="receipt-type">PAYMENT RECEIPT</div>
+                <div class="receipt-no">
+                    Receipt No: #<c:out value="${receipt.orderCode}"/>
+                    <c:if test="${reprint}"><span class="reprint-badge">COPY</span></c:if>
+                </div>
+            </div>
+
+            <div class="meta-row">
+                <span>Date: <fmt:formatDate value="${receipt.transTime}" pattern="dd/MM/yyyy"/></span>
+                <span>Time: <fmt:formatDate value="${receipt.transTime}" pattern="HH:mm:ss"/></span>
             </div>
             <div class="meta-row">
-                <span class="meta-label">Date &amp; Time:</span>
-                <span class="meta-val"><fmt:formatDate value="${receipt.transTime}" pattern="yyyy-MM-dd HH:mm:ss"/></span>
-            </div>
-            <div class="meta-row">
-                <span class="meta-label">Cashier:</span>
-                <span class="meta-val"><c:out value="${receipt.cashierCode}"/></span>
-            </div>
-            <div class="meta-row">
-                <span class="meta-label">Payment Method:</span>
-                <span class="meta-val">
+                <span>Cashier: <c:out value="${receipt.cashierCode}"/></span>
+                <span>Method:
                     <c:choose>
-                        <c:when test="${receipt.cashAmount > 0 && receipt.amount > 0}">Split (Cash + VietQR)</c:when>
-                        <c:when test="${receipt.cashAmount > 0}">Cash at counter</c:when>
+                        <c:when test="${receipt.cashAmount > 0 && receipt.amount > 0}">Split (Cash+QR)</c:when>
+                        <c:when test="${receipt.cashAmount > 0}">Cash</c:when>
                         <c:otherwise>VietQR Dynamic</c:otherwise>
                     </c:choose>
                 </span>
             </div>
-            <c:if test="${not empty receipt.bankTransId}">
-                <div class="meta-row">
-                    <span class="meta-label">Bank Ref / Trace:</span>
-                    <span class="meta-val meta-val-mono"><c:out value="${receipt.bankTransId}"/></span>
-                </div>
-            </c:if>
-        </div>
 
-        <!-- 3. Itemized Products Table -->
-        <c:if test="${not empty orderItems}">
-            <div class="receipt-table-block">
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th class="col-name">ITEM</th>
-                            <th class="col-qty">QTY</th>
-                            <th class="col-price">PRICE</th>
-                            <th class="col-total">TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="item" items="${orderItems}">
+            <div class="dashed-sep"></div>
+
+            <!-- Items Table (4 Columns: Item Name, Qty, Price, Total) -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="col-item">Item Name</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-price">Price</th>
+                        <th class="col-amt">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="padding:0;"><div class="dashed-sep" style="margin:2px 0;"></div></td>
+                    </tr>
+                    <c:choose>
+                        <c:when test="${not empty orderItems}">
+                            <c:forEach var="item" items="${orderItems}">
+                                <tr>
+                                    <td class="col-item"><c:out value="${item.productName}"/></td>
+                                    <td class="col-qty"><c:out value="${item.quantity}"/></td>
+                                    <td class="col-price"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0"/></td>
+                                    <td class="col-amt"><fmt:formatNumber value="${item.subtotal}" pattern="#,##0"/></td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
                             <tr>
-                                <td class="col-name"><c:out value="${item.productName}"/></td>
-                                <td class="col-qty"><c:out value="${item.quantity}"/></td>
-                                <td class="col-price"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0"/></td>
-                                <td class="col-total"><fmt:formatNumber value="${item.subtotal}" pattern="#,##0"/></td>
+                                <td class="col-item">Quick Custom Sale</td>
+                                <td class="col-qty">1</td>
+                                <td class="col-price"><fmt:formatNumber value="${receipt.orderAmount}" pattern="#,##0"/></td>
+                                <td class="col-amt"><fmt:formatNumber value="${receipt.orderAmount}" pattern="#,##0"/></td>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-        </c:if>
+                        </c:otherwise>
+                    </c:choose>
+                </tbody>
+            </table>
 
-        <!-- 4. Amounts & Totals -->
-        <div class="receipt-totals-block">
-            <div class="meta-row" style="font-weight: 600;">
-                <span>Subtotal</span>
-                <span class="meta-val"><fmt:formatNumber value="${receipt.orderAmount}" pattern="#,##0"/> ₫</span>
-            </div>
-            <c:if test="${receipt.cashAmount > 0}">
-                <div class="total-sub-row">
-                    <span>&bull; Cash at counter</span>
-                    <span><fmt:formatNumber value="${receipt.cashAmount}" pattern="#,##0"/> ₫</span>
+            <div class="dashed-sep"></div>
+
+            <!-- Summary / Totals -->
+            <div class="summary-wrap">
+                <div class="sum-row">
+                    <span>Subtotal:</span>
+                    <span class="sum-val"><fmt:formatNumber value="${receipt.subtotal}" pattern="#,##0"/> VND</span>
                 </div>
-                <c:if test="${receipt.amount > 0}">
-                    <div class="total-sub-row">
-                        <span>&bull; VietQR transfer</span>
-                        <span><fmt:formatNumber value="${receipt.amount}" pattern="#,##0"/> ₫</span>
+                <c:if test="${receipt.discountAmount.signum() > 0}">
+                    <div class="sum-row">
+                        <span>Discount (<c:out value="${receipt.discountCode}"/>):</span>
+                        <span class="sum-val">-<fmt:formatNumber value="${receipt.discountAmount}" pattern="#,##0"/> VND</span>
                     </div>
                 </c:if>
-            </c:if>
-            <c:if test="${receipt.vatAmount.signum() > 0}">
-                <div class="total-sub-row">
-                    <span>&bull; VAT <fmt:formatNumber value="${receipt.vatRate}" pattern="0.##"/>% included</span>
-                    <span><fmt:formatNumber value="${receipt.vatAmount}" pattern="#,##0"/> ₫</span>
+                <c:if test="${not empty receipt.affiliateCode}">
+                    <div class="sum-row">
+                        <span>Referral code:</span>
+                        <span class="sum-val"><c:out value="${receipt.affiliateCode}"/></span>
+                    </div>
+                </c:if>
+                <c:if test="${receipt.vatAmount.signum() > 0}">
+                    <div class="sum-row">
+                        <span>VAT (<fmt:formatNumber value="${receipt.vatRate}" pattern="0.##"/>%):</span>
+                        <span class="sum-val"><fmt:formatNumber value="${receipt.vatAmount}" pattern="#,##0"/> VND</span>
+                    </div>
+                </c:if>
+
+                <div class="dashed-sep"></div>
+
+                <div class="total-row">
+                    <span class="total-lbl">TOTAL:</span>
+                    <span class="total-val"><fmt:formatNumber value="${receipt.orderAmount}" pattern="#,##0"/> VND</span>
                 </div>
-            </c:if>
-            <div class="rc-line-solid"></div>
-            <div class="total-grand-row">
-                <span class="total-grand-label">TOTAL PAID</span>
-                <span class="total-grand-val"><fmt:formatNumber value="${receipt.orderAmount}" pattern="#,##0"/> ₫</span>
+
+                <c:if test="${receipt.cashAmount > 0}">
+                    <div class="sum-row" style="margin-top: 2px;">
+                        <span>Cash:</span>
+                        <span class="sum-val"><fmt:formatNumber value="${receipt.cashAmount}" pattern="#,##0"/> VND</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>Change:</span>
+                        <span class="sum-val">0 VND</span>
+                    </div>
+                </c:if>
+                <c:if test="${receipt.amount > 0}">
+                    <div class="sum-row" style="margin-top: 2px;">
+                        <span>VietQR:</span>
+                        <span class="sum-val"><fmt:formatNumber value="${receipt.amount}" pattern="#,##0"/> VND</span>
+                    </div>
+                    <c:if test="${not empty receipt.bankTransId}">
+                        <div class="sum-row" style="font-size: 9px; color: #475569;">
+                            <span>Trace No:</span>
+                            <span class="sum-val" style="font-family: var(--rc-mono);"><c:out value="${receipt.bankTransId}"/></span>
+                        </div>
+                    </c:if>
+                </c:if>
             </div>
         </div>
 
-        <!-- 5. Status Confirmation Stamp -->
-        <div class="receipt-status-stamp">
-            &bull; TRANSACTION COMPLETED &bull;
-        </div>
+        <!-- Footer & Codes -->
+        <div class="footer-wrap">
+            <div class="dashed-sep"></div>
+            <div class="thanks-msg text-center">
+                Thank you &amp; See you again!
+            </div>
 
-        <!-- 6. Footer -->
-        <div class="receipt-footer-block">
-            <div class="footer-thank">Thank you for your purchase!</div>
-            <div class="footer-policy">Please keep this receipt for returns within 7 days</div>
-            <p class="footer-brandmark">Tinky Smart Payment Speaker POS</p>
+            <!-- Barcode & QR Code Side-by-Side matching photo -->
+            <div class="codes-row">
+                <div class="barcode-wrap">
+                    <svg class="barcode-svg" viewBox="0 0 160 36" fill="#000">
+                        <!-- Code128 pattern -->
+                        <rect x="0" y="0" width="2" height="36"/>
+                        <rect x="4" y="0" width="1" height="36"/>
+                        <rect x="6" y="0" width="3" height="36"/>
+                        <rect x="11" y="0" width="1" height="36"/>
+                        <rect x="14" y="0" width="2" height="36"/>
+                        <rect x="18" y="0" width="3" height="36"/>
+                        <rect x="23" y="0" width="1" height="36"/>
+                        <rect x="26" y="0" width="1" height="36"/>
+                        <rect x="29" y="0" width="2" height="36"/>
+                        <rect x="33" y="0" width="4" height="36"/>
+                        <rect x="39" y="0" width="1" height="36"/>
+                        <rect x="42" y="0" width="2" height="36"/>
+                        <rect x="46" y="0" width="3" height="36"/>
+                        <rect x="51" y="0" width="1" height="36"/>
+                        <rect x="54" y="0" width="3" height="36"/>
+                        <rect x="59" y="0" width="2" height="36"/>
+                        <rect x="63" y="0" width="1" height="36"/>
+                        <rect x="66" y="0" width="4" height="36"/>
+                        <rect x="72" y="0" width="1" height="36"/>
+                        <rect x="75" y="0" width="2" height="36"/>
+                        <rect x="79" y="0" width="2" height="36"/>
+                        <rect x="83" y="0" width="1" height="36"/>
+                        <rect x="86" y="0" width="3" height="36"/>
+                        <rect x="91" y="0" width="2" height="36"/>
+                        <rect x="95" y="0" width="1" height="36"/>
+                        <rect x="98" y="0" width="3" height="36"/>
+                        <rect x="103" y="0" width="1" height="36"/>
+                        <rect x="106" y="0" width="4" height="36"/>
+                        <rect x="112" y="0" width="2" height="36"/>
+                        <rect x="116" y="0" width="1" height="36"/>
+                        <rect x="119" y="0" width="3" height="36"/>
+                        <rect x="124" y="0" width="2" height="36"/>
+                        <rect x="128" y="0" width="1" height="36"/>
+                        <rect x="131" y="0" width="3" height="36"/>
+                        <rect x="136" y="0" width="1" height="36"/>
+                        <rect x="139" y="0" width="2" height="36"/>
+                        <rect x="143" y="0" width="4" height="36"/>
+                        <rect x="149" y="0" width="1" height="36"/>
+                        <rect x="152" y="0" width="2" height="36"/>
+                        <rect x="156" y="0" width="2" height="36"/>
+                    </svg>
+                    <div class="barcode-digits">
+                        <c:choose>
+                            <c:when test="${not empty receipt.bankTransId}">003009000000<c:out value="${receipt.orderId}"/></c:when>
+                            <c:otherwise>00300900000010700799</c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+
+                <!-- Clean QR Code SVG -->
+                <div class="qr-wrap">
+                    <svg class="qr-svg" viewBox="0 0 29 29" shape-rendering="crispEdges">
+                        <path fill="#fff" d="M0 0h29v29H0z"/>
+                        <path fill="#000" d="M0 0h7v7H0zm1 1v5h5V1zM8 0h1v1H8zm3 0h1v2h-1zm3 0h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1zm4 0h7v7h-7zm1 1v5h5V1zM2 2h3v3H2zm20 0h3v3h-3zM9 1h1v1H9zm4 0h1v2h-1zm-4 2h2v1H9zm3 0h1v1h-1zm4 0h2v1h-2zm-6 1h1v1h-1zm2 0h1v1h-1zm2 0h2v1h-2zm-5 1h1v1H9zm3 0h1v1h-1zm-4 1h1v1H8zm2 0h1v1h-1zm4 0h2v1h-2zm-5 1h2v1H9zm3 0h2v1h-2zm0 1h1v1h-1zm-4 1h1v1H8zm2 0h1v1h-1zm3 0h1v1h-1zm-3 1h2v1H9zm-8 1h1v1H1zm2 0h1v1H3zm3 0h2v1H6zm4 0h1v1h-1zm2 0h1v1h-1zm-9 1h1v1H2zm3 0h1v1H5zm2 0h1v1H7zm4 0h1v1h-1zm-9 1h2v1H2zm4 0h1v1H6zm2 0h1v1H8zm2 0h2v1h-2zm-9 1h1v1H1zm4 0h1v1H5zm2 0h2v1H7zm3 0h1v1h-1zm-9 1h1v1H1zm2 0h2v1H3zm3 0h1v1H6zm3 0h1v1H9zm-7 1h1v1H2zm2 0h1v1H4zm3 0h1v1H7zm2 0h1v1H9zm11-13h1v1h-1zm3 0h1v1h-1zm-2 1h1v2h-1zm3 0h1v1h-1zm-1 2h1v1h-1zm3 0h1v1h-1zm-2 1h1v1h-1zm-1 1h1v1h-1zm2 0h2v1h-2zm-2 1h1v1h-1zm-1 1h1v2h-1zm2 0h1v1h-1zm2 0h1v1h-1zm-2 2h1v1h-1zm0 1h2v1h-2zm-18 2h7v7H0zm1 1v5h5v-5zM2 24h3v3H2zm6-2h1v1H8zm2 0h1v1h-1zm-3 1h1v2H7zm3 0h1v1h-1zm-2 1h1v1H8zm3 0h1v1h-1zm-3 1h1v1H8zm2 0h2v1h-2zm-3 1h1v1H7zm3 0h1v1h-1zm1 1h1v1h-1zm-3 1h1v1H8zm2 0h2v1h-2zm8-9h1v1h-1zm2 0h2v1h-2zm-1 1h1v1h-1zm-2 1h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm-2 1h1v1h-1zm2 0h1v1h-1zm-3 1h1v1h-1zm1 0h1v1h-1zm-2 1h1v1h-1zm2 0h1v1h-1zm-1 1h1v1h-1zm-1 1h1v1h-1zm2 0h1v1h-1zm-1 1h1v1h-1zm2 0h1v1h-1z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="internal-note text-center">
+                FOR TINKY PROJECT INTERNAL USE
+            </div>
         </div>
     </div>
 
-    <!-- Return link on screen -->
-    <div class="no-print" style="margin-top: 16px; text-align: center;">
+    <div class="no-print" style="margin-top: 14px; text-align: center;">
         <a href="${ctx}/transactions" class="btn-receipt-back" style="box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 7px 18px;">
             &larr; Return to Transactions
         </a>

@@ -17,9 +17,6 @@ import model.User;
 import model.enums.Permission;
 import service.AuditService;
 
-/**
- * Printers at the counter. A technician can put a device into maintenance (the printer stops printing) and bring it back.
- */
 @WebServlet(name = "DeviceServlet", urlPatterns = {"/admin/devices"})
 public class DeviceServlet extends HttpServlet {
 
@@ -39,12 +36,13 @@ public class DeviceServlet extends HttpServlet {
             throws ServletException, IOException {
         User actor = (User) request.getSession().getAttribute(LoginServlet.SESSION_USER);
         try {
-            request.setAttribute("devices", deviceDAO.findAll());
+            java.util.List<Device> devices = deviceDAO.findAll();
+            new service.PrinterStatusService().apply(devices);
+            request.setAttribute("devices", devices);
         } catch (SQLException e) {
             throw new ServletException("Cannot load devices", e);
         }
         request.setAttribute("canWrite", RolePermissions.has(actor.getRole(), Permission.DEVICE_WRITE));
-        request.setAttribute("offlineAfter", DeviceDAO.OFFLINE_AFTER_SECONDS);
         request.setAttribute("message", MESSAGES.get(request.getParameter("msg")));
         request.getRequestDispatcher(VIEW).forward(request, response);
     }
@@ -66,7 +64,6 @@ public class DeviceServlet extends HttpServlet {
                 msg = action;
             }
         } catch (NumberFormatException e) {
-            // keeps msg = bad
         } catch (SQLException e) {
             throw new ServletException("Cannot update the device", e);
         }

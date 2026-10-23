@@ -7,7 +7,7 @@
 <div class="card">
     <h1>Devices</h1>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
-    <p class="hint">A device shows ONLINE while its page is open and polling, OFFLINE when it has been silent for ${offlineAfter} seconds, and MAINTENANCE when a technician has taken it out of service.</p>
+    <p class="hint">A device shows ONLINE while it is in service and MAINTENANCE when a technician has taken it out of service. The app cannot see the physical printer, so ONLINE does not prove the hardware is connected.</p>
 </div>
 
 <div class="card">
