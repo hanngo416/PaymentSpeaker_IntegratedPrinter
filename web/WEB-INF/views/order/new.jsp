@@ -17,8 +17,33 @@
     </c:if>
 </c:forEach>
 
+<div class="pos-omnichannel-bar" style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+    <div class="card" style="flex: 1; min-width: 180px; padding: 10px 14px; margin: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary, #0ea5e9);">
+        <div>
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted, #64748b); font-weight: 600;">POS Store Today</div>
+            <div style="font-size: 15px; font-weight: 700; color: var(--text, #0f172a);"><fmt:formatNumber value="${storeTodayTotal}" pattern="#,##0"/> ₫</div>
+        </div>
+        <span style="font-size: 18px;" title="Store POS Counter">🏪</span>
+    </div>
+    <c:forEach var="ch" items="${channelToday}">
+        <div class="card" style="flex: 1; min-width: 220px; padding: 10px 14px; margin: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid ${ch.channel == 'SHOPEE' ? '#ee4d2d' : (ch.channel == 'TIKTOK' ? '#0f172a' : '#10b981')};">
+            <div>
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted, #64748b); font-weight: 600;">
+                    ${ch.channel == 'SHOPEE' ? 'Shopee' : (ch.channel == 'TIKTOK' ? 'TikTok Shop' : ch.channel)} Today
+                </div>
+                <div style="font-size: 15px; font-weight: 700; color: var(--text, #0f172a);">
+                    <fmt:formatNumber value="${ch.totalRevenue}" pattern="#,##0"/> ₫
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted, #64748b);">
+                    ${ch.orderCount} order(s) &bull; Net: <fmt:formatNumber value="${ch.netRevenue}" pattern="#,##0"/> ₫
+                </div>
+            </div>
+            <span style="font-size: 18px;" title="${ch.channel}">${ch.channel == 'SHOPEE' ? '🛒' : (ch.channel == 'TIKTOK' ? '🎵' : '📦')}</span>
+        </div>
+    </c:forEach>
+</div>
+
 <div class="pos-dual-layout">
-    <!-- LEFT: Convenience Store Product Catalog -->
     <div class="card pos-catalog-panel">
         <div class="pos-catalog-header">
             <div class="pos-search-wrap">
@@ -34,7 +59,6 @@
             </button>
         </div>
 
-        <!-- Tier 1: Category Navigation Tabs -->
         <div class="pos-cat-tabs" id="posCatTabs">
             <button type="button" class="pos-cat-tab active" data-cat="all">
                 <span class="cat-icon">🏪</span>
@@ -54,7 +78,6 @@
             </c:forEach>
         </div>
 
-        <!-- Tier 2: Group Sub-filter Pills -->
         <div class="pos-grp-bar" id="posGrpBar">
             <button type="button" class="pos-grp-pill active" data-grp="all" data-cat="all">All Groups</button>
             <c:forEach var="g" items="${groups}">
@@ -64,7 +87,6 @@
             </c:forEach>
         </div>
 
-        <!-- Tier 3: Products Grid -->
         <div class="pos-product-grid" id="posProductGrid">
             <c:forEach var="p" items="${products}">
                 <div class="pos-product-card"
@@ -99,7 +121,6 @@
         </div>
     </div>
 
-    <!-- RIGHT: Cart & Checkout / Pending Queue Panel -->
     <div class="card pos-create-panel">
         <div class="pos-panel-tabs">
             <button type="button" class="pos-panel-tab-btn active" id="tabBtnCart">
@@ -119,7 +140,6 @@
             </button>
         </div>
 
-        <!-- VIEW 1: CART & CHECKOUT FORM -->
         <div id="panelViewCart" class="pos-panel-view">
             <c:if test="${not empty error}">
                 <div class="alert-banner" style="margin-bottom: 12px; padding: 8px 12px; font-size: 13px;"><c:out value="${error}"/></div>
@@ -128,7 +148,6 @@
             <form method="post" action="${ctx}/orders/new" id="orderForm">
                 <input type="hidden" name="cartItems" id="cartItems" value="">
 
-                <!-- Selected Items List -->
                 <div class="pos-cart-section">
                     <div class="pos-cart-header">
                         <span class="pos-cart-title">Selected Items</span>
@@ -160,7 +179,7 @@
                 </div>
 
                 <div class="pos-compact-label-row">
-                    <label for="pickedCode" class="pos-compact-label">Discount code</label>
+                    <label for="pickedCode" class="pos-compact-label">Discount (Code or VND amount)</label>
                 </div>
                 <div class="pos-discount-row">
                     <select id="pickedCode" name="pickedCode">
@@ -169,9 +188,19 @@
                             <option value="<c:out value='${d.code}'/>" ${pickedCode == d.code ? 'selected' : ''}><c:out value="${d.code}"/> (<c:choose><c:when test="${d.kind == 'PERCENT'}">-<fmt:formatNumber value="${d.value}" pattern="#,##0"/>%</c:when><c:otherwise>-<fmt:formatNumber value="${d.value}" pattern="#,##0"/> VND</c:otherwise></c:choose>)</option>
                         </c:forEach>
                     </select>
-                    <input type="text" id="typedCode" name="typedCode" maxlength="30" autocomplete="off" placeholder="Or type a code"
-                           value="<c:out value='${typedCode}'/>">
+                    <input type="text" id="discountAmount" name="discountAmount" inputmode="numeric" maxlength="11" autocomplete="off" placeholder="Or enter a discount (VND)"
+                           value="<c:out value='${discountAmount}'/>">
                 </div>
+
+                <div class="pos-compact-label-row">
+                    <label for="affiliateCode" class="pos-compact-label">Affiliate referral code (optional)</label>
+                </div>
+                <div class="pos-discount-row">
+                    <input type="text" id="affiliateCode" name="affiliateCode" maxlength="30" autocomplete="off" placeholder="e.g. LINH08"
+                           value="<c:out value='${affiliateCode}'/>">
+                    <button type="button" id="affiliateCheck">Check</button>
+                </div>
+                <div id="affiliateResult" class="hint"></div>
 
                 <div class="pos-compact-methods">
                     <label class="pos-seg-label">
@@ -227,7 +256,6 @@
             </form>
         </div>
 
-        <!-- VIEW 2: PENDING ORDERS QUEUE -->
         <div id="panelViewPending" class="pos-panel-view" style="display: none;">
             <div class="pos-pending-panel">
                 <c:choose>
@@ -287,7 +315,6 @@
     </div>
 </div>
 
-<!-- BOTTOM: Recent Orders Table -->
 <div class="card">
     <div class="head-row">
         <h2>Recent orders</h2>
@@ -377,7 +404,6 @@
     </c:choose>
 </div>
 
-<!-- Modal for quick QR inspection without leaving the POS page -->
 <div class="modal-backdrop" id="posQrModal" hidden>
     <div class="modal pos-qr-quick-modal" role="dialog" aria-modal="true" aria-labelledby="mQrTitle">
         <button type="button" class="modal-close" id="posQrModalClose" aria-label="Close">&times;</button>
@@ -404,6 +430,21 @@
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
 <script>
     (function () {
+        var affInput = document.getElementById('affiliateCode');
+        var affBtn = document.getElementById('affiliateCheck');
+        var affOut = document.getElementById('affiliateResult');
+        if (affBtn) {
+            affBtn.addEventListener('click', function () {
+                var code = affInput.value.trim();
+                if (!code) { affOut.textContent = ''; return; }
+                var amount = (document.getElementById('amount').value || '0').replace(/[^0-9]/g, '');
+                affOut.textContent = 'Checking...';
+                fetch('${ctx}/orders/affiliate?code=' + encodeURIComponent(code) + '&amount=' + amount, { credentials: 'same-origin' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) { affOut.textContent = d.message; affOut.style.color = d.ok ? '#0f766e' : '#b4233c'; })
+                    .catch(function () { affOut.textContent = 'Could not check the code.'; affOut.style.color = '#b4233c'; });
+            });
+        }
         var MAX_AMOUNT = <%= util.AppConfig.MAX_AMOUNT %>;
         var amountInput = document.getElementById('amount');
         var cashInput = document.getElementById('cashAmount');
@@ -415,7 +456,6 @@
         var submitBtn = document.getElementById('submitBtn');
         var submitBtnIcon = document.getElementById('submitBtnIcon');
 
-        // Panel tabs
         var tabBtnCart = document.getElementById('tabBtnCart');
         var tabBtnPending = document.getElementById('tabBtnPending');
         var panelViewCart = document.getElementById('panelViewCart');
@@ -436,7 +476,6 @@
             });
         }
 
-        // Catalog filtering & search
         var selectedCat = 'all';
         var selectedGrp = 'all';
         var searchQuery = '';
@@ -522,7 +561,6 @@
             });
         }
 
-        // Cart state & management
         var cart = [];
         var cartList = document.getElementById('posCartList');
         var cartEmpty = document.getElementById('posCartEmpty');
@@ -694,7 +732,6 @@
             });
         }
 
-        // Modal elements
         var modal = document.getElementById('posQrModal');
         var modalClose = document.getElementById('posQrModalClose');
         var mDoneBtn = document.getElementById('mDoneBtn');
@@ -737,7 +774,6 @@
             var hasQr = chkQr ? chkQr.checked : true;
 
             if (hasCash && !hasQr) {
-                // Case 2: 100% Cash payment
                 splitSection.style.display = 'none';
                 cashInput.value = total > 0 ? formatNumber(total) : '';
                 setBtnText(total > 0 ? 'Complete Cash Order (' + formatDisplay(total) + ')' : 'Complete Cash Order', false);
@@ -746,7 +782,6 @@
                     submitBtnIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
                 }
             } else if (!hasCash && hasQr) {
-                // Case 1: 100% VietQR payment
                 splitSection.style.display = 'none';
                 cashInput.value = '';
                 setBtnText(total > 0 ? 'Generate QR code (' + formatDisplay(total) + ')' : 'Generate QR code', false);
@@ -755,7 +790,6 @@
                     submitBtnIcon.innerHTML = '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>';
                 }
             } else if (hasCash && hasQr) {
-                // Case 3: Combined Cash + QR payment
                 splitSection.style.display = 'block';
                 submitBtn.classList.remove('cash-only');
                 if (submitBtnIcon) {
@@ -802,7 +836,6 @@
             });
         });
 
-        // Digits only, grouped with commas, never above the maximum order amount
         function keepDigits() {
             var digits = this.value.replace(/[^0-9]/g, '').replace(/^0+/, '');
             if (digits.length > 9) { digits = digits.substring(0, 9); }
@@ -869,9 +902,6 @@
         }
         updatePreview();
 
-        // -------------------------------------------------------------
-        // QR Quick Modal Logic
-        // -------------------------------------------------------------
         function openQrModal(code, amount, transfer, cash, qrUrl, remaining) {
             activeModalCode = code;
             mTitle.textContent = 'Order #' + code;
@@ -951,9 +981,6 @@
             });
         });
 
-        // -------------------------------------------------------------
-        // Live polling of pending cards
-        // -------------------------------------------------------------
         var pendingCards = document.querySelectorAll('.pos-mini-card[data-status="PENDING"]');
         if (pendingCards.length > 0) {
             setInterval(function () {

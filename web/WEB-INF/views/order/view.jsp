@@ -34,7 +34,6 @@
          data-status-url="${ctx}/orders/status">
 
         <c:choose>
-            <%-- STATE 1: COMPLETED / PAID --%>
             <c:when test="${order.status == 'COMPLETED' || order.status == 'PAID'}">
                 <div class="order-hero-banner success">
                     <div class="order-status-icon success">
@@ -84,14 +83,26 @@
                                 <span class="val"><fmt:formatNumber value="${order.transferAmount}" pattern="#,##0"/> ₫</span>
                             </div>
                         </c:if>
-                        <c:if test="${not empty order.discountCode}">
+                        <c:if test="${order.discountAmount.signum() > 0}">
                             <div class="summary-row">
                                 <span class="label">Order Amount</span>
                                 <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
                             </div>
                             <div class="summary-row">
-                                <span class="label">Discount <span class="mono">(<c:out value="${order.discountCode}"/>)</span></span>
+                                <span class="label">Discount<c:if test="${not empty order.discountCode}"> <span class="mono">(<c:out value="${order.discountCode}"/>)</span></c:if></span>
                                 <span class="val">-<fmt:formatNumber value="${order.discountAmount}" pattern="#,##0"/> ₫</span>
+                            </div>
+                        </c:if>
+                        <c:if test="${!order.vatIncluded && order.vatAmount.signum() > 0}">
+                            <c:if test="${order.discountAmount.signum() == 0}">
+                                <div class="summary-row">
+                                    <span class="label">Order Amount</span>
+                                    <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
+                                </div>
+                            </c:if>
+                            <div class="summary-row">
+                                <span class="label">VAT <fmt:formatNumber value="${order.vatRate}" pattern="0.##"/>%</span>
+                                <span class="val">+<fmt:formatNumber value="${order.vatAmount}" pattern="#,##0"/> ₫</span>
                             </div>
                         </c:if>
                         <div class="summary-row">
@@ -151,7 +162,6 @@
                 </div>
             </c:when>
 
-            <%-- STATE 2: PENDING --%>
             <c:when test="${order.status == 'PENDING'}">
                 <div class="order-hero-banner pending">
                     <div class="order-status-icon pending">
@@ -191,14 +201,26 @@
                             <span class="label">Order Code</span>
                             <span class="val mono"><c:out value="${order.orderCode}"/></span>
                         </div>
-                        <c:if test="${not empty order.discountCode}">
+                        <c:if test="${order.discountAmount.signum() > 0}">
                             <div class="summary-row">
                                 <span class="label">Order Amount</span>
                                 <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
                             </div>
                             <div class="summary-row">
-                                <span class="label">Discount <span class="mono">(<c:out value="${order.discountCode}"/>)</span></span>
+                                <span class="label">Discount<c:if test="${not empty order.discountCode}"> <span class="mono">(<c:out value="${order.discountCode}"/>)</span></c:if></span>
                                 <span class="val">-<fmt:formatNumber value="${order.discountAmount}" pattern="#,##0"/> ₫</span>
+                            </div>
+                        </c:if>
+                        <c:if test="${!order.vatIncluded && order.vatAmount.signum() > 0}">
+                            <c:if test="${order.discountAmount.signum() == 0}">
+                                <div class="summary-row">
+                                    <span class="label">Order Amount</span>
+                                    <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
+                                </div>
+                            </c:if>
+                            <div class="summary-row">
+                                <span class="label">VAT <fmt:formatNumber value="${order.vatRate}" pattern="0.##"/>%</span>
+                                <span class="val">+<fmt:formatNumber value="${order.vatAmount}" pattern="#,##0"/> ₫</span>
                             </div>
                         </c:if>
                         <div class="summary-row">
@@ -243,7 +265,6 @@
                 </div>
             </c:when>
 
-            <%-- STATE 3: CANCELLED / EXPIRED --%>
             <c:otherwise>
                 <div class="order-hero-banner cancelled">
                     <div class="order-status-icon cancelled">
@@ -274,14 +295,26 @@
                             <span class="label">Order Code</span>
                             <span class="val mono"><c:out value="${order.orderCode}"/></span>
                         </div>
-                        <c:if test="${not empty order.discountCode}">
+                        <c:if test="${order.discountAmount.signum() > 0}">
                             <div class="summary-row">
                                 <span class="label">Order Amount</span>
                                 <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
                             </div>
                             <div class="summary-row">
-                                <span class="label">Discount <span class="mono">(<c:out value="${order.discountCode}"/>)</span></span>
+                                <span class="label">Discount<c:if test="${not empty order.discountCode}"> <span class="mono">(<c:out value="${order.discountCode}"/>)</span></c:if></span>
                                 <span class="val">-<fmt:formatNumber value="${order.discountAmount}" pattern="#,##0"/> ₫</span>
+                            </div>
+                        </c:if>
+                        <c:if test="${!order.vatIncluded && order.vatAmount.signum() > 0}">
+                            <c:if test="${order.discountAmount.signum() == 0}">
+                                <div class="summary-row">
+                                    <span class="label">Order Amount</span>
+                                    <span class="val"><fmt:formatNumber value="${order.subtotal}" pattern="#,##0"/> ₫</span>
+                                </div>
+                            </c:if>
+                            <div class="summary-row">
+                                <span class="label">VAT <fmt:formatNumber value="${order.vatRate}" pattern="0.##"/>%</span>
+                                <span class="val">+<fmt:formatNumber value="${order.vatAmount}" pattern="#,##0"/> ₫</span>
                             </div>
                         </c:if>
                         <div class="summary-row">

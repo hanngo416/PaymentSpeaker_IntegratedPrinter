@@ -119,7 +119,6 @@ public class OrderServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    // Orders belong to the open shift; without one the cashier is sent to the shift page to start it
     private boolean shiftOpen(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
         if (shiftService.current() != null) {
             return true;
@@ -129,8 +128,16 @@ public class OrderServlet extends HttpServlet {
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response, User user,
-            String error, String amount, String cashAmount, String pickedCode, String typedCode) throws SQLException, ServletException, IOException {
-        request.setAttribute("recentOrders", orderService.recent(user));
+            String error, String amount, String cashAmount, String pickedCode, String discountAmount) throws SQLException, ServletException, IOException {
+        List<Order> recent = orderService.recent(user);
+        BigDecimal storeToday = BigDecimal.ZERO;
+        for (Order o : recent) {
+            if ("COMPLETED".equals(o.getStatus())) {
+                storeToday = storeToday.add(o.getAmount());
+            }
+        }
+        request.setAttribute("recentOrders", recent);
+        request.setAttribute("storeTodayTotal", storeToday);
         request.setAttribute("categories", catalogDAO.findAllCategories());
         request.setAttribute("groups", catalogDAO.findAllGroups());
         request.setAttribute("products", catalogDAO.findActiveProducts());
@@ -139,7 +146,8 @@ public class OrderServlet extends HttpServlet {
         request.setAttribute("cashAmount", cashAmount);
         request.setAttribute("sharedCodes", orderService.sharedCodes());
         request.setAttribute("pickedCode", pickedCode);
-        request.setAttribute("typedCode", typedCode);
+        request.setAttribute("discountAmount", discountAmount);
+        request.setAttribute("channelToday", new dao.ChannelSaleDAO().todaySummaries());
         request.getRequestDispatcher(VIEW_NEW).forward(request, response);
     }
 
@@ -148,16 +156,17 @@ public class OrderServlet extends HttpServlet {
         String rawAmount = request.getParameter("amount");
         String rawCash = request.getParameter("cashAmount");
         String picked = request.getParameter("pickedCode");
-        String typed = request.getParameter("typedCode");
+        String rawDiscount = request.getParameter("discountAmount");
         String rawCartItems = request.getParameter("cartItems");
+        String affiliateCode = request.getParameter("affiliateCode");
         boolean allCash = request.getParameter("methodCash") != null && request.getParameter("methodQr") == null;
-        String rawCode = typed != null && !typed.trim().isEmpty() ? typed : picked;
-        List<OrderItem> items = parseCartItems(rawCartItems);
         try {
-            Order order = orderService.create(user, rawAmount, rawCash, allCash, rawCode, items.isEmpty() ? null : items);
+            List<OrderItem> items = parseCartItems(rawCartItems);
+            Order order = orderService.create(user, rawAmount, rawCash, allCash, picked, rawDiscount, items.isEmpty() ? null : items, affiliateCode);
             response.sendRedirect(request.getContextPath() + "/orders/view?code=" + order.getOrderCode());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            showNewForm(request, response, user, e.getMessage(), rawAmount, rawCash, picked, typed);
+            request.setAttribute("affiliateCode", affiliateCode);
+            showNewForm(request, response, user, e.getMessage(), rawAmount, rawCash, picked, rawDiscount);
         }
     }
 
@@ -178,17 +187,11 @@ public class OrderServlet extends HttpServlet {
                 }
                 JsonObject obj = itemEl.getAsJsonObject();
                 int pId = obj.has("productId") && !obj.get("productId").isJsonNull() ? obj.get("productId").getAsInt() : 0;
-                String name = obj.has("productName") && !obj.get("productName").isJsonNull() ? obj.get("productName").getAsString().trim() : "";
-                BigDecimal price = obj.has("unitPrice") && !obj.get("unitPrice").isJsonNull()
-                        ? new BigDecimal(obj.get("unitPrice").getAsString().trim())
-                        : BigDecimal.ZERO;
                 int qty = obj.has("quantity") && !obj.get("quantity").isJsonNull() ? obj.get("quantity").getAsInt() : 1;
-                if (!name.isEmpty() && price.signum() > 0 && qty > 0) {
-                    BigDecimal subtotal = price.multiply(BigDecimal.valueOf(qty));
-                    items.add(new OrderItem(0, pId > 0 ? pId : null, name, price, qty, subtotal));
-                }
+                items.add(new OrderItem(0, pId > 0 ? pId : null, "", BigDecimal.ZERO, qty, BigDecimal.ZERO));
             }
-        } catch (Exception ignored) {
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException("The cart could not be read. Please rebuild it.");
         }
         return items;
     }

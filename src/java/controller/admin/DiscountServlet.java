@@ -18,10 +18,6 @@ import model.User;
 import service.AuditService;
 import util.SqlErrors;
 
-/**
- * Discount codes. A shared code (no holder) is picked from a list at the counter;
- * a personal code (with a holder) is typed by hand and works once.
- */
 @WebServlet(name = "DiscountServlet", urlPatterns = {"/admin/discounts"})
 public class DiscountServlet extends HttpServlet {
 

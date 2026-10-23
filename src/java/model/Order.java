@@ -23,11 +23,15 @@ public class Order {
     private String discountCode;
     private BigDecimal discountAmount = BigDecimal.ZERO;
     private BigDecimal vatRate = BigDecimal.ZERO;
+    private BigDecimal vatAmount = BigDecimal.ZERO;
+    private boolean vatIncluded = true;
     private OrderStatus status;
     private String qrContent;
     private Timestamp expiresAt;
     private Timestamp createdAt;
     private int remainingSeconds;
+    private Integer referredByAffiliateId;
+    private Integer referralCampaignId;
 
     public int getOrderId() { return orderId; }
     public void setOrderId(int orderId) { this.orderId = orderId; }
@@ -60,8 +64,18 @@ public class Order {
     public BigDecimal getVatRate() { return vatRate != null ? vatRate : BigDecimal.ZERO; }
     public void setVatRate(BigDecimal vatRate) { this.vatRate = vatRate != null ? vatRate : BigDecimal.ZERO; }
 
+    public BigDecimal getVatAmount() { return vatAmount != null ? vatAmount : BigDecimal.ZERO; }
+    public void setVatAmount(BigDecimal vatAmount) { this.vatAmount = vatAmount != null ? vatAmount : BigDecimal.ZERO; }
+
+    public boolean isVatIncluded() { return vatIncluded; }
+    public void setVatIncluded(boolean vatIncluded) { this.vatIncluded = vatIncluded; }
+
     public BigDecimal getSubtotal() {
-        return amount != null ? amount.add(getDiscountAmount()) : BigDecimal.ZERO;
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal goods = amount.add(getDiscountAmount());
+        return vatIncluded ? goods : goods.subtract(getVatAmount());
     }
 
     public OrderStatus getStatus() { return status; }
@@ -78,4 +92,10 @@ public class Order {
 
     public int getRemainingSeconds() { return remainingSeconds; }
     public void setRemainingSeconds(int remainingSeconds) { this.remainingSeconds = remainingSeconds; }
+
+    public Integer getReferredByAffiliateId() { return referredByAffiliateId; }
+    public void setReferredByAffiliateId(Integer referredByAffiliateId) { this.referredByAffiliateId = referredByAffiliateId; }
+
+    public Integer getReferralCampaignId() { return referralCampaignId; }
+    public void setReferralCampaignId(Integer referralCampaignId) { this.referralCampaignId = referralCampaignId; }
 }

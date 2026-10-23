@@ -73,7 +73,6 @@ public class DiscountDAO {
         }
     }
 
-    // Takes one use inside the caller's transaction; false when the code ran out or expired meanwhile
     public static boolean consume(Connection con, String code) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(
                 "UPDATE DiscountCodes SET used_count = used_count + 1 WHERE code = ? AND " + USABLE)) {

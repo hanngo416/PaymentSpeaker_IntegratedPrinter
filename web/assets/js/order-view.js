@@ -11,7 +11,8 @@
     }
 
     var statusUrl = box.dataset.statusUrl;
-    var endAt = Date.now() + parseInt(box.dataset.remaining, 10) * 1000;
+    var remainingAtLoad = parseInt(box.dataset.remaining, 10);
+    var endAt = Date.now() + remainingAtLoad * 1000;
     var countdown = document.getElementById('countdown');
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -19,7 +20,7 @@
     function tick() {
         var left = Math.max(0, Math.round((endAt - Date.now()) / 1000));
         countdown.textContent = pad(Math.floor(left / 60)) + ':' + pad(left % 60);
-        if (left === 0) {
+        if (left === 0 && remainingAtLoad > 0) {
             location.reload();
         }
     }

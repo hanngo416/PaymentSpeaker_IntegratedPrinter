@@ -14,7 +14,6 @@ import java.util.Properties;
  */
 public final class VietQrUtil {
 
-    // The same sepay.properties the polling job reads, so the QR and the polling can never point at two different accounts
     private static final Properties CONFIG = ConfigUtil.load("sepay.properties");
 
     private VietQrUtil() {

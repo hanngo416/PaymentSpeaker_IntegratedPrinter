@@ -19,9 +19,9 @@ public class OrderMatchRule implements Rule {
         if (!canAccept(order, tx)) {
             return Verdict.flag(TxLabel.ORDER_CLOSED, "ORDER_NOT_PENDING",
                     "Order " + order.getOrderCode() + " is " + order.getStatus()
-                    + " and no longer waiting for payment.", Verdict.MEDIUM);
+                    + (order.getStatus() == OrderStatus.PENDING ? " but had already expired when the transfer was made." : " and no longer waiting for payment."),
+                    Verdict.MEDIUM);
         }
-        // The VietQR code has a fixed amount (order total minus the cash), so a different amount is not a payment of this order
         if (tx.getAmount().compareTo(order.getTransferAmount()) != 0) {
             return Verdict.flag(TxLabel.NO_ORDER, "AMOUNT_MISMATCH",
                     "Order " + order.getOrderCode() + " expects " + order.getTransferAmount().toPlainString()
@@ -30,14 +30,12 @@ public class OrderMatchRule implements Rule {
         return null;
     }
 
-    // A transfer is kept for the order while it is PENDING. An order that the sweep already marked EXPIRED still takes
-    // a transfer made before the deadline.
     public static boolean canAccept(Order order, Transaction tx) {
-        if (order.getStatus() == OrderStatus.PENDING) {
-            return true;
-        }
-        if (order.getStatus() != OrderStatus.EXPIRED || order.getExpiresAt() == null) {
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.EXPIRED) {
             return false;
+        }
+        if (order.getExpiresAt() == null) {
+            return order.getStatus() == OrderStatus.PENDING;
         }
         Timestamp paidAt = tx.getTransTime() != null ? tx.getTransTime() : new Timestamp(System.currentTimeMillis());
         return !paidAt.after(order.getExpiresAt());

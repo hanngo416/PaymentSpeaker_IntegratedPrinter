@@ -12,9 +12,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import model.Attribution;
 import model.Order;
 import model.OrderItem;
 import model.enums.OrderStatus;
+import util.AppConfig;
 import util.DBUtil;
 
 /**
@@ -24,23 +26,28 @@ import util.DBUtil;
 public class OrderDAO {
 
     private static final String SELECT_COLUMNS
-            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, vat_rate, status, qr_content, "
+            = "SELECT order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, vat_rate, vat_amount, vat_included, status, qr_content, "
             + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
             + "FROM Orders ";
 
-    // A cancelled or overdue order gives its discount code use back
-    private static final String RELEASE_PREFIX = "DECLARE @c TABLE (code NVARCHAR(30)); "
-            + "UPDATE Orders SET status = N'CANCELLED' OUTPUT inserted.discount_code INTO @c ";
+    private static final String RELEASE_PREFIX = "DECLARE @c TABLE (code NVARCHAR(30), order_id INT); "
+            + "UPDATE Orders SET status = N'CANCELLED' OUTPUT inserted.discount_code, inserted.order_id INTO @c ";
     private static final String RELEASE_SUFFIX = "; UPDATE d SET used_count = d.used_count - (SELECT COUNT(*) FROM @c WHERE code = d.code) "
-            + "FROM DiscountCodes d WHERE d.code IN (SELECT code FROM @c)";
+            + "FROM DiscountCodes d WHERE d.code IN (SELECT code FROM @c); "
+            + "UPDATE Commissions SET status = N'REVERSED', amount = 0, reason = N'Order cancelled', updated_at = SYSDATETIME() "
+            + "WHERE order_id IN (SELECT order_id FROM @c) AND status IN (N'PENDING', N'APPROVED', N'ON_HOLD', N'AVAILABLE')";
 
     public void insert(Order order, int validMinutes) throws SQLException {
         insert(order, validMinutes, null);
     }
 
     public void insert(Order order, int validMinutes, List<OrderItem> items) throws SQLException {
-        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, discount_code, discount_amount, vat_rate, status, qr_content, expires_at) "
-                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()))";
+        insert(order, validMinutes, items, null);
+    }
+
+    public void insert(Order order, int validMinutes, List<OrderItem> items, Attribution attribution) throws SQLException {
+        String sql = "INSERT INTO Orders (order_code, created_by, created_by_code, amount, cash_amount, discount_code, discount_amount, vat_rate, vat_amount, vat_included, status, qr_content, expires_at, referred_by_affiliate_id, referral_campaign_id) "
+                + "VALUES (?, ?, (SELECT user_code FROM Users WHERE user_id = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, DATEADD(MINUTE, ?, GETDATE()), ?, ?)";
         try (Connection con = DBUtil.getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -55,9 +62,13 @@ public class OrderDAO {
                 ps.setString(6, order.getDiscountCode());
                 ps.setBigDecimal(7, order.getDiscountAmount());
                 ps.setBigDecimal(8, order.getVatRate());
-                ps.setString(9, order.getStatus() != null ? order.getStatus().name() : OrderStatus.PENDING.name());
-                ps.setString(10, order.getQrContent());
-                ps.setInt(11, validMinutes);
+                ps.setBigDecimal(9, order.getVatAmount());
+                ps.setBoolean(10, order.isVatIncluded());
+                ps.setString(11, order.getStatus() != null ? order.getStatus().name() : OrderStatus.PENDING.name());
+                ps.setString(12, order.getQrContent());
+                ps.setInt(13, validMinutes);
+                ps.setObject(14, order.getReferredByAffiliateId());
+                ps.setObject(15, order.getReferralCampaignId());
                 ps.executeUpdate();
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
@@ -66,6 +77,9 @@ public class OrderDAO {
                 }
                 if (items != null && !items.isEmpty()) {
                     OrderItemDAO.insertBatch(con, order.getOrderId(), items);
+                }
+                if (attribution != null) {
+                    CommissionDAO.insert(con, order.getOrderId(), order.getAmount().longValue(), attribution);
                 }
                 con.commit();
             } catch (SQLException | RuntimeException e) {
@@ -86,7 +100,7 @@ public class OrderDAO {
     }
 
     public List<Order> findRecent(int limit, Integer createdBy) throws SQLException {
-        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, vat_rate, status, qr_content, "
+        String sql = "SELECT TOP (?) order_id, order_code, created_by, created_by_code, amount, ISNULL(cash_amount, 0) AS cash_amount, discount_code, ISNULL(discount_amount, 0) AS discount_amount, vat_rate, vat_amount, vat_included, status, qr_content, "
                 + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
                 + "FROM Orders " + (createdBy == null ? "" : "WHERE created_by = ? ")
                 + "ORDER BY created_at DESC, order_id DESC";
@@ -106,15 +120,13 @@ public class OrderDAO {
         return list;
     }
 
-    // Mark expired orders
     public void expireOverdue() throws SQLException {
         try (Connection con = DBUtil.getConnection();
              Statement st = con.createStatement()) {
-            st.execute(RELEASE_PREFIX + "WHERE status = N'PENDING' AND expires_at < GETDATE()" + RELEASE_SUFFIX);
+            st.execute(RELEASE_PREFIX + "WHERE status = N'PENDING' AND expires_at < DATEADD(MINUTE, -" + AppConfig.ORDER_GRACE_MINUTES + ", GETDATE())" + RELEASE_SUFFIX);
         }
     }
 
-    // Cancel order
     public boolean cancel(String orderCode) throws SQLException {
         String sql = RELEASE_PREFIX + "WHERE order_code = ? AND status = N'PENDING'" + RELEASE_SUFFIX;
         try (Connection con = DBUtil.getConnection();
@@ -138,6 +150,8 @@ public class OrderDAO {
         o.setDiscountCode(rs.getString("discount_code"));
         o.setDiscountAmount(rs.getBigDecimal("discount_amount"));
         o.setVatRate(rs.getBigDecimal("vat_rate"));
+        o.setVatAmount(rs.getBigDecimal("vat_amount"));
+        o.setVatIncluded(rs.getBoolean("vat_included"));
         o.setStatus(OrderStatus.valueOf(rs.getString("status")));
         o.setQrContent(rs.getString("qr_content"));
         o.setExpiresAt(rs.getTimestamp("expires_at"));
