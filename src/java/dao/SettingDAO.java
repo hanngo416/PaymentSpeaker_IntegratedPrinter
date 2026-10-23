@@ -11,26 +11,42 @@ public class SettingDAO {
 
     private static final String VAT_RATE = "vat_rate";
 
-    public BigDecimal getVatRate() throws SQLException {
+    public String get(String key, String fallback) throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement("SELECT setting_value FROM Settings WHERE setting_key = ?")) {
-            ps.setString(1, VAT_RATE);
+            ps.setString(1, key);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? new BigDecimal(rs.getString(1)) : BigDecimal.ZERO;
+                return rs.next() ? rs.getString(1) : fallback;
             }
         }
     }
 
-    public void setVatRate(BigDecimal rate) throws SQLException {
+    public void set(String key, String value) throws SQLException {
         String sql = "UPDATE Settings SET setting_value = ? WHERE setting_key = ?; "
                 + "IF @@ROWCOUNT = 0 INSERT INTO Settings (setting_key, setting_value) VALUES (?, ?)";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, rate.toPlainString());
-            ps.setString(2, VAT_RATE);
-            ps.setString(3, VAT_RATE);
-            ps.setString(4, rate.toPlainString());
+            ps.setString(1, value);
+            ps.setString(2, key);
+            ps.setString(3, key);
+            ps.setString(4, value);
             ps.executeUpdate();
         }
+    }
+
+    public boolean getVatIncluded() throws SQLException {
+        return "1".equals(get("vat_included", "1"));
+    }
+
+    public void setVatIncluded(boolean included) throws SQLException {
+        set("vat_included", included ? "1" : "0");
+    }
+
+    public BigDecimal getVatRate() throws SQLException {
+        return new BigDecimal(get(VAT_RATE, "0"));
+    }
+
+    public void setVatRate(BigDecimal rate) throws SQLException {
+        set(VAT_RATE, rate.toPlainString());
     }
 }

@@ -27,10 +27,10 @@
 
     function renderAutoprint() {
         if (!autoprintToggle) { return; }
-        var on = localStorage.getItem('spk-autoprint') === 'on';
+        var on = localStorage.getItem('spk-autoprint') !== 'off';
         autoprintToggle.checked = on;
         if (autoprintStatus) {
-            autoprintStatus.textContent = on ? 'Auto-print is active' : 'Auto-print is off';
+            autoprintStatus.textContent = on ? 'Print on OK is enabled' : 'Print on OK is off';
             autoprintStatus.className = on ? 'pill ACTIVE' : 'pill';
         }
     }

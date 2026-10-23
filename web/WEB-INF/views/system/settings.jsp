@@ -45,10 +45,10 @@
     <div class="setting-item">
         <div class="setting-info">
             <div class="setting-title-row">
-                <strong>Auto-print receipts</strong>
-                <span id="autoprintStatus" class="pill">Auto-print is off</span>
+                <strong>Print receipt when OK is pressed</strong>
+                <span id="autoprintStatus" class="pill">Print on OK is off</span>
             </div>
-            <p class="hint">Automatically open and print receipt as soon as payment is confirmed at the counter.</p>
+            <p class="hint">When a payment popup appears, pressing OK also prints the receipt of that order.</p>
         </div>
         <div class="setting-control">
             <label class="toggle-switch" title="Toggle automatic receipt printing">
@@ -79,7 +79,7 @@
     <div class="setting-item">
         <div class="setting-info">
             <strong>VAT rate included in prices</strong>
-            <p class="hint">Printed on the receipt as "VAT included". 8% applies until 31/12/2026, then 10% unless the law is extended. Use 0 to hide the VAT line. Each order keeps the rate it was created with.</p>
+            <p class="hint">Choose whether the prices in the catalog already contain VAT (the receipt then shows the VAT part of the total) or VAT is added on top (the total paid is the goods plus VAT, rounded to the nearest dong). 8% applies until 31/12/2026, then 10% unless the law is extended. Use 0 to hide the VAT line. Each order keeps the rate and the way it was created with.</p>
         </div>
         <div class="setting-control">
             <c:choose>
@@ -88,6 +88,10 @@
                         <input type="hidden" name="action" value="vat">
                         <input type="text" name="vatRate" value="${vatRate}" inputmode="decimal" maxlength="5" aria-label="VAT rate in percent" style="width:80px">
                         <span>%</span>
+                        <select name="vatIncluded" aria-label="How VAT is applied">
+                            <option value="0" ${vatIncluded ? '' : 'selected'}>VAT is added on top of the price</option>
+                            <option value="1" ${vatIncluded ? 'selected' : ''}>Price already includes VAT</option>
+                        </select>
                         <button type="submit" class="btn">Save</button>
                     </form>
                 </c:when>
@@ -109,9 +113,9 @@
                 <p class="hint">
                     Type: <c:out value="${d.deviceType}"/> ·
                     <c:choose>
-                        <c:when test="${d.status == 'ONLINE'}">Device is ready to print receipts.</c:when>
-                        <c:when test="${d.status == 'MAINTENANCE'}">Device is under maintenance by technician.</c:when>
-                        <c:otherwise>Device has been idle or offline.</c:otherwise>
+                        <c:when test="${d.status == 'MAINTENANCE'}">In maintenance mode: receipts cannot be printed.</c:when>
+                        <c:when test="${not empty d.detail}"><c:out value="${d.detail}"/></c:when>
+                        <c:otherwise>In service.</c:otherwise>
                     </c:choose>
                     <c:if test="${!canWrite}">
                         (Only technician or administrator can change maintenance status)
@@ -124,17 +128,19 @@
                         <form method="post" action="${ctx}/settings" class="device-toggle-form">
                             <input type="hidden" name="id" value="${d.deviceId}">
                             <input type="hidden" name="action" value="${d.status == 'MAINTENANCE' ? 'online' : 'maintenance'}">
-                            <label class="toggle-switch" title="Switch between Online and Maintenance mode">
-                                <input type="checkbox" ${d.status != 'MAINTENANCE' ? 'checked' : ''} onchange="this.form.submit()">
+                            <label class="toggle-switch" title="Maintenance mode">
+                                <input type="checkbox" ${d.status == 'MAINTENANCE' ? 'checked' : ''} onchange="this.form.submit()">
                                 <span class="toggle-slider"></span>
                             </label>
+                            <span class="hint">Maintenance mode</span>
                         </form>
                     </c:when>
                     <c:otherwise>
                         <label class="toggle-switch disabled" title="Only technician or admin can change device status">
-                            <input type="checkbox" ${d.status != 'MAINTENANCE' ? 'checked' : ''} disabled>
+                            <input type="checkbox" ${d.status == 'MAINTENANCE' ? 'checked' : ''} disabled>
                             <span class="toggle-slider"></span>
                         </label>
+                        <span class="hint">Maintenance mode</span>
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -143,6 +149,32 @@
     <c:if test="${empty devices}">
         <p class="hint">No hardware devices registered in the system.</p>
     </c:if>
+    <c:if test="${canWrite}">
+        <p class="hint" style="margin-top: 8px;"><a href="${ctx}/admin/devices">Manage all hardware devices &rarr;</a></p>
+    </c:if>
+    <div class="setting-item">
+        <div class="setting-info">
+            <strong>Receipt printer on this PC</strong>
+            <p class="hint">The status above is read from Windows, so the server must run on the PC the printer is plugged into. Receipts are sent straight to this printer by the server, whatever browser is used.</p>
+        </div>
+        <div class="setting-control">
+            <c:choose>
+                <c:when test="${canWrite}">
+                    <form method="post" action="${ctx}/settings" class="filters">
+                        <select name="printerName" aria-label="Windows printer">
+                            <c:if test="${empty printerName}"><option value="">Choose a printer</option></c:if>
+                            <c:forEach var="pr" items="${installedPrinters}">
+                                <option value="<c:out value='${pr}'/>" ${pr == printerName ? 'selected' : ''}><c:out value="${pr}"/></option>
+                            </c:forEach>
+                        </select>
+                        <button type="submit" name="action" value="printer" class="btn">Save</button>
+                        <button type="submit" name="action" value="printtest" class="btn">Print test slip</button>
+                    </form>
+                </c:when>
+                <c:otherwise><strong><c:out value="${empty printerName ? 'Not selected' : printerName}"/></strong></c:otherwise>
+            </c:choose>
+        </div>
+    </div>
 </div>
 
 <div class="card">
@@ -153,6 +185,6 @@
 </div>
 
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
-<script src="${ctx}/assets/js/settings.js?v=3" charset="UTF-8"></script>
+<script src="${ctx}/assets/js/settings.js?v=4" charset="UTF-8"></script>
 </body>
 </html>
