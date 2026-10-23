@@ -13,9 +13,6 @@ import model.view.Report;
 import model.view.ShiftRow;
 import model.view.Summary;
 
-/**
- * Builds the shift, day, month and year reports. Every period is a time window [from, to).
- */
 public class ReportService {
 
     private static final int SHIFTS_TO_SCAN = 200;
@@ -23,7 +20,6 @@ public class ReportService {
     private final ShiftDAO shiftDAO = new ShiftDAO();
     private final SummaryDAO summaryDAO = new SummaryDAO();
 
-    // Null when there is no such shift. An open shift is reported up to now.
     public Report forShift(String id) throws SQLException {
         ShiftRow shift = shiftDAO.find(id);
         if (shift == null) {
@@ -76,7 +72,6 @@ public class ReportService {
         return shiftDAO.findRecent(limit);
     }
 
-    // Shifts opened inside the window, oldest first
     private List<ShiftRow> shiftsBetween(Timestamp from, Timestamp to) throws SQLException {
         List<ShiftRow> inside = new ArrayList<>();
         for (ShiftRow s : shiftDAO.findRecent(SHIFTS_TO_SCAN)) {

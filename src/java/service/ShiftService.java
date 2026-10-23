@@ -10,11 +10,6 @@ import model.User;
 import model.enums.Role;
 import model.view.ShiftRow;
 
-/**
- * Opening and closing the counter. One shift is open at a time for the whole store; the pair OPEN_SHIFT and CLOSE_SHIFT
- * in the audit log is the shift. These records are written directly (not through AuditService) so a failed write is an
- * error the cashier sees instead of a shift that silently never started.
- */
 public class ShiftService {
 
     public static final String ALREADY_OPEN = "A shift is already open.";
@@ -37,7 +32,6 @@ public class ShiftService {
         return shiftDAO.find(id);
     }
 
-    // The cashier types the cash counted in the drawer; an admin can close a forgotten shift without a count (force)
     public synchronized ShiftRow close(User user, String rawCounted, boolean force) throws SQLException {
         ShiftRow open = shiftDAO.findOpen();
         if (open == null) {

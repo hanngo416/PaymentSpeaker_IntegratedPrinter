@@ -19,7 +19,6 @@
 </head>
 <body class="receipt-screen-body">
 <div class="receipt-screen-wrap">
-    <!-- Non-printable top action toolbar -->
     <div class="receipt-toolbar no-print">
         <c:choose>
             <c:when test="${sessionScope.loginUser.role == 'AUDITOR'}">
@@ -61,7 +60,6 @@
         </div>
     </div>
 
-    <!-- The Thermal Receipt Slip -->
     <div class="receipt-slip">
         <div class="receipt-header">
             <div class="receipt-brand">
@@ -79,7 +77,6 @@
 
         <div class="receipt-dashed-line"></div>
 
-        <!-- Report Meta Info -->
         <div class="receipt-meta-grid">
             <div class="receipt-row">
                 <span class="r-label">Printed by:</span>
@@ -118,12 +115,15 @@
 
         <div class="receipt-dashed-line"></div>
 
-        <!-- Section 1: Sales Summary -->
         <div class="receipt-section-header">&bull; SALES SUMMARY &bull;</div>
         <div class="receipt-amount-block">
             <div class="receipt-row r-sub">
                 <span class="r-label">Completed Orders</span>
                 <span class="r-val r-bold">${report.summary.orderCount}</span>
+            </div>
+            <div class="receipt-row r-sub">
+                <span class="r-label">Discounts Given</span>
+                <span class="r-val"><fmt:formatNumber value="${report.summary.discount}" pattern="#,##0"/> ₫</span>
             </div>
             <div class="receipt-solid-line"></div>
             <div class="receipt-row r-total-row">
@@ -134,7 +134,6 @@
 
         <div class="receipt-dashed-line"></div>
 
-        <!-- Section 2: Cash Reconciliation -->
         <div class="receipt-section-header">&bull; CASH DRAWER AUDIT &bull;</div>
         <div class="receipt-meta-grid">
             <div class="receipt-row">
@@ -167,7 +166,6 @@
 
         <div class="receipt-dashed-line"></div>
 
-        <!-- Section 3: VietQR Reconciliation -->
         <div class="receipt-section-header">&bull; VIETQR BANK AUDIT &bull;</div>
         <div class="receipt-meta-grid">
             <div class="receipt-row">

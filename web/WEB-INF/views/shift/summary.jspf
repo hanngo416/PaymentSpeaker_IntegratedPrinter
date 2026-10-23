@@ -6,6 +6,7 @@
         </div>
         <div class="kpi-sub">
             <span>${report.summary.orderCount} paid order(s)</span>
+            <span>Discounts given: <fmt:formatNumber value="${report.summary.discount}" pattern="#,##0"/> VND</span>
         </div>
     </div>
     <div class="report-kpi-card">
@@ -37,7 +38,11 @@
                 <c:when test="${report.countedCash != null}">
                     <span>Counted</span>
                     <span class="pill ${report.cashDiff.signum() == 0 ? 'COMPLETED' : 'HIGH'}" style="font-size: 11px; padding: 2px 7px;">
-                        ${report.cashDiff.signum() == 0 ? 'Matched' : 'Discrepancy'}
+                        <c:choose>
+                            <c:when test="${report.cashDiff.signum() == 0}">Matched</c:when>
+                            <c:when test="${report.cashDiff.signum() > 0}">Over</c:when>
+                            <c:otherwise>Short</c:otherwise>
+                        </c:choose>
                     </span>
                 </c:when>
                 <c:otherwise>
@@ -122,7 +127,8 @@
                             <span class="pill ${report.cashDiff.signum() == 0 ? 'COMPLETED' : 'HIGH'}">
                                 <c:choose>
                                     <c:when test="${report.cashDiff.signum() == 0}">Matched (0 VND)</c:when>
-                                    <c:otherwise><fmt:formatNumber value="${report.cashDiff}" pattern="#,##0"/> VND</c:otherwise>
+                                    <c:when test="${report.cashDiff.signum() > 0}">Over (+<fmt:formatNumber value="${report.cashDiff}" pattern="#,##0"/> VND)</c:when>
+                                    <c:otherwise>Short (<fmt:formatNumber value="${report.cashDiff}" pattern="#,##0"/> VND)</c:otherwise>
                                 </c:choose>
                             </span>
                         </c:when>

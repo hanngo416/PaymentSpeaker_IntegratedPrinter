@@ -1,5 +1,6 @@
 package dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,17 +13,15 @@ import java.util.TreeMap;
 import model.view.Summary;
 import util.DBUtil;
 
-/**
- * Money totals of a time window [from, to): paid orders (what should have come in) against every transfer
- * that reached the account (what really came in).
- */
 public class SummaryDAO {
+
+    public static final String STORE_REVENUE_EXPR = "amount - CASE WHEN vat_included = 0 THEN vat_amount ELSE 0 END";
 
     public Summary summarize(Timestamp from, Timestamp to) throws SQLException {
         Summary s = new Summary();
         try (Connection con = DBUtil.getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT COUNT(*), ISNULL(SUM(amount), 0), ISNULL(SUM(cash_amount), 0) FROM Orders "
+                    "SELECT COUNT(*), ISNULL(SUM(amount), 0), ISNULL(SUM(cash_amount), 0), ISNULL(SUM(discount_amount), 0) FROM Orders "
                     + "WHERE status IN (N'COMPLETED', N'PAID') AND created_at >= ? AND created_at < ?")) {
                 window(ps, from, to);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -30,6 +29,7 @@ public class SummaryDAO {
                     s.setOrderCount(rs.getInt(1));
                     s.setTotal(rs.getBigDecimal(2));
                     s.setCash(rs.getBigDecimal(3));
+                    s.setDiscount(rs.getBigDecimal(4));
                 }
             }
             try (PreparedStatement ps = con.prepareStatement(
@@ -53,7 +53,6 @@ public class SummaryDAO {
         return s;
     }
 
-    // One line per day (labelLength 10, yyyy-mm-dd) or per month (labelLength 7, yyyy-mm), oldest first
     public List<Summary> breakdown(Timestamp from, Timestamp to, int labelLength) throws SQLException {
         Map<String, Summary> map = new TreeMap<>();
         try (Connection con = DBUtil.getConnection()) {
@@ -96,6 +95,42 @@ public class SummaryDAO {
             map.put(label, s);
         }
         return s;
+    }
+
+    public BigDecimal yearRevenue(int year) throws SQLException {
+        String sql = "SELECT "
+                + "(SELECT ISNULL(SUM(" + STORE_REVENUE_EXPR + "), 0) FROM Orders "
+                + "WHERE status = N'COMPLETED' AND YEAR(created_at) = ?) "
+                + "+ (SELECT ISNULL(SUM(goods_amount), 0) FROM ChannelSales "
+                + "WHERE status = N'COMPLETED' AND YEAR(sold_at) = ?)";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, year);
+            ps.setInt(2, year);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getBigDecimal(1);
+            }
+        }
+    }
+
+    public BigDecimal revenueBetween(java.sql.Date from, java.sql.Date to) throws SQLException {
+        String sql = "SELECT "
+                + "(SELECT ISNULL(SUM(" + STORE_REVENUE_EXPR + "), 0) FROM Orders "
+                + "WHERE status = N'COMPLETED' AND CAST(created_at AS DATE) BETWEEN ? AND ?) "
+                + "+ (SELECT ISNULL(SUM(goods_amount), 0) FROM ChannelSales "
+                + "WHERE status = N'COMPLETED' AND CAST(sold_at AS DATE) BETWEEN ? AND ?)";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDate(1, from);
+            ps.setDate(2, to);
+            ps.setDate(3, from);
+            ps.setDate(4, to);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getBigDecimal(1);
+            }
+        }
     }
 
     private static void window(PreparedStatement ps, Timestamp from, Timestamp to) throws SQLException {

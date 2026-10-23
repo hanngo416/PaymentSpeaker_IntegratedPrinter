@@ -20,10 +20,7 @@ import model.view.Summary;
 import service.AuditService;
 import service.ReportService;
 
-/**
- * Statistics by day, month or year for admins and auditors: on screen, as a printout or as a CSV file.
- */
-@WebServlet(name = "InvoiceServlet", urlPatterns = {"/invoices"})
+@WebServlet(name = "InvoiceServlet", urlPatterns = {"/reports/shifts", "/invoices"})
 public class InvoiceServlet extends HttpServlet {
 
     private static final String VIEW = "/WEB-INF/views/shift/invoices.jsp";
@@ -114,7 +111,7 @@ public class InvoiceServlet extends HttpServlet {
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"invoices-" + report.getPeriod() + ".csv\"");
         PrintWriter out = response.getWriter();
-        out.print('﻿');   // lets Excel read the file as UTF-8
+        out.print('﻿');
         out.print("Period,Completed orders,Order total,Cash,Expected by transfer,Received in account,Difference\r\n");
         if (report.getRows().isEmpty()) {
             csvLine(out, report.getPeriod(), report.getSummary());

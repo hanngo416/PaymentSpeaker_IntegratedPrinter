@@ -14,10 +14,6 @@ import java.util.Map;
 import model.view.ShiftRow;
 import util.DBUtil;
 
-/**
- * Reads shifts back from the audit log. A shift has no table of its own: opening writes OPEN_SHIFT and closing writes
- * CLOSE_SHIFT with the same entity id, so the audit trail is also the shift history.
- */
 public class ShiftDAO {
 
     public static final String OPEN = "OPEN_SHIFT";
@@ -27,7 +23,6 @@ public class ShiftDAO {
             = "SELECT actor_username, action, entity_id, detail_json, created_at FROM AuditLogs ";
     private static final String ONLY_SHIFTS = "WHERE action IN (N'" + OPEN + "', N'" + CLOSE + "') ";
 
-    // The shift that is open now, or null: the last shift record is an OPEN_SHIFT
     public ShiftRow findOpen() throws SQLException {
         String id = null;
         try (Connection con = DBUtil.getConnection();
@@ -57,7 +52,6 @@ public class ShiftDAO {
         return row == null || row.getOpenedAt() == null ? null : row;
     }
 
-    // Newest first
     public List<ShiftRow> findRecent(int limit) throws SQLException {
         Map<String, ShiftRow> map = new LinkedHashMap<>();
         try (Connection con = DBUtil.getConnection();
@@ -109,7 +103,6 @@ public class ShiftDAO {
             }
             row.setForced(o.has("forced") && "true".equals(o.get("forced").getAsString()));
         } catch (RuntimeException e) {
-            // A record that cannot be read just has no counted cash
         }
     }
 }

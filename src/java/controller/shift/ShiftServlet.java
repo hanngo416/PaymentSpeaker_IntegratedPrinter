@@ -24,9 +24,6 @@ import service.AuditService;
 import service.ReportService;
 import service.ShiftService;
 
-/**
- * The counter shift: /shift opens and closes it, /shift/print prints the summary of one shift or of a whole day.
- */
 @WebServlet(name = "ShiftServlet", urlPatterns = {"/shift", "/shift/print"})
 public class ShiftServlet extends HttpServlet {
 
@@ -109,7 +106,6 @@ public class ShiftServlet extends HttpServlet {
     private void print(HttpServletRequest request, HttpServletResponse response, User actor)
             throws SQLException, ServletException, IOException {
         String ctx = request.getContextPath();
-        // Auditors have no shift page, they go back to the statistics page
         String back = RolePermissions.has(actor.getRole(), Permission.SHIFT_USE) ? "/shift" : "/invoices";
         if (deviceDAO.isInMaintenance("PRINTER")) {
             response.sendRedirect(ctx + back + "?msg=busy");
