@@ -1,0 +1,5 @@
+Order ID,Created Time,Order Status,SKU Subtotal After Discount,Payment Platform Fee,Seller Shipping Fee,Creator Commission,Cost of Goods
+TT261031TK01,2026-10-31 08:45:00,Delivered,420000,25200,0,21000,210000
+TT261031TK02,2026-10-31 09:20:00,Completed,550000,33000,20000,27500,270000
+TT261031TK03,2026-10-31 10:40:00,Delivered,280000,16800,0,14000,140000
+
