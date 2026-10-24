@@ -1,0 +1,12 @@
+<div class="card">
+    <h1>Platform commissions</h1>
+    <p class="hint">Commissions reported by Shopee and TikTok Shop for the store's own products. Paid outside Tinky; Tinky only records the payments.</p>
+    <div>
+        <a class="btn ${chTab == 'commissions' ? 'primary' : ''}" href="${ctx}/admin/channel-commissions">Commissions</a>
+        <c:if test="${canWrite}"><a class="btn ${chTab == 'import' ? 'primary' : ''}" href="${ctx}/admin/channel-commissions/import">Import CSV</a></c:if>
+        <a class="btn ${chTab == 'payouts' ? 'primary' : ''}" href="${ctx}/admin/channel-payouts">Payouts</a>
+        <a class="btn ${chTab == 'reports' ? 'primary' : ''}" href="${ctx}/admin/channel-reports">Reports</a>
+        <c:if test="${canWrite}"><a class="btn" href="${ctx}/admin/affiliate-overview">Affiliate program</a></c:if>
+    </div>
+    <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
+</div>
