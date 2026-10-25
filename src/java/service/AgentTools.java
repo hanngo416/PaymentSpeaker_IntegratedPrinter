@@ -93,6 +93,8 @@ public class AgentTools {
                     new String[]{"query"}, Permission.USER_READ),
             new Tool("list_devices", "Devices (printer) with status and last ping.",
                     new String[0], Permission.DEVICE_READ),
+            new Tool("search_tax_docs", "Guide for opening and running a shop in Vietnam: business registration, permits for cafe or convenience store, tax rules for household businesses, invoices, bookkeeping, bank statements, filing and paying tax. Required: query (keywords, Vietnamese or English). Returns up to 3 documents with a source and sometimes a note.",
+                    new String[]{"query"}, Permission.DASHBOARD_READ),
             new Tool("tax_estimate", "This year's revenue against the tax-free threshold, with VAT and personal income tax estimates.",
                     new String[0], Permission.TAX_READ),
             new Tool("tax_rules", "Tax rules in force with their legal source reference.",
@@ -205,6 +207,8 @@ public class AgentTools {
                 o.addProperty("note", "Estimate only, not the amount to pay");
                 return o;
             }
+            case "search_tax_docs":
+                return new TaxDocService().search(text(args, "query"));
             default: {
                 TaxService.TaxView v = taxService.view(LocalDate.now().getYear());
                 JsonArray rows = new JsonArray();

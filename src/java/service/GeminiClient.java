@@ -23,19 +23,33 @@ public class GeminiClient {
         if (key.isEmpty() || key.startsWith("xxxx")) {
             throw new IOException("Gemini api.key is not set");
         }
-        String model = config.getProperty("model", "gemini-3.5-flash-lite").trim();
+        String main = config.getProperty("model", "gemini-3.6-flash").trim();
+        String backup = config.getProperty("fallback.model", "gemini-3.5-flash-lite").trim();
         int readMs = Integer.parseInt(config.getProperty("timeout.seconds", "20").trim()) * 1000;
-        URL url = new URL(BASE + model + ":generateContent");
         byte[] payload = body.toString().getBytes(StandardCharsets.UTF_8);
-        try {
-            return post(url, key, payload, readMs);
-        } catch (RateLimitedException e) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+        IOException last = null;
+        String[] models = backup.isEmpty() || backup.equals(main) ? new String[]{main} : new String[]{main, backup};
+        for (String model : models) {
+            URL url = new URL(BASE + model + ":generateContent");
+            for (int attempt = 0; attempt < 2; attempt++) {
+                try {
+                    return post(url, key, payload, readMs);
+                } catch (RateLimitedException e) {
+                    last = e;
+                    if (attempt == 0) {
+                        pause();
+                    }
+                }
             }
-            return post(url, key, payload, readMs);
+        }
+        throw last;
+    }
+
+    private static void pause() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -52,11 +66,16 @@ public class GeminiClient {
                 out.write(payload);
             }
             int status = con.getResponseCode();
-            if (status == 429) {
-                throw new RateLimitedException();
+            if (status == 429 || status == 500 || status == 503) {
+                throw new RateLimitedException(status);
             }
             if (status != 200) {
-                throw new IOException("Gemini returned HTTP " + status);
+                String detail = "";
+                try {
+                    detail = " " + read(con.getErrorStream());
+                } catch (IOException | RuntimeException ignored) {
+                }
+                throw new IOException("Gemini returned HTTP " + status + detail);
             }
             return new JsonParser().parse(read(con.getInputStream())).getAsJsonObject();
         } finally {
@@ -78,8 +97,8 @@ public class GeminiClient {
 
     private static class RateLimitedException extends IOException {
 
-        RateLimitedException() {
-            super("Gemini returned HTTP 429");
+        RateLimitedException(int status) {
+            super("Gemini returned HTTP " + status);
         }
     }
 }

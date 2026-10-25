@@ -41,7 +41,9 @@ public class BotChatServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.addProperty("answer", "Question is too long (max " + AgentService.MAX_MESSAGE + " characters)");
         } else {
-            AgentService.Reply reply = agent.ask(user, message.trim(), parseHistory(request.getParameter("history")));
+            String page = request.getParameter("page");
+            String pageTitle = request.getParameter("pageTitle");
+            AgentService.Reply reply = agent.ask(user, message.trim(), parseHistory(request.getParameter("history")), page, pageTitle);
             out.addProperty("answer", reply.getAnswer());
             out.addProperty("fallback", reply.isFallback());
             JsonArray steps = new JsonArray();
@@ -49,6 +51,14 @@ public class BotChatServlet extends HttpServlet {
                 steps.add(new com.google.gson.JsonPrimitive(s));
             }
             out.add("steps", steps);
+            JsonArray links = new JsonArray();
+            for (String[] l : reply.getLinks()) {
+                JsonObject o = new JsonObject();
+                o.addProperty("title", l[0]);
+                o.addProperty("url", l[1]);
+                links.add(o);
+            }
+            out.add("links", links);
         }
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

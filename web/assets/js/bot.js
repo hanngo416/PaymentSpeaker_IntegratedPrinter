@@ -6,6 +6,8 @@
     var ctx = box.dataset.ctx;
     var toggle = document.getElementById('botToggle');
     var panel = document.getElementById('botPanel');
+    var body = document.getElementById('botBody');
+    var closeBtn = document.getElementById('botClose');
     var dot = document.getElementById('botDot');
     var statusLine = document.getElementById('botStatus');
     var list = document.getElementById('botMessages');
@@ -85,9 +87,17 @@
         panel.hidden = !panel.hidden;
         if (!panel.hidden) {
             renderLog();
+            renderChat();
             showDot(false);
+            input.focus();
         }
     });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            panel.hidden = true;
+        });
+    }
 
     var chatUrl = box.dataset.chatUrl;
     var chat = document.getElementById('botChat');
@@ -108,9 +118,49 @@
         try { sessionStorage.setItem(CHAT_KEY, JSON.stringify(items.slice(-30))); } catch (e) { }
     }
 
+    function officialLink(url) {
+        try {
+            var u = new URL(url);
+            var h = u.hostname;
+            return u.protocol === 'https:' && (h === 'vbpl.vn' || /(^|\.)chinhphu\.vn$/.test(h) || /(^|\.)gov\.vn$/.test(h) || /(^|\.)shopee\.vn$/.test(h));
+        } catch (e) { return false; }
+    }
+
     function renderChat() {
         chat.innerHTML = '';
         var items = readChat();
+        if (items.length === 0 && list.children.length === 0) {
+            var empty = document.createElement('div');
+            empty.className = 'bot-empty';
+            empty.textContent = 'How can I help you today? Ask about sales, orders, or tax.';
+            chat.appendChild(empty);
+
+            var chips = document.createElement('div');
+            chips.style.display = 'flex';
+            chips.style.flexWrap = 'wrap';
+            chips.style.gap = '6px';
+            chips.style.justifyContent = 'center';
+            chips.style.marginTop = '12px';
+            var suggestions = ['Revenue today', 'Top products', '2026 tax rules'];
+            suggestions.forEach(function (q) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn';
+                btn.style.fontSize = '12px';
+                btn.style.padding = '4px 10px';
+                btn.style.borderRadius = '14px';
+                btn.style.background = '#ffffff';
+                btn.style.border = '1px solid var(--line)';
+                btn.style.cursor = 'pointer';
+                btn.textContent = q;
+                btn.addEventListener('click', function () {
+                    input.value = q;
+                    form.dispatchEvent(new Event('submit', { cancelable: true }));
+                });
+                chips.appendChild(btn);
+            });
+            chat.appendChild(chips);
+        }
         for (var i = 0; i < items.length; i++) {
             var row = document.createElement('div');
             row.className = 'bot-line ' + items[i].who;
@@ -122,14 +172,33 @@
                 s.textContent = 'Used: ' + items[i].steps.join(', ');
                 row.appendChild(s);
             }
+            var links = items[i].links || [];
+            var shown = 0;
+            for (var k = 0; k < links.length; k++) {
+                if (!officialLink(links[k].url)) { continue; }
+                if (shown === 0) {
+                    var head = document.createElement('small');
+                    head.textContent = 'Official sources to read more:';
+                    row.appendChild(head);
+                }
+                var a = document.createElement('a');
+                a.className = 'bot-link';
+                a.href = links[k].url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = links[k].title;
+                row.appendChild(a);
+                shown++;
+            }
             chat.appendChild(row);
         }
-        panel.scrollTop = panel.scrollHeight;
+        var scroller = body || panel;
+        scroller.scrollTop = scroller.scrollHeight;
     }
 
-    function addChat(who, text, steps) {
+    function addChat(who, text, steps, links) {
         var items = readChat();
-        items.push({ who: who, text: text, steps: steps || [] });
+        items.push({ who: who, text: text, steps: steps || [], links: links || [] });
         saveChat(items);
         renderChat();
     }
@@ -145,7 +214,8 @@
         wait.className = 'bot-line bot';
         wait.innerHTML = '<p>Thinking...</p>';
         chat.appendChild(wait);
-        panel.scrollTop = panel.scrollHeight;
+        var scroller = body || panel;
+        scroller.scrollTop = scroller.scrollHeight;
         var xhr = new XMLHttpRequest();
         xhr.open('POST', chatUrl, true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
@@ -154,7 +224,7 @@
             sendBtn.disabled = false;
             try {
                 var data = JSON.parse(xhr.responseText);
-                addChat('bot', data.answer, data.steps);
+                addChat('bot', data.answer, data.steps, data.links);
             } catch (e) {
                 addChat('bot', 'The assistant could not answer. Please try again.');
             }
@@ -164,16 +234,23 @@
             addChat('bot', 'The assistant could not be reached. Please try again.');
         };
         var past = readChat().slice(0, -1).filter(function (m) { return m.text; }).map(function (m) { return { who: m.who, text: m.text }; });
-        xhr.send('message=' + encodeURIComponent(text) + '&history=' + encodeURIComponent(JSON.stringify(past.slice(-8))));
+        var path = window.location.pathname;
+        if (ctx && path.indexOf(ctx) === 0) {
+            path = path.substring(ctx.length);
+        }
+        if (!path || path === '') {
+            path = '/home';
+        }
+        var payload = 'message=' + encodeURIComponent(text)
+            + '&page=' + encodeURIComponent(path)
+            + '&pageTitle=' + encodeURIComponent(document.title || '')
+            + '&history=' + encodeURIComponent(JSON.stringify(past.slice(-8)));
+        xhr.send(payload);
     });
 
     document.getElementById('botClear').addEventListener('click', function () {
         saveChat([]);
         renderChat();
-    });
-
-    toggle.addEventListener('click', function () {
-        if (!panel.hidden) { renderChat(); input.focus(); }
     });
 
     dot.hidden = load(UNREAD_KEY) !== '1';
