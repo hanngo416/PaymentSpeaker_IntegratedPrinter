@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </c:if>
 
 <div class="card">
-    <p>Kết quả kiểm tra nghĩa vụ và lịch sử đánh giá nằm ở trang <a href="${ctx}/tax/checker">Kiểm tra nghĩa vụ</a>.</p>
+    <p>Eligibility results and the assessment history are on the <a href="${ctx}/tax/checker">Obligation check</a>.</p>
 </div>
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
 </body>

@@ -28,5 +28,6 @@
     <p><c:out value="${denyReason}"/></p>
     <p><a href="${pageContext.request.contextPath}/home">Back to home</a></p>
 </div>
+<%@ include file="/WEB-INF/views/common/i18n.jspf" %>
 </body>
 </html>

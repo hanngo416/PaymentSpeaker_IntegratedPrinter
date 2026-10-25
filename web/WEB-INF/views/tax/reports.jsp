@@ -1,49 +1,49 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="pageTitle" value="Doanh thu và báo cáo"/>
+<c:set var="pageTitle" value="Revenue and reports"/>
 <c:set var="nav" value="tax"/>
 <c:set var="taxTab" value="reports"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <%@ include file="/WEB-INF/views/common/tax-tabs.jspf" %>
 <div class="card">
-    <h1>Doanh thu và báo cáo thuế</h1>
-    <p class="hint">Tự động tổng hợp từ đơn hàng tại quầy và đơn sàn đã nhập. Doanh thu này chưa chắc bằng doanh thu tính thuế theo luật: xem cách tính ở cuối trang và đối chiếu với kế toán.</p>
+    <h1>Revenue and tax reports</h1>
+    <p class="hint">Summed up automatically from counter orders and imported marketplace orders. This revenue is not necessarily the revenue used for tax by law: see how it is calculated at the bottom of the page and check with an accountant.</p>
 </div>
 
 <div class="card">
     <form method="get" action="${ctx}/tax/reports" class="filters">
-        <label>Kỳ báo cáo
+        <label>Reporting period
             <select name="range" id="rangeSelect">
-                <option value="ytd" ${range == 'ytd' ? 'selected' : ''}>Từ đầu năm</option>
-                <option value="m0" ${range == 'm0' ? 'selected' : ''}>Tháng này</option>
-                <option value="m1" ${range == 'm1' ? 'selected' : ''}>Tháng trước</option>
-                <option value="q" ${range == 'q' ? 'selected' : ''}>Quý này</option>
-                <option value="custom" ${range == 'custom' ? 'selected' : ''}>Tùy chọn</option>
+                <option value="ytd" ${range == 'ytd' ? 'selected' : ''}>Year to date</option>
+                <option value="m0" ${range == 'm0' ? 'selected' : ''}>This month</option>
+                <option value="m1" ${range == 'm1' ? 'selected' : ''}>Last month</option>
+                <option value="q" ${range == 'q' ? 'selected' : ''}>This quarter</option>
+                <option value="custom" ${range == 'custom' ? 'selected' : ''}>Custom</option>
             </select>
         </label>
-        <label>Từ ngày <input type="date" name="from" value="${from}" id="fromInput" ${range == 'custom' ? '' : 'disabled'}></label>
-        <label>Đến ngày <input type="date" name="to" value="${to}" id="toInput" ${range == 'custom' ? '' : 'disabled'}></label>
-        <button type="submit" class="primary">Xem</button>
-        <c:if test="${empty error}"><a class="btn" href="${ctx}/tax/reports?range=${range}&amp;from=${from}&amp;to=${to}&amp;export=csv">Xuất CSV</a></c:if>
+        <label>From <input type="date" name="from" value="${from}" id="fromInput" ${range == 'custom' ? '' : 'disabled'}></label>
+        <label>To <input type="date" name="to" value="${to}" id="toInput" ${range == 'custom' ? '' : 'disabled'}></label>
+        <button type="submit" class="primary">View</button>
+        <c:if test="${empty error}"><a class="btn" href="${ctx}/tax/reports?range=${range}&amp;from=${from}&amp;to=${to}&amp;export=csv">Export CSV</a></c:if>
     </form>
     <c:if test="${not empty error}"><div class="alert-line"><c:out value="${error}"/></div></c:if>
-    <p class="hint">Kỳ báo cáo: ${from} đến ${to}</p>
+    <p class="hint">Reporting period: ${from} to ${to}</p>
 </div>
 
 <div class="kpis">
-    <div class="card"><span class="kpi-label">Doanh thu gộp</span><div class="kpi-value"><fmt:formatNumber value="${report.gross}" pattern="#,##0"/></div><p class="kpi-sub">VND, trước giảm giá</p></div>
-    <div class="card"><span class="kpi-label">Giảm giá</span><div class="kpi-value">-<fmt:formatNumber value="${report.discounts}" pattern="#,##0"/></div><p class="kpi-sub">Mã giảm giá và số tiền nhập tay</p></div>
-    <div class="card"><span class="kpi-label">Đơn hủy và hoàn trả</span><div class="kpi-value"><fmt:formatNumber value="${report.removed}" pattern="#,##0"/></div><p class="kpi-sub">Đã loại khỏi doanh thu</p></div>
-    <div class="card"><span class="kpi-label">Doanh thu dùng để tính thuế</span><div class="kpi-value"><fmt:formatNumber value="${report.taxable}" pattern="#,##0"/></div><p class="kpi-sub">Doanh thu ròng, cần bạn xem lại</p></div>
+    <div class="card"><span class="kpi-label">Gross revenue</span><div class="kpi-value"><fmt:formatNumber value="${report.gross}" pattern="#,##0"/></div><p class="kpi-sub">VND, before discounts</p></div>
+    <div class="card"><span class="kpi-label">Discounts</span><div class="kpi-value">-<fmt:formatNumber value="${report.discounts}" pattern="#,##0"/></div><p class="kpi-sub">Discount codes and typed amounts</p></div>
+    <div class="card"><span class="kpi-label">Cancelled and returned orders</span><div class="kpi-value"><fmt:formatNumber value="${report.removed}" pattern="#,##0"/></div><p class="kpi-sub">Already excluded from revenue</p></div>
+    <div class="card"><span class="kpi-label">Revenue used for tax</span><div class="kpi-value"><fmt:formatNumber value="${report.taxable}" pattern="#,##0"/></div><p class="kpi-sub">Net revenue, please review it</p></div>
 </div>
 
 <div class="card">
-    <h2>Theo kênh bán</h2>
+    <h2>By sales channel</h2>
     <table>
-        <thead><tr><th>Kênh</th><th class="r">Doanh thu ròng</th><th>Tỷ trọng</th></tr></thead>
+        <thead><tr><th>Channel</th><th class="r">Net revenue</th><th>Share</th></tr></thead>
         <tbody>
-        <tr><td>Cửa hàng (POS)</td><td class="r"><fmt:formatNumber value="${report.store}" pattern="#,##0"/></td><td><progress class="bar" value="${report.store}" max="${report.taxable > 0 ? report.taxable : 1}"></progress></td></tr>
+        <tr><td>Store (POS)</td><td class="r"><fmt:formatNumber value="${report.store}" pattern="#,##0"/></td><td><progress class="bar" value="${report.store}" max="${report.taxable > 0 ? report.taxable : 1}"></progress></td></tr>
         <tr><td>Shopee</td><td class="r"><fmt:formatNumber value="${report.shopee}" pattern="#,##0"/></td><td><progress class="bar" value="${report.shopee}" max="${report.taxable > 0 ? report.taxable : 1}"></progress></td></tr>
         <tr><td>TikTok</td><td class="r"><fmt:formatNumber value="${report.tiktok}" pattern="#,##0"/></td><td><progress class="bar" value="${report.tiktok}" max="${report.taxable > 0 ? report.taxable : 1}"></progress></td></tr>
         </tbody>
@@ -51,9 +51,9 @@
 </div>
 
 <div class="card">
-    <h2>Chi tiết theo tháng</h2>
+    <h2>Monthly detail</h2>
     <table>
-        <thead><tr><th>Tháng</th><th class="r">Cửa hàng</th><th class="r">Shopee</th><th class="r">TikTok</th><th class="r">Giảm giá</th><th class="r">Hủy / hoàn trả</th><th class="r">Doanh thu tính thuế</th><th>So sánh</th></tr></thead>
+        <thead><tr><th>Month</th><th class="r">Store</th><th class="r">Shopee</th><th class="r">TikTok</th><th class="r">Discounts</th><th class="r">Cancelled / returned</th><th class="r">Taxable revenue</th><th>Compare</th></tr></thead>
         <tbody>
         <c:forEach var="m" items="${report.months}">
             <tr>
@@ -69,17 +69,17 @@
         </c:forEach>
         </tbody>
     </table>
-    <p class="hint">Số liệu tính bằng VND. Đơn hủy và hoàn trả chỉ để tham khảo, đã không nằm trong doanh thu tính thuế.</p>
+    <p class="hint">Amounts are in VND. Cancelled and returned orders are for reference only and are not part of the taxable revenue.</p>
 </div>
 
 <div class="card">
-    <h2>Cách tính</h2>
+    <h2>How it is calculated</h2>
     <ul class="plain">
-        <li>Nguồn dữ liệu: đơn hoàn tất tại quầy (không tính VAT cộng thêm) và đơn Shopee, TikTok đã nhập ở trạng thái hoàn tất.</li>
-        <li>Doanh thu dùng để tính thuế = doanh thu cửa hàng ròng + doanh thu các sàn.</li>
-        <li>Doanh thu gộp = doanh thu dùng để tính thuế + giảm giá.</li>
-        <li>Loại trừ: đơn đã hủy, đơn sàn bị hủy hoặc hoàn trả. Hệ thống chưa có hoàn tiền cho đơn tại quầy.</li>
-        <li>Bản tổng hợp này để bạn tham khảo, không phải tờ khai và hệ thống không tự nộp thay bạn.</li>
+        <li>Data source: completed counter orders (without VAT added on top) and imported Shopee and TikTok orders that are completed.</li>
+        <li>Revenue used for tax = net store revenue + marketplace revenue.</li>
+        <li>Gross revenue = revenue used for tax + discounts.</li>
+        <li>Excluded: cancelled orders and cancelled or returned marketplace orders. The system has no refunds for counter orders yet.</li>
+        <li>This summary is for reference. It is not a tax return and the system does not file anything for you.</li>
     </ul>
     <c:forEach var="w" items="${warnings}"><div class="alert-line"><c:out value="${w}"/></div></c:forEach>
 </div>

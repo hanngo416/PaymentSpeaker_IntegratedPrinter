@@ -12,6 +12,22 @@
 </div>
 
 <div class="card">
+    <h2>Language</h2>
+    <div class="setting-item">
+        <div class="setting-info">
+            <strong>Interface language</strong>
+            <p class="hint">Switch the whole application between English and Vietnamese. The choice is saved in this browser. Receipts, emails and the Starter Guide articles keep their own language.</p>
+        </div>
+        <div class="setting-control">
+            <select id="langSelect" aria-label="Interface language">
+                <option value="en">English</option>
+                <option value="vi">Tiếng Việt</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="card">
     <h2>Speaker & Sound Notification</h2>
     <div class="setting-item">
         <div class="setting-info">
@@ -185,6 +201,6 @@
 </div>
 
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
-<script src="${ctx}/assets/js/settings.js?v=4" charset="UTF-8"></script>
+<script src="${ctx}/assets/js/settings.js?v=5" charset="UTF-8"></script>
 </body>
 </html>

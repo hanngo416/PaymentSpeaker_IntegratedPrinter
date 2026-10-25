@@ -1,0 +1,2 @@
+<c:if test="${cookie.tinky_lang.value == 'vi'}"><script src="${pageContext.request.contextPath}/assets/js/i18n-vi.js?v=1" charset="UTF-8"></script></c:if>
+<script src="${pageContext.request.contextPath}/assets/js/i18n.js?v=1" charset="UTF-8"></script>

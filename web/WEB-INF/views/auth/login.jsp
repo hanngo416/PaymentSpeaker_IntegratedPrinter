@@ -42,5 +42,6 @@
 
     <a class="btn" href="${pageContext.request.contextPath}/login/google">Sign in with Google</a>
 </div>
+<%@ include file="/WEB-INF/views/common/i18n.jspf" %>
 </body>
 </html>

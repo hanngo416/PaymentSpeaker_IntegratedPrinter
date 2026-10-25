@@ -221,7 +221,7 @@
                     <button type="button" class="preset-chip" data-amount="500000">500k</button>
                 </div>
 
-                <details class="pos-promo-accordion" id="promoAccordion" ${not empty pickedCode || not empty discountAmount || not empty affiliateCode ? 'open' : ''}>
+                <details class="pos-promo-accordion" id="promoAccordion"<c:if test="${not empty pickedCode || not empty discountAmount || not empty affiliateCode}"> open</c:if>>
                     <summary class="pos-promo-summary">
                         <span class="pos-promo-summary-title">
                             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

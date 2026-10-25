@@ -119,13 +119,13 @@ public class TaxViewServlet extends AffiliateBase {
                 Date f = parseDate(request.getParameter("from"));
                 Date t = parseDate(request.getParameter("to"));
                 if (f == null || t == null) {
-                    error = "Hãy chọn đủ ngày bắt đầu và ngày kết thúc.";
+                    error = "Choose both a start date and an end date.";
                 } else if (f.after(t)) {
-                    error = "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.";
+                    error = "The start date must be on or before the end date.";
                 } else if (f.toLocalDate().getYear() < 2000 || t.toLocalDate().isAfter(today)) {
-                    error = "Kỳ báo cáo phải từ năm 2000 đến hôm nay.";
+                    error = "The reporting period must be between the year 2000 and today.";
                 } else if (t.toLocalDate().toEpochDay() - f.toLocalDate().toEpochDay() > 1830) {
-                    error = "Kỳ báo cáo tối đa 5 năm.";
+                    error = "The reporting period is at most 5 years.";
                 } else {
                     from = f.toLocalDate();
                     to = t.toLocalDate();
@@ -147,10 +147,10 @@ public class TaxViewServlet extends AffiliateBase {
         List<String> warnings = new ArrayList<>();
         int completion = tools.completion(tools.profile());
         if (completion < 100) {
-            warnings.add("Hồ sơ thuế mới hoàn thành " + completion + "%.");
+            warnings.add("The tax profile is only " + completion + "% complete.");
         }
         if (report.shopee.signum() + report.tiktok.signum() == 0) {
-            warnings.add("Chưa có đơn từ sàn Shopee hoặc TikTok trong kỳ này. Nếu bạn có bán online, hãy nhập file đơn ở mục Sales book.");
+            warnings.add("There are no Shopee or TikTok orders in this period. If you sell online, import the order file in the Sales book.");
         }
         request.setAttribute("report", report);
         request.setAttribute("range", range);

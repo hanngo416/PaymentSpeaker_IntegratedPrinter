@@ -65,5 +65,6 @@
         tick();
     })();
 </script>
+<%@ include file="/WEB-INF/views/common/i18n.jspf" %>
 </body>
 </html>

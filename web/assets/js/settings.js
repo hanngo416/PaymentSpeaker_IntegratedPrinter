@@ -88,6 +88,15 @@
         });
     }
 
+    var langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        langSelect.value = /(?:^|; )tinky_lang=vi/.test(document.cookie) ? 'vi' : 'en';
+        langSelect.addEventListener('change', function () {
+            TinkyI18n.setLang(langSelect.value);
+            location.reload();
+        });
+    }
+
     document.addEventListener('announcer-history', renderLog);
 
     renderSound();

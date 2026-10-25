@@ -46,3 +46,4 @@
     </button>
 </div>
 <script src="${ctx}/assets/js/bot.js?v=7" charset="UTF-8"></script>
+<%@ include file="/WEB-INF/views/common/i18n.jspf" %>

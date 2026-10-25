@@ -47,15 +47,15 @@ public class TaxDocumentServlet extends AffiliateBase {
         TYPES.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         TYPES.put("doc", "application/msword");
         TYPES.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        TEXT.put("saved", "Đã lưu tài liệu.");
-        TEXT.put("updated", "Đã cập nhật trạng thái.");
-        TEXT.put("deleted", "Đã xóa tài liệu.");
-        TEXT.put("nofile", "Hãy chọn một tệp để tải lên.");
-        TEXT.put("badtype", "Chỉ nhận tệp PDF, PNG, JPG, CSV, XLS, XLSX, DOC, DOCX.");
-        TEXT.put("toobig", "Tệp vượt quá 10 MB.");
-        TEXT.put("badname", "Tên tài liệu phải từ 2 đến 150 ký tự.");
-        TEXT.put("badcat", "Nhóm hoặc kỳ không hợp lệ.");
-        TEXT.put("missing", "Không tìm thấy tài liệu hoặc trạng thái không cho phép thao tác này.");
+        TEXT.put("saved", "Document saved.");
+        TEXT.put("updated", "Status updated.");
+        TEXT.put("deleted", "Document deleted.");
+        TEXT.put("nofile", "Choose a file to upload.");
+        TEXT.put("badtype", "Only PDF, PNG, JPG, CSV, XLS, XLSX, DOC and DOCX files are accepted.");
+        TEXT.put("toobig", "The file is larger than 10 MB.");
+        TEXT.put("badname", "The document name must be 2 to 150 characters.");
+        TEXT.put("badcat", "The category or period is not valid.");
+        TEXT.put("missing", "Document not found, or its status does not allow this action.");
     }
 
     private final TaxDocumentDAO dao = new TaxDocumentDAO();
