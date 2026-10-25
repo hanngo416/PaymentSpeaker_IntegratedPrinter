@@ -4,7 +4,7 @@
 <c:set var="nav" value="affiliates"/>
 <c:set var="chTab" value="reports"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
-<%@ include file="/WEB-INF/views/common/channel-tabs.jspf" %>
+<%@ include file="/WEB-INF/views/common/affiliate-tabs.jspf" %>
 <div class="card">
     <form method="get" action="${ctx}/admin/channel-reports" class="filters">
         <label>Report

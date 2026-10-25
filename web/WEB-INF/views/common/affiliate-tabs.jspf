@@ -1,13 +1,24 @@
+<c:set var="tabMgr" value="${role == 'ADMIN' || role == 'STORE_MANAGER'}"/>
 <div class="card">
     <h1>Affiliate program</h1>
+    <c:if test="${not empty chTab}">
+        <p class="hint">Platform commissions are reported by Shopee and TikTok Shop for the store's own products. They are paid outside Tinky; Tinky only records the payments.</p>
+    </c:if>
+    <c:if test="${tabMgr}">
+        <div>
+            <a class="btn ${affTab == 'overview' ? 'primary' : ''}" href="${ctx}/admin/affiliate-overview">Overview</a>
+            <a class="btn ${affTab == 'affiliates' ? 'primary' : ''}" href="${ctx}/admin/affiliates">Affiliates</a>
+            <a class="btn ${affTab == 'campaigns' ? 'primary' : ''}" href="${ctx}/admin/campaigns">Campaigns</a>
+            <a class="btn ${affTab == 'referrals' ? 'primary' : ''}" href="${ctx}/admin/referrals">Referral tracking</a>
+            <a class="btn ${affTab == 'commissions' ? 'primary' : ''}" href="${ctx}/admin/commissions">Commissions</a>
+            <a class="btn ${affTab == 'payouts' ? 'primary' : ''}" href="${ctx}/admin/payouts">Wallet &amp; payouts</a>
+        </div>
+    </c:if>
     <div>
-        <a class="btn ${affTab == 'overview' ? 'primary' : ''}" href="${ctx}/admin/affiliate-overview">Overview</a>
-        <a class="btn ${affTab == 'affiliates' ? 'primary' : ''}" href="${ctx}/admin/affiliates">Affiliates</a>
-        <a class="btn ${affTab == 'campaigns' ? 'primary' : ''}" href="${ctx}/admin/campaigns">Campaigns</a>
-        <a class="btn ${affTab == 'referrals' ? 'primary' : ''}" href="${ctx}/admin/referrals">Referral tracking</a>
-        <a class="btn ${affTab == 'commissions' ? 'primary' : ''}" href="${ctx}/admin/commissions">Commissions</a>
-        <a class="btn ${affTab == 'payouts' ? 'primary' : ''}" href="${ctx}/admin/payouts">Wallet &amp; payouts</a>
-        <a class="btn" href="${ctx}/admin/channel-commissions">Platform commissions</a>
+        <a class="btn ${chTab == 'commissions' ? 'primary' : ''}" href="${ctx}/admin/channel-commissions">Platform commissions</a>
+        <c:if test="${tabMgr}"><a class="btn ${chTab == 'import' ? 'primary' : ''}" href="${ctx}/admin/channel-commissions/import">Import CSV</a></c:if>
+        <a class="btn ${chTab == 'payouts' ? 'primary' : ''}" href="${ctx}/admin/channel-payouts">Platform payouts</a>
+        <a class="btn ${chTab == 'reports' ? 'primary' : ''}" href="${ctx}/admin/channel-reports">Platform reports</a>
     </div>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
 </div>

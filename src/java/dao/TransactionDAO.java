@@ -218,9 +218,7 @@ public class TransactionDAO {
         r.setCashierCode(rs.getString("created_by_code"));
         r.setAmount(rs.getBigDecimal("amount"));
         r.setOrderAmount(rs.getBigDecimal("order_amount"));
-        try {
-            r.setCashAmount(rs.getBigDecimal("cash_amount"));
-        } catch (SQLException ignored) { }
+        r.setCashAmount(DBUtil.optionalDecimal(rs, "cash_amount"));
         r.setVatRate(rs.getBigDecimal("vat_rate"));
         r.setStoredVat(rs.getBigDecimal("vat_amount"));
         r.setVatIncluded(rs.getBoolean("vat_included"));

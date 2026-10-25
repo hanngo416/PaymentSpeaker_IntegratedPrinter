@@ -19,6 +19,7 @@ import model.User;
 import service.AuditService;
 import util.AppConfig;
 import util.SqlErrors;
+import static util.Params.trim;
 
 @WebServlet(name = "ProductServlet", urlPatterns = {"/admin/products"})
 public class ProductServlet extends HttpServlet {
@@ -227,9 +228,5 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("q", q);
         request.setAttribute("groupFilter", groupFilter);
         request.getRequestDispatcher(VIEW).forward(request, response);
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

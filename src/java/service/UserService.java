@@ -14,6 +14,7 @@ import model.User;
 import model.UserFilter;
 import model.enums.Role;
 import model.enums.UserStatus;
+import static util.Params.trim;
 
 public class UserService {
 
@@ -256,9 +257,5 @@ public class UserService {
             return Result.LAST_ADMIN;
         }
         return Result.OK;
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

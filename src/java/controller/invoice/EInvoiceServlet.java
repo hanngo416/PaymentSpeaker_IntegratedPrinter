@@ -27,6 +27,7 @@ import model.User;
 import model.enums.OrderStatus;
 import service.AuditService;
 import service.InvoiceService;
+import static util.Params.trim;
 
 @WebServlet(name = "EInvoiceServlet", urlPatterns = {"/invoices/manage", "/invoices/new", "/invoices/export"})
 public class EInvoiceServlet extends HttpServlet {
@@ -439,9 +440,5 @@ public class EInvoiceServlet extends HttpServlet {
 
     private static String nullIfEmpty(String s) {
         return s == null || s.isEmpty() ? null : s;
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

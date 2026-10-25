@@ -12,7 +12,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light only">
     <title>Enter code</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css?v=18">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css?v=38">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/guide.css?v=38">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css?v=38">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/auth.css?v=38">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/receipt.css?v=38">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/screens.css?v=38">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/tools.css?v=38">
 </head>
 <body class="auth">
 <div class="auth-card">

@@ -5,7 +5,7 @@
 <c:set var="nav" value="affiliates"/>
 <c:set var="chTab" value="commissions"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
-<%@ include file="/WEB-INF/views/common/channel-tabs.jspf" %>
+<%@ include file="/WEB-INF/views/common/affiliate-tabs.jspf" %>
 <div class="kpis">
     <div class="card"><span class="kpi-label">Pending approval</span><div class="kpi-value"><fmt:formatNumber value="${totals.PENDING}" pattern="#,##0"/></div><p class="kpi-sub">Generated, not yet an expense</p></div>
     <div class="card"><span class="kpi-label">Approved, unpaid</span><div class="kpi-value accent"><fmt:formatNumber value="${totals.APPROVED}" pattern="#,##0"/></div><p class="kpi-sub">Owed to the partners</p></div>

@@ -23,6 +23,7 @@ import model.TaxRuleFilter;
 import model.User;
 import model.enums.Permission;
 import service.AuditService;
+import static util.Params.trim;
 
 @WebServlet(name = "TaxRuleServlet", urlPatterns = {"/admin/taxes"})
 public class TaxRuleServlet extends HttpServlet {
@@ -239,9 +240,5 @@ public class TaxRuleServlet extends HttpServlet {
         request.setAttribute("q", f.getQ());
         request.setAttribute("canManage", RolePermissions.has(user.getRole(), Permission.TAX_MANAGE));
         request.getRequestDispatcher(VIEW).forward(request, response);
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

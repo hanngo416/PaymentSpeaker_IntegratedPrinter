@@ -31,6 +31,7 @@ import model.view.DayProfit;
 import service.AuditService;
 import service.ProfitService;
 import util.SqlErrors;
+import static util.Params.trim;
 
 @WebServlet(name = "SalesServlet", urlPatterns = {"/sales"})
 public class SalesServlet extends HttpServlet {
@@ -386,9 +387,5 @@ public class SalesServlet extends HttpServlet {
             return Timestamp.valueOf(LocalDateTime.now());
         }
         return Timestamp.valueOf(d.atStartOfDay());
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

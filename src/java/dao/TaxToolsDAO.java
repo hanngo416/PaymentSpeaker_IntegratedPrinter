@@ -118,11 +118,11 @@ public class TaxToolsDAO {
     }
 
     public List<Map<String, Object>> calculations() throws SQLException {
-        return query("SELECT c.*, u.full_name AS created_name FROM TaxCalculations c JOIN Users u ON u.user_id = c.created_by ORDER BY c.created_at DESC, c.calc_id DESC");
+        return query("SELECT c.calc_id, c.calc_date, c.period_label, c.period_from, c.period_to, c.sector, c.revenue, c.adjustment, c.vat_amount, c.pit_amount, c.total_amount, c.rule_stamp, c.verified_rules, c.note, c.created_by, c.created_at, u.full_name AS created_name FROM TaxCalculations c JOIN Users u ON u.user_id = c.created_by ORDER BY c.created_at DESC, c.calc_id DESC");
     }
 
     public Map<String, Object> calculation(int id) throws SQLException {
-        List<Map<String, Object>> rows = query("SELECT * FROM TaxCalculations WHERE calc_id = ?", id);
+        List<Map<String, Object>> rows = query("SELECT calc_id, calc_date, period_label, period_from, period_to, sector, revenue, adjustment, vat_amount, pit_amount, total_amount, rule_stamp, verified_rules, note, created_by, created_at FROM TaxCalculations WHERE calc_id = ?", id);
         return rows.isEmpty() ? null : rows.get(0);
     }
 
@@ -143,7 +143,7 @@ public class TaxToolsDAO {
     }
 
     public List<Map<String, Object>> expenses(String q, String category, String doc, Date from, Date to) throws SQLException {
-        StringBuilder sql = new StringBuilder("SELECT * FROM Expenses WHERE 1 = 1 ");
+        StringBuilder sql = new StringBuilder("SELECT expense_id, spent_on, supplier, supplier_tax_code, category, amount, payment_method, invoice_no, has_document, tax_treatment, note, created_by, created_at FROM Expenses WHERE 1 = 1 ");
         List<Object> args = new ArrayList<>();
         if (q != null && !q.isEmpty()) {
             sql.append("AND (supplier LIKE ? OR invoice_no LIKE ?) ");

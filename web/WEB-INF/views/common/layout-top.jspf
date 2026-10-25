@@ -9,7 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light only">
     <title><c:out value="${pageTitle}"/></title>
-    <link rel="stylesheet" href="${ctx}/assets/css/app.css?v=37">
+    <link rel="stylesheet" href="${ctx}/assets/css/base.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/guide.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/dashboard.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/auth.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/receipt.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/screens.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/tools.css?v=38">
     <script>
         (function () {
             try {
@@ -75,8 +81,10 @@
                     </a>
                 </c:if>
 
+                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR' || not empty myAffiliate}">
+                    <div class="nav-section-title">Sales &amp; Marketing</div>
+                </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
-                    <div class="nav-section-title">Omnichannel</div>
                     <a href="${ctx}/sales" class="${nav == 'sales' ? 'active' : ''}" title="Sales book">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         <span class="nav-text">Sales Book</span>
@@ -87,9 +95,6 @@
                     </a>
                 </c:if>
 
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR' || not empty myAffiliate}">
-                    <div class="nav-section-title">Marketing</div>
-                </c:if>
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
                     <a href="${ctx}/admin/affiliate-overview" class="${nav == 'affiliates' ? 'active' : ''}" title="Affiliate program">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>

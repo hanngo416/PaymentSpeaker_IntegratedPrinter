@@ -17,6 +17,7 @@ import model.DiscountCode;
 import model.User;
 import service.AuditService;
 import util.SqlErrors;
+import static util.Params.trim;
 
 @WebServlet(name = "DiscountServlet", urlPatterns = {"/admin/discounts"})
 public class DiscountServlet extends HttpServlet {
@@ -160,9 +161,5 @@ public class DiscountServlet extends HttpServlet {
             throw new ServletException("Cannot load discount codes", e);
         }
         request.getRequestDispatcher(VIEW).forward(request, response);
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

@@ -6,7 +6,7 @@
 <c:set var="chTab" value="import"/>
 <c:set var="canWrite" value="true"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
-<%@ include file="/WEB-INF/views/common/channel-tabs.jspf" %>
+<%@ include file="/WEB-INF/views/common/affiliate-tabs.jspf" %>
 <div class="card narrow">
     <h2>Import a commission report</h2>
     <p class="hint">Steps: upload the CSV, review the preview, then confirm. The whole file is checked first: if any line has an error, nothing is imported. Records already imported are skipped.</p>

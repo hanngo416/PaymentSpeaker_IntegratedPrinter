@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.User;
 import service.AuthService;
 import service.OtpService;
+import static util.Params.trim;
 
 /**
  *
@@ -98,9 +99,5 @@ public class OtpRequestServlet extends HttpServlet {
         request.setAttribute("error", error);
         request.setAttribute("email", email);
         request.getRequestDispatcher(LOGIN_VIEW).forward(request, response);
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

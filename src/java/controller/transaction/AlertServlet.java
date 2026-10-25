@@ -20,6 +20,7 @@ import model.User;
 import model.enums.Permission;
 import model.view.AlertRow;
 import service.AuditService;
+import static util.Params.parseInt;
 
 @WebServlet(name = "AlertServlet", urlPatterns = {"/alerts"})
 public class AlertServlet extends HttpServlet {
@@ -111,13 +112,5 @@ public class AlertServlet extends HttpServlet {
             }
         }
         response.sendRedirect(request.getContextPath() + "/alerts?msg=" + msg);
-    }
-
-    private static Integer parseInt(String s) {
-        try {
-            return s == null || s.trim().isEmpty() ? null : Integer.valueOf(s.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 }

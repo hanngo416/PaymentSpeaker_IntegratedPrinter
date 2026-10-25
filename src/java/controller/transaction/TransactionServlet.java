@@ -19,6 +19,8 @@ import model.enums.TxLabel;
 import model.view.DayTotal;
 import model.view.TxRow;
 import util.TxChart;
+import static util.Params.parseDate;
+import static util.Params.parseInt;
 
 @WebServlet(name = "TransactionServlet", urlPatterns = {"/transactions"})
 public class TransactionServlet extends HttpServlet {
@@ -120,21 +122,5 @@ public class TransactionServlet extends HttpServlet {
             }
         }
         return null;
-    }
-
-    private static Date parseDate(String s) {
-        try {
-            return s == null || s.trim().isEmpty() ? null : Date.valueOf(s.trim());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    private static Integer parseInt(String s) {
-        try {
-            return s == null || s.trim().isEmpty() ? null : Integer.valueOf(s.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 }

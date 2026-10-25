@@ -144,9 +144,7 @@ public class OrderDAO {
         o.setCreatedByCode(rs.getString("created_by_code"));
         BigDecimal amount = rs.getBigDecimal("amount");
         o.setAmount(amount);
-        try {
-            o.setCashAmount(rs.getBigDecimal("cash_amount"));
-        } catch (SQLException ignored) { }
+        o.setCashAmount(DBUtil.optionalDecimal(rs, "cash_amount"));
         o.setDiscountCode(rs.getString("discount_code"));
         o.setDiscountAmount(rs.getBigDecimal("discount_amount"));
         o.setVatRate(rs.getBigDecimal("vat_rate"));

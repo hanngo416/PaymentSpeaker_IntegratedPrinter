@@ -19,6 +19,7 @@ import model.Page;
 import model.User;
 import service.AuditService;
 import util.SqlErrors;
+import static util.Params.trim;
 
 @WebServlet(name = "CategoryServlet", urlPatterns = {"/admin/categories", "/admin/groups"})
 public class CategoryServlet extends HttpServlet {
@@ -213,9 +214,5 @@ public class CategoryServlet extends HttpServlet {
         int removed = catalogDAO.forceDeleteGroup(id);
         AuditService.log(actor, "GROUP_FORCE_DELETE", "GROUP", group.getGroupName(), "products", String.valueOf(removed));
         return "groupForced";
-    }
-
-    private static String trim(String s) {
-        return s == null ? "" : s.trim();
     }
 }

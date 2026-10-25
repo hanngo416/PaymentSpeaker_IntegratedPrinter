@@ -4,6 +4,7 @@
  */
 package util;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -36,4 +37,12 @@ public class DBUtil {
     public static void close(Statement st, Connection cn) {
         close(null, st, cn);
     }  
+
+    public static BigDecimal optionalDecimal(ResultSet rs, String column) {
+        try {
+            return rs.getBigDecimal(column);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
 }

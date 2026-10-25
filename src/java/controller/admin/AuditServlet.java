@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import static util.Params.parseDate;
 
 @WebServlet(name = "AuditServlet", urlPatterns = {"/admin/audit"})
 public class AuditServlet extends HttpServlet {
@@ -66,13 +67,5 @@ public class AuditServlet extends HttpServlet {
         }
         String t = s.trim();
         return t.isEmpty() ? null : (t.length() > 100 ? t.substring(0, 100) : t);
-    }
-
-    private static java.sql.Date parseDate(String s) {
-        try {
-            return s == null ? null : java.sql.Date.valueOf(s);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
     }
 }

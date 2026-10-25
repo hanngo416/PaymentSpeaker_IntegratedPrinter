@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.User;
 import model.enums.Role;
 import service.UserService;
+import static util.Params.parseInt;
 
 @WebServlet(name = "UserEditServlet", urlPatterns = {"/admin/users/edit"})
 public class UserEditServlet extends HttpServlet {
@@ -128,14 +129,6 @@ public class UserEditServlet extends HttpServlet {
         try {
             return s == null || s.isEmpty() ? null : Role.valueOf(s);
         } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    private static Integer parseInt(String s) {
-        try {
-            return s == null || s.trim().isEmpty() ? null : Integer.valueOf(s.trim());
-        } catch (NumberFormatException e) {
             return null;
         }
     }

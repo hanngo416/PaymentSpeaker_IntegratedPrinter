@@ -22,6 +22,7 @@ import model.enums.Role;
 import model.enums.UserStatus;
 import filter.RolePermissions;
 import service.UserService;
+import static util.Params.parseInt;
 
 @WebServlet(name = "UserListServlet", urlPatterns = {"/admin/users"})
 public class UserListServlet extends HttpServlet {
@@ -123,14 +124,6 @@ public class UserListServlet extends HttpServlet {
 
     private static String oneOf(String value, String[] allowed) {
         return value != null && Arrays.asList(allowed).contains(value) ? value : null;
-    }
-
-    private static Integer parseInt(String s) {
-        try {
-            return s == null || s.trim().isEmpty() ? null : Integer.valueOf(s.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     private static String trim(String s) {

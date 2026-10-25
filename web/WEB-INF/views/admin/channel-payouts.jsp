@@ -5,7 +5,7 @@
 <c:set var="nav" value="affiliates"/>
 <c:set var="chTab" value="payouts"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
-<%@ include file="/WEB-INF/views/common/channel-tabs.jspf" %>
+<%@ include file="/WEB-INF/views/common/affiliate-tabs.jspf" %>
 
 <c:if test="${not empty detail}">
     <div class="card">
