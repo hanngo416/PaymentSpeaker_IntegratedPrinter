@@ -53,8 +53,6 @@ public class TransactionIngestService {
         if (transactionDAO.existsByBankTransId(bankTransId)) {
             return Outcome.DUPLICATE;
         }
-        orderDAO.expireOverdue();
-
         Transaction t = new Transaction();
         t.setBankTransId(bankTransId);
         t.setAmount(parseAmount(payload.get("transferAmount")));
@@ -84,6 +82,7 @@ public class TransactionIngestService {
                     "amount", t.getAmount().toPlainString(), "label", recorded.getLabel().name(),
                     "status", recorded.isLegit() ? "COMPLETED" : "CANCELLED",
                     "order", order == null ? "" : order.getOrderCode());
+            orderDAO.expireOverdue();
             return Outcome.CREATED;
         } catch (SQLException e) {
             if (SqlErrors.isDuplicateKey(e)) {
