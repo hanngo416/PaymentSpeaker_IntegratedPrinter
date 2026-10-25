@@ -6,10 +6,25 @@
 <c:set var="taxTab" value="profile"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <%@ include file="/WEB-INF/views/common/tax-tabs.jspf" %>
-<div class="card">
-    <h1>Business profile</h1>
-    <p class="hint">Answer what you know. "I do not know" is fine.</p>
-    <p>Profile completeness: <b>${completion}%</b></p>
+<div class="card" style="margin-bottom: 14px;">
+    <h1>Business profile &amp; tax</h1>
+    <p class="hint">Answer simple questions about your business. Select "I do not know" if unsure.</p>
+    <div style="margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="hint">Profile completeness</span>
+            <b>${completion}%</b>
+        </div>
+        <div class="hb single">
+            <span class="bar"><i style="width: ${completion}%;"></i></span>
+        </div>
+    </div>
+</div>
+
+<div class="steps">
+    <div class="on"><b>Step 1</b>Premises &amp; Type</div>
+    <div class="${completion >= 30 ? 'done' : ''}"><b>Step 2</b>Operations &amp; Sales</div>
+    <div class="${completion >= 60 ? 'done' : ''}"><b>Step 3</b>Tax Registration</div>
+    <div class="${completion >= 90 ? 'done' : ''}"><b>Step 4</b>Review &amp; Save</div>
 </div>
 
 <c:if test="${canManage}">

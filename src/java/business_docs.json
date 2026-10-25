@@ -327,7 +327,7 @@
           "Đã thống nhất tỷ lệ sở hữu nếu có người thân cùng đứng tên hộ kinh doanh",
           "Xác định được mức chi phí kế toán hàng tháng tương ứng với từng mô hình"
         ],
-        "costs": "Đăng ký Hộ kinh doanh: 50.000 - 100.000 VNĐ; Thành lập Công ty TNHH: 1.500.000 - 3.000.000 VNĐ (kèm chữ ký số, con dấu, lệ phí môn bài).",
+        "costs": "Đăng ký Hộ kinh doanh: lệ phí theo địa phương (khoảng 50.000 - 100.000 VNĐ); Thành lập Công ty TNHH: khoảng 1.500.000 - 3.000.000 VNĐ (kèm chữ ký số, con dấu).",
         "common_mistakes": [
           "Vừa mở quán nhỏ đã thành lập công ty TNHH, dẫn đến việc hàng tháng phải tốn tiền thuê dịch vụ kế toán nộp báo cáo thuế định kỳ dù chưa có doanh thu.",
           "Bán hàng quy mô lớn nhưng vẫn để tư cách cá nhân không đăng ký, bị phạt trốn đăng ký kinh doanh."
@@ -351,7 +351,8 @@
         "label": "Kiểm tra điều kiện mô hình kinh doanh của bạn",
         "url": "/tax/profile",
         "required_permission": "TAX_READ"
-      }
+      },
+      "verify_note": "Từ 2026 hộ kinh doanh không còn phải nộp lệ phí môn bài (Nghị quyết 198/2025/QH15); mức phí đăng ký và nghĩa vụ của công ty cần xác nhận với cơ quan có thẩm quyền."
     },
     {
       "id": "register-hkd-2026",
@@ -414,7 +415,8 @@
         "label": "Lưu mã số thuế và hồ sơ vào hệ thống Tinky",
         "url": "/tax/profile",
         "required_permission": "TAX_READ"
-      }
+      },
+      "verify_note": "Lệ phí đăng ký theo quy định địa phương. Giấy tờ bắt buộc cụ thể (bản sao công chứng, hợp đồng thuê mặt bằng) cần đối chiếu với cơ quan đăng ký kinh doanh cấp xã; theo Nghị định 168/2025/NĐ-CP, văn bản ủy quyền của các thành viên mới bắt buộc công chứng hoặc chứng thực."
     },
     {
       "id": "permits-attp-pccc",
@@ -435,7 +437,7 @@
       ],
       "summary": "Quy chuẩn cơ sở đạt điều kiện vệ sinh ATTP, hồ sơ quản lý PCCC cơ sở mẫu PC01 và trang bị phương tiện chữa cháy cho quán cafe, trà sữa, nhà hàng ăn uống.",
       "content": {
-        "overview": "Kinh doanh dịch vụ ăn uống (F&B) thuộc nhóm ngành có điều kiện, bắt buộc phải có Giấy chứng nhận cơ sở đủ điều kiện ATTP và đáp ứng tiêu chuẩn PCCC cơ sở.",
+        "overview": "Kinh doanh dịch vụ ăn uống (F&B) thuộc nhóm phải có Giấy chứng nhận cơ sở đủ điều kiện an toàn thực phẩm, trừ các trường hợp được miễn cấp giấy theo Điều 12 Nghị định 15/2018/NĐ-CP (như kinh doanh thực phẩm nhỏ lẻ, thức ăn đường phố), khi đó vẫn phải tuân thủ yêu cầu an toàn thực phẩm. Về phòng cháy chữa cháy, cơ sở thuộc Phụ lục I Nghị định 105/2025/NĐ-CP cần phiếu thông tin cơ sở (mẫu PC01), nội quy PCCC, phương tiện chữa cháy tại chỗ và người phụ trách; pháp luật không quy định cấp chứng nhận PCCC riêng cho loại cơ sở này.",
         "why_it_matters": "Kinh doanh không có chứng nhận ATTP có thể bị phạt từ 20.000.000 đến 30.000.000 VNĐ. Vi phạm PCCC có thể bị đình chỉ hoạt động kinh doanh ngay lập tức.",
         "when_to_do": "Làm hồ sơ sau khi đã hoàn thiện thi công quầy bar/bếp và trước khi mở cửa đón khách chính thức.",
         "steps": [
@@ -479,7 +481,8 @@
         "label": "Quản lý danh sách thiết bị và trạng thái vận hành",
         "url": "/admin/devices",
         "required_permission": "DEVICE_MANAGE"
-      }
+      },
+      "verify_note": "Quán nhỏ có thuộc diện miễn giấy ATTP hoặc thuộc Phụ lục I PCCC hay không phụ thuộc quy mô và quy định địa phương; các mức phí và số bình chữa cháy trong bài chỉ là ví dụ. Hãy hỏi UBND phường/xã, Trạm y tế hoặc Công an phường/xã nơi đặt quán."
     },
     {
       "id": "tax-threshold-1bn",
@@ -504,21 +507,21 @@
       ],
       "summary": "Căn cứ Nghị định 141/2026/NĐ-CP, ngưỡng doanh thu miễn thuế cho hộ kinh doanh được nâng lên 1 tỷ đồng/năm. Hướng dẫn tính thuế GTGT và TNCN khi vượt ngưỡng.",
       "content": {
-        "overview": "Từ năm 2026, hộ kinh doanh có doanh thu dưới 1.000.000.000 VNĐ/năm được miễn hoàn toàn thuế GTGT và thuế TNCN. Doanh thu trên 1 tỷ đồng bắt buộc nộp thuế theo tỷ lệ % và áp dụng hóa đơn điện tử.",
+        "overview": "Từ năm 2026 (Nghị định 141/2026/NĐ-CP), hộ kinh doanh có doanh thu cả năm từ 1.000.000.000 VNĐ trở xuống không chịu thuế GTGT và không nộp thuế TNCN nhưng vẫn phải thông báo doanh thu. Khi doanh thu năm vượt 1 tỷ đồng thì phải kê khai và nộp thuế từ quý phát sinh doanh thu vượt ngưỡng và dùng hóa đơn điện tử.",
         "why_it_matters": "Không theo dõi doanh thu cộng dồn dẫn đến việc bị ấn định thuế hồi tố và bị phạt chậm nộp khi doanh thu thực tế vượt ngưỡng mà không chuyển đổi phương pháp kê khai.",
         "when_to_do": "Theo dõi lũy kế doanh thu hàng ngày trên hệ thống POS. Khi đạt 70% (700 triệu), 90% (900 triệu) phải chuẩn bị thủ tục kê khai thuế.",
         "steps": [
-          "Bước 1: Xác định mã ngành kinh doanh chính (GOODS: hàng hóa 1.5%; FOOD_BEVERAGE: ăn uống 3.0%).",
-          "Bước 2: Cài đặt tỷ lệ thuế tương ứng trong phân hệ Quản lý thuế của Tinky.",
+          "Bước 1: Xác định ngành kinh doanh chính theo 4 nhóm trong Tinky: GOODS (bán hàng: VAT 1% + TNCN 0,5%), SERVICE (dịch vụ: 5% + 2%), PRODUCTION (quán cà phê, ăn uống, sản xuất: 3% + 1,5%), OTHER (khác: 2% + 1%). Các tỷ lệ này đang ở trạng thái chưa xác minh.",
+          "Bước 2: ADMIN chọn ngành trong trang Quy tắc thuế (Tax rules) của Tinky.",
           "Bước 3: Theo dõi doanh thu bán tại quán cộng dồn với đơn sàn Shopee/TikTok Shop.",
-          "Bước 4: Khi vượt ngưỡng 1 tỷ, liên hệ nhà mạng kích hoạt hóa đơn điện tử máy tính tiền."
+          "Bước 4: Khi doanh thu đạt 1 tỷ, đăng ký hóa đơn điện tử trong 30 ngày (hóa đơn có mã của cơ quan thuế, hoặc hóa đơn từ máy tính tiền có kết nối truyền dữ liệu)."
         ],
         "checklist": [
           "Đã có mã số thuế hộ kinh doanh chính chủ",
           "Đã thông báo tài khoản ngân hàng kinh doanh bằng mẫu 01/BK-STK",
           "Đã mở Sổ doanh thu Mẫu S1a-HKD hoặc S2a-HKD theo Thông tư 152/2025/TT-BTC"
         ],
-        "costs": "Dưới 1 tỷ/năm: 0 VNĐ thuế; Từ 1 tỷ trở lên: 1.5% - 3.0% doanh thu + chi phí hóa đơn điện tử ~1.200.000 VNĐ/năm.",
+        "costs": "Dưới 1 tỷ/năm: 0 VNĐ thuế (vẫn phải thông báo doanh thu); từ 1 tỷ trở lên: VAT và TNCN theo tỷ lệ ngành (ví dụ bán hàng 1% + 0,5%; ăn uống, sản xuất 3% + 1,5%) cộng chi phí hóa đơn điện tử (tùy nhà cung cấp, cần hỏi báo giá).",
         "common_mistakes": [
           "Tưởng rằng tiền gửi về tài khoản ngân hàng cá nhân thì cơ quan thuế không biết.",
           "Lấy số tiền rút về ví sàn (đã trừ phí) để tính thuế thay vì lấy tổng doanh thu sau voucher của shop."
@@ -547,7 +550,8 @@
         "label": "Xem thanh tiến độ doanh thu của bạn",
         "url": "/tax",
         "required_permission": "TAX_READ"
-      }
+      },
+      "verify_note": "Luật Thuế TNCN 109/2025/QH15 nêu mức 500 triệu đồng, còn Nghị định 141/2026/NĐ-CP nâng ngưỡng lên 1 tỷ đồng; các tỷ lệ theo ngành trong Tinky chưa được xác minh. Hãy xác nhận cách áp dụng với cơ quan thuế."
     },
     {
       "id": "bank-account-01bkstk",
@@ -573,7 +577,7 @@
       "content": {
         "overview": "Hộ kinh doanh bắt buộc phải thông báo toàn bộ số tài khoản mở tại ngân hàng và số hiệu ví điện tử có liên quan đến hoạt động sản xuất kinh doanh cho cơ quan thuế.",
         "why_it_matters": "Cơ quan thuế có cơ chế đối soát dữ liệu với Ngân hàng Nhà nước. Nếu phát hiện tài khoản nhận tiền bán hàng nhưng không khai báo, chủ hộ sẽ bị phạt vi phạm về đăng ký thuế và truy thu doanh thu ẩn.",
-        "when_to_do": "Nộp Mẫu 01/BK-STK kèm theo tờ khai thuế đầu tiên khi bắt đầu kinh doanh, hoặc trong vòng 10 ngày khi mở thêm tài khoản mới.",
+        "when_to_do": "Hộ đang hoạt động nộp Mẫu 01/BK-STK kèm tờ khai thuế đầu tiên của năm 2026; hộ mới ra kinh doanh nộp kèm thông báo doanh thu hoặc tờ khai đầu tiên. Khi đổi hoặc mở thêm tài khoản, ví thì thông báo lại.",
         "steps": [
           "Bước 1: Mở một tài khoản ngân hàng riêng chuyên dùng nhận tiền bán lẻ và tiền quyết toán sàn.",
           "Bước 2: Điền thông tin vào Mẫu 01/BK-STK (Tên ngân hàng, số tài khoản, tên chủ tài khoản, ngày mở).",
@@ -609,7 +613,8 @@
         "label": "Cấu hình tài khoản VietQR nhận tiền trên Tinky",
         "url": "/settings",
         "required_permission": "SETTING_MANAGE"
-      }
+      },
+      "verify_note": "Thời hạn nộp có thể khác theo nhóm hộ (có nhóm được quy định hạn riêng). Hãy xác nhận với cơ quan thuế."
     },
     {
       "id": "bookkeeping-tt152",
@@ -672,7 +677,8 @@
         "label": "Xem báo cáo ca để trích xuất số liệu ghi sổ",
         "url": "/reports/shifts",
         "required_permission": "REPORT_VIEW"
-      }
+      },
+      "verify_note": "Mẫu sổ cho hộ tính TNCN theo thu nhập tính thuế (sổ chi tiết doanh thu, chi phí, hàng hóa, tiền) chưa được đối chiếu từ văn bản gốc. Hãy xem phụ lục Thông tư 152/2025/TT-BTC."
     },
     {
       "id": "pos-hardware-setup",
