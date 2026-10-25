@@ -230,4 +230,19 @@ public class TaxToolsDAO {
         Object v = rows.get(0).values().iterator().next();
         return v == null ? 0 : ((Number) v).intValue();
     }
+
+    public List<Map<String, Object>> storeMonthly(Date from, Date to) throws SQLException {
+        return query("SELECT CONVERT(char(7), created_at, 120) AS ym, "
+                + "SUM(CASE WHEN status = N'COMPLETED' THEN " + SummaryDAO.STORE_REVENUE_EXPR + " ELSE 0 END) AS net, "
+                + "SUM(CASE WHEN status = N'COMPLETED' THEN discount_amount ELSE 0 END) AS discounts, "
+                + "SUM(CASE WHEN status = N'CANCELLED' THEN amount ELSE 0 END) AS cancelled "
+                + "FROM Orders WHERE CAST(created_at AS DATE) BETWEEN ? AND ? GROUP BY CONVERT(char(7), created_at, 120)", from, to);
+    }
+
+    public List<Map<String, Object>> channelMonthly(Date from, Date to) throws SQLException {
+        return query("SELECT CONVERT(char(7), sold_at, 120) AS ym, channel, "
+                + "SUM(CASE WHEN status = N'COMPLETED' THEN goods_amount ELSE 0 END) AS net, "
+                + "SUM(CASE WHEN status IN (N'RETURNED', N'CANCELLED') THEN goods_amount ELSE 0 END) AS removed "
+                + "FROM ChannelSales WHERE CAST(sold_at AS DATE) BETWEEN ? AND ? GROUP BY CONVERT(char(7), sold_at, 120), channel", from, to);
+    }
 }

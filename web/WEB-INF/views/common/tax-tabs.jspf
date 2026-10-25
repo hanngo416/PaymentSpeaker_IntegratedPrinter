@@ -1,13 +1,1 @@
-<div class="card">
-    <div>
-        <a class="btn ${taxTab == 'estimate' ? 'primary' : ''}" href="${ctx}/tax">Estimate</a>
-        <a class="btn ${taxTab == 'profile' ? 'primary' : ''}" href="${ctx}/tax/profile">Profile and eligibility</a>
-        <a class="btn ${taxTab == 'obligations' ? 'primary' : ''}" href="${ctx}/tax/obligations">Obligations</a>
-        <a class="btn ${taxTab == 'calculator' ? 'primary' : ''}" href="${ctx}/tax/calculator">Calculator</a>
-        <a class="btn ${taxTab == 'payments' ? 'primary' : ''}" href="${ctx}/tax/payments">Payments</a>
-        <a class="btn ${taxTab == 'expenses' ? 'primary' : ''}" href="${ctx}/tax/expenses">Expenses</a>
-        <a class="btn ${taxTab == 'reconciliation' ? 'primary' : ''}" href="${ctx}/tax/reconciliation">Reconciliation</a>
-        <a class="btn ${taxTab == 'notifications' ? 'primary' : ''}" href="${ctx}/tax/notifications">Notifications</a>
-    </div>
-    <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
-</div>
+<c:if test="${not empty message}"><div class="card"><div class="msg"><c:out value="${message}"/></div></div></c:if>

@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pageTitle" value="Invoice"/>
 <c:set var="nav" value="einvoices"/>
+<c:set var="taxTab" value="invoices"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <div class="card narrow">
     <h1><c:out value="${mode == 'edit' ? 'Edit draft invoice' : 'New draft invoice'}"/></h1>

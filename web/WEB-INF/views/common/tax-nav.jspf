@@ -1,0 +1,65 @@
+                <div class="nav-section-title">Quản lý thuế</div>
+                <a href="${ctx}/home" title="Menu chính">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    <span class="nav-text">Menu chính</span>
+                </a>
+                <a href="${ctx}/tax" class="${taxTab == 'estimate' ? 'active' : ''}" title="Tổng quan thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span class="nav-text">Tổng quan thuế</span>
+                </a>
+                <a href="${ctx}/tax/profile" class="${taxTab == 'profile' ? 'active' : ''}" title="Hồ sơ kinh doanh & thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="nav-text">Hồ sơ kinh doanh & thuế</span>
+                </a>
+                <a href="${ctx}/tax/checker" class="${taxTab == 'checker' ? 'active' : ''}" title="Kiểm tra nghĩa vụ">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span class="nav-text">Kiểm tra nghĩa vụ</span>
+                </a>
+                <a href="${ctx}/tax/obligations" class="${taxTab == 'obligations' ? 'active' : ''}" title="Nghĩa vụ thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+                    <span class="nav-text">Nghĩa vụ thuế</span>
+                </a>
+                <a href="${ctx}/tax/calculator" class="${taxTab == 'calculator' ? 'active' : ''}" title="Máy tính thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="15"/></svg>
+                    <span class="nav-text">Máy tính thuế</span>
+                </a>
+                <a href="${ctx}/tax/reports" class="${taxTab == 'reports' ? 'active' : ''}" title="Doanh thu & báo cáo">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="nav-text">Doanh thu & báo cáo</span>
+                </a>
+                <a href="${ctx}/tax/reconciliation" class="${taxTab == 'reconciliation' ? 'active' : ''}" title="Đối soát">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <span class="nav-text">Đối soát</span>
+                </a>
+                <a href="${ctx}/invoices/manage" class="${taxTab == 'invoices' ? 'active' : ''}" title="Hóa đơn điện tử">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span class="nav-text">Hóa đơn điện tử</span>
+                </a>
+                <a href="${ctx}/tax/expenses" class="${taxTab == 'expenses' ? 'active' : ''}" title="Chi phí & mua hàng">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span class="nav-text">Chi phí & mua hàng</span>
+                </a>
+                <a href="${ctx}/tax/payments" class="${taxTab == 'payments' ? 'active' : ''}" title="Nộp thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span class="nav-text">Nộp thuế</span>
+                </a>
+                <a href="${ctx}/tax/calendar" class="${taxTab == 'calendar' ? 'active' : ''}" title="Lịch thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span class="nav-text">Lịch thuế</span>
+                </a>
+                <a href="${ctx}/tax/documents" class="${taxTab == 'documents' ? 'active' : ''}" title="Hồ sơ & chứng từ">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <span class="nav-text">Hồ sơ & chứng từ</span>
+                </a>
+                <a href="${ctx}/tax/notifications" class="${taxTab == 'notifications' ? 'active' : ''}" title="Thông báo">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <span class="nav-text">Thông báo</span>
+                </a>
+                <a href="${ctx}/admin/taxes" class="${taxTab == 'rules' ? 'active' : ''}" title="Quy tắc thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+                    <span class="nav-text">Quy tắc thuế</span>
+                </a>
+                <a href="${ctx}/tax/assistant" class="${taxTab == 'assistant' ? 'active' : ''}" title="Trợ lý AI thuế">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    <span class="nav-text">Trợ lý AI thuế</span>
+                </a>

@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pageTitle" value="E-invoices"/>
 <c:set var="nav" value="einvoices"/>
+<c:set var="taxTab" value="invoices"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <c:set var="base" value="${ctx}/invoices/manage?status=${status}"/>
 <div class="card">

@@ -587,6 +587,17 @@ BEGIN
 END
 GO
 
+IF NOT EXISTS (SELECT 1 FROM TaxDocuments)
+BEGIN
+    INSERT INTO TaxDocuments (doc_name, category, period_label, status)
+    VALUES
+    (N'Business registration certificate', N'REGISTRATION', NULL, N'MISSING'),
+    (N'Tax code certificate', N'TAX_CODE', NULL, N'MISSING'),
+    (N'Latest bank statement', N'BANK', NULL, N'MISSING'),
+    (N'Premises rental contract', N'OTHER', NULL, N'MISSING');
+END
+GO
+
 IF NOT EXISTS (SELECT 1 FROM ChannelCommissions)
 BEGIN
     DECLARE @mgr INT = (SELECT user_id FROM Users WHERE user_code = N'mai_manager');

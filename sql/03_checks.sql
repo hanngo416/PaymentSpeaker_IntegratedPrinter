@@ -33,6 +33,7 @@ UNION ALL SELECT 'TaxCalculations', COUNT(*), 0 FROM TaxCalculations
 UNION ALL SELECT 'TaxAssessments', COUNT(*), 0 FROM TaxAssessments
 UNION ALL SELECT 'Expenses', COUNT(*), 8 FROM Expenses
 UNION ALL SELECT 'TaxReconNotes', COUNT(*), 0 FROM TaxReconNotes
+UNION ALL SELECT 'TaxDocuments', COUNT(*), 4 FROM TaxDocuments
 UNION ALL SELECT 'ChannelSales', COUNT(*), 56 FROM ChannelSales
 UNION ALL SELECT 'ChannelCommissions', COUNT(*), 6 FROM ChannelCommissions
 UNION ALL SELECT 'ChannelPayouts', COUNT(*), 1 FROM ChannelPayouts

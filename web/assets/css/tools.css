@@ -466,3 +466,24 @@
 .alert-line { border-left: 4px solid var(--bad); background: var(--bad-bg); padding: 8px 12px; border-radius: 6px; margin: 6px 0; font-size: var(--fs-sm); }
 .kv { width: 100%; }
 .kv td:first-child { color: var(--gray); width: 40%; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+ul.plain { margin: 8px 0 16px; padding-left: 18px; }
+ul.plain li { margin-bottom: 4px; font-size: var(--fs-md); color: var(--gray); }
+progress.bar { width: 100%; min-width: 90px; height: 10px; appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; overflow: hidden; background: var(--surface-soft); }
+progress.bar::-webkit-progress-bar { background: var(--surface-soft); border-radius: 999px; }
+progress.bar::-webkit-progress-value { background: var(--primary-2); border-radius: 999px; }
+progress.bar::-moz-progress-bar { background: var(--primary-2); border-radius: 999px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.cal-head h2 { margin: 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal-dow { text-align: center; font-size: var(--fs-xs); font-weight: 700; color: var(--muted); padding: 4px 0; }
+.cal-day { min-height: 84px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; }
+.cal-day.empty { border: 0; background: transparent; }
+.cal-day.today { background: #fff0f7; border-color: var(--primary-2); }
+.cal-num { display: block; font-size: var(--fs-xs); color: var(--muted); margin-bottom: 3px; }
+.cal-day .pill { display: block; margin-top: 3px; white-space: normal; text-align: left; text-decoration: none; }
+@media (max-width: 860px) {
+    .cal-day { min-height: 56px; }
+    .cal-day .pill { font-size: 10px; padding: 1px 4px; }
+}

@@ -17,28 +17,42 @@
     </c:if>
 </c:forEach>
 
-<div class="pos-omnichannel-bar" style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
-    <div class="card" style="flex: 1; min-width: 180px; padding: 10px 14px; margin: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary, #0ea5e9);">
-        <div>
-            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted, #64748b); font-weight: 600;">POS Store Today</div>
-            <div style="font-size: 15px; font-weight: 700; color: var(--text, #0f172a);"><fmt:formatNumber value="${storeTodayTotal}" pattern="#,##0"/> ₫</div>
+<div class="pos-omnichannel-bar">
+    <div class="pos-omni-card store">
+        <div class="pos-omni-meta">
+            <span class="pos-omni-title">POS Store Today</span>
+            <span class="pos-omni-val"><fmt:formatNumber value="${storeTodayTotal}" pattern="#,##0"/> ₫</span>
         </div>
-        <span style="font-size: 18px;" title="Store POS Counter">🏪</span>
+        <div class="pos-omni-icon store" title="Store POS Counter">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </div>
     </div>
     <c:forEach var="ch" items="${channelToday}">
-        <div class="card" style="flex: 1; min-width: 220px; padding: 10px 14px; margin: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid ${ch.channel == 'SHOPEE' ? '#ee4d2d' : (ch.channel == 'TIKTOK' ? '#0f172a' : '#10b981')};">
-            <div>
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted, #64748b); font-weight: 600;">
+        <div class="pos-omni-card ${ch.channel == 'SHOPEE' ? 'shopee' : (ch.channel == 'TIKTOK' ? 'tiktok' : 'other')}">
+            <div class="pos-omni-meta">
+                <span class="pos-omni-title">
                     ${ch.channel == 'SHOPEE' ? 'Shopee' : (ch.channel == 'TIKTOK' ? 'TikTok Shop' : ch.channel)} Today
-                </div>
-                <div style="font-size: 15px; font-weight: 700; color: var(--text, #0f172a);">
+                </span>
+                <span class="pos-omni-val">
                     <fmt:formatNumber value="${ch.totalRevenue}" pattern="#,##0"/> ₫
-                </div>
-                <div style="font-size: 11px; color: var(--text-muted, #64748b);">
+                </span>
+                <span class="pos-omni-sub">
                     ${ch.orderCount} order(s) &bull; Net: <fmt:formatNumber value="${ch.netRevenue}" pattern="#,##0"/> ₫
-                </div>
+                </span>
             </div>
-            <span style="font-size: 18px;" title="${ch.channel}">${ch.channel == 'SHOPEE' ? '🛒' : (ch.channel == 'TIKTOK' ? '🎵' : '📦')}</span>
+            <div class="pos-omni-icon ${ch.channel == 'SHOPEE' ? 'shopee' : (ch.channel == 'TIKTOK' ? 'tiktok' : 'other')}" title="${ch.channel}">
+                <c:choose>
+                    <c:when test="${ch.channel == 'SHOPEE'}">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    </c:when>
+                    <c:when test="${ch.channel == 'TIKTOK'}">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    </c:when>
+                    <c:otherwise>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    </c:otherwise>
+                </c:choose>
+            </div>
         </div>
     </c:forEach>
 </div>
@@ -55,23 +69,39 @@
                 <button type="button" id="posSearchClear" class="pos-search-clear" style="display: none;">&times;</button>
             </div>
             <button type="button" class="btn-custom-sale" id="btnCustomSale" title="Switch to custom amount sale">
-                ⚡ Quick Custom Sale
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Quick Custom Sale</span>
             </button>
         </div>
 
         <div class="pos-cat-tabs" id="posCatTabs">
             <button type="button" class="pos-cat-tab active" data-cat="all">
-                <span class="cat-icon">🏪</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
                 <span>All Items</span>
             </button>
             <c:forEach var="c" items="${categories}">
                 <button type="button" class="pos-cat-tab" data-cat="${c.categoryId}">
                     <c:choose>
-                        <c:when test="${c.categoryName == 'Beverages'}"><span class="cat-icon">🥤</span></c:when>
-                        <c:when test="${c.categoryName == 'Snacks'}"><span class="cat-icon">🍿</span></c:when>
-                        <c:when test="${c.categoryName == 'Bakery'}"><span class="cat-icon">🥐</span></c:when>
-                        <c:when test="${c.categoryName == 'Ready to Eat'}"><span class="cat-icon">🍜</span></c:when>
-                        <c:otherwise><span class="cat-icon">📦</span></c:otherwise>
+                        <c:when test="${c.categoryName == 'Beverages'}">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                        </c:when>
+                        <c:when test="${c.categoryName == 'Snacks'}">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                        </c:when>
+                        <c:when test="${c.categoryName == 'Bakery'}">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0-1.8 1"></path><path d="M8.5 13a4 4 0 0 0 7 0"></path></svg>
+                        </c:when>
+                        <c:when test="${c.categoryName == 'Ready to Eat'}">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3z"></path></svg>
+                        </c:when>
+                        <c:otherwise>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </c:otherwise>
                     </c:choose>
                     <span><c:out value="${c.categoryName}"/></span>
                 </button>
@@ -104,6 +134,14 @@
                         <span class="pos-prod-grp"><c:out value="${p.groupName}"/></span>
                     </div>
                     <div class="pos-prod-name"><c:out value="${p.productName}"/></div>
+                    <c:choose>
+                        <c:when test="${p.stockQuantity > 0}">
+                            <div class="pos-prod-stock in-stock">&bull; Stock: <c:out value="${p.stockQuantity}"/></div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="pos-prod-stock out-of-stock">&bull; Out of stock</div>
+                        </c:otherwise>
+                    </c:choose>
                     <div class="pos-prod-bottom">
                         <span class="pos-prod-price"><fmt:formatNumber value="${p.price}" pattern="#,##0"/> ₫</span>
                         <span class="pos-prod-add-btn" aria-hidden="true">
@@ -150,13 +188,18 @@
 
                 <div class="pos-cart-section">
                     <div class="pos-cart-header">
-                        <span class="pos-cart-title">Selected Items</span>
+                        <span class="pos-cart-title">Order Items</span>
                         <button type="button" class="pos-cart-clear-btn" id="btnClearCart" style="display: none;">Clear all</button>
                     </div>
                     <div class="pos-cart-list" id="posCartList"></div>
                     <div class="pos-cart-empty-state" id="posCartEmpty">
+                        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="pos-cart-empty-icon">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
                         <p class="pos-cart-empty-title">Cart is empty</p>
-                        <p class="pos-cart-empty-desc">Click items from the catalog on the left to add, or type a custom amount below.</p>
+                        <p class="pos-cart-empty-desc">Click items from catalog on the left to add, or enter a custom amount.</p>
                     </div>
                 </div>
 
@@ -178,29 +221,43 @@
                     <button type="button" class="preset-chip" data-amount="500000">500k</button>
                 </div>
 
-                <div class="pos-compact-label-row">
-                    <label for="pickedCode" class="pos-compact-label">Discount (Code or VND amount)</label>
-                </div>
-                <div class="pos-discount-row">
-                    <select id="pickedCode" name="pickedCode">
-                        <option value="">No discount</option>
-                        <c:forEach var="d" items="${sharedCodes}">
-                            <option value="<c:out value='${d.code}'/>" ${pickedCode == d.code ? 'selected' : ''}><c:out value="${d.code}"/> (<c:choose><c:when test="${d.kind == 'PERCENT'}">-<fmt:formatNumber value="${d.value}" pattern="#,##0"/>%</c:when><c:otherwise>-<fmt:formatNumber value="${d.value}" pattern="#,##0"/> VND</c:otherwise></c:choose>)</option>
-                        </c:forEach>
-                    </select>
-                    <input type="text" id="discountAmount" name="discountAmount" inputmode="numeric" maxlength="11" autocomplete="off" placeholder="Or enter a discount (VND)"
-                           value="<c:out value='${discountAmount}'/>">
-                </div>
+                <details class="pos-promo-accordion" id="promoAccordion" ${not empty pickedCode || not empty discountAmount || not empty affiliateCode ? 'open' : ''}>
+                    <summary class="pos-promo-summary">
+                        <span class="pos-promo-summary-title">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span>Discount & Referral code</span>
+                        </span>
+                        <span class="pos-promo-arrow">&#9660;</span>
+                    </summary>
+                    <div class="pos-promo-content">
+                        <div class="pos-compact-label-row">
+                            <label for="pickedCode" class="pos-compact-label">Discount Code / Amount</label>
+                        </div>
+                        <div class="pos-discount-row">
+                            <select id="pickedCode" name="pickedCode">
+                                <option value="">No discount</option>
+                                <c:forEach var="d" items="${sharedCodes}">
+                                    <option value="<c:out value='${d.code}'/>" ${pickedCode == d.code ? 'selected' : ''}><c:out value="${d.code}"/> (<c:choose><c:when test="${d.kind == 'PERCENT'}">-<fmt:formatNumber value="${d.value}" pattern="#,##0"/>%</c:when><c:otherwise>-<fmt:formatNumber value="${d.value}" pattern="#,##0"/> VND</c:otherwise></c:choose>)</option>
+                                </c:forEach>
+                            </select>
+                            <input type="text" id="discountAmount" name="discountAmount" inputmode="numeric" maxlength="11" autocomplete="off" placeholder="Or enter VND"
+                                   value="<c:out value='${discountAmount}'/>">
+                        </div>
 
-                <div class="pos-compact-label-row">
-                    <label for="affiliateCode" class="pos-compact-label">Affiliate referral code (optional)</label>
-                </div>
-                <div class="pos-discount-row">
-                    <input type="text" id="affiliateCode" name="affiliateCode" maxlength="30" autocomplete="off" placeholder="e.g. LINH08"
-                           value="<c:out value='${affiliateCode}'/>">
-                    <button type="button" id="affiliateCheck">Check</button>
-                </div>
-                <div id="affiliateResult" class="hint"></div>
+                        <div class="pos-compact-label-row">
+                            <label for="affiliateCode" class="pos-compact-label">Affiliate referral code</label>
+                        </div>
+                        <div class="pos-discount-row">
+                            <input type="text" id="affiliateCode" name="affiliateCode" maxlength="30" autocomplete="off" placeholder="e.g. LINH08"
+                                   value="<c:out value='${affiliateCode}'/>">
+                            <button type="button" id="affiliateCheck" class="pos-btn-affiliate-check">Check</button>
+                        </div>
+                        <div id="affiliateResult" class="hint"></div>
+                    </div>
+                </details>
 
                 <div class="pos-compact-methods">
                     <label class="pos-seg-label">
@@ -247,7 +304,7 @@
                 </div>
 
                 <button class="pos-compact-submit" type="submit" id="submitBtn">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg id="submitBtnIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
                         <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
                     </svg>

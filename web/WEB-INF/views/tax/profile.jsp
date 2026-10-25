@@ -7,8 +7,8 @@
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <%@ include file="/WEB-INF/views/common/tax-tabs.jspf" %>
 <div class="card">
-    <h1>Business profile and eligibility checker</h1>
-    <p class="hint">Answer what you know. "I do not know" is fine. The checker never decides from revenue alone: it also needs your business type and registration details, and it says what is still missing.</p>
+    <h1>Business profile</h1>
+    <p class="hint">Answer what you know. "I do not know" is fine.</p>
     <p>Profile completeness: <b>${completion}%</b></p>
 </div>
 
@@ -144,38 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </c:if>
 
 <div class="card">
-    <h2>Eligibility check</h2>
-    <p class="hint">Assessment date <b>today</b>, applicable period <b>this calendar year</b>. A result is a guide, not a legal decision: check it with the tax office or an accountant.</p>
-    <c:forEach var="c" items="${checks}">
-        <div class="card">
-            <h3><c:out value="${c.label}"/> <span class="pill ${c.status == 'APPLICABLE' ? 'ACTIVE' : (c.status == 'NOT_APPLICABLE' ? 'EXPIRED' : 'PENDING')}">${c.status}</span></h3>
-            <p><c:out value="${c.reason}"/></p>
-            <c:forEach var="cond" items="${c.conds}">
-                <div class="hint"><c:choose><c:when test="${cond[1] == true}">&#10003;</c:when><c:when test="${cond[1] == false}">&#10007;</c:when><c:otherwise>?</c:otherwise></c:choose> <c:out value="${cond[0]}"/></div>
-            </c:forEach>
-            <c:if test="${not empty c.missing}"><div class="alert-line">Missing: <c:forEach var="m" items="${c.missing}" varStatus="st"><c:out value="${m}"/><c:if test="${!st.last}">, </c:if></c:forEach></div></c:if>
-            <p class="hint">Basis: <c:out value="${c.basis}"/> - verification: ${c.verified ? 'VERIFIED' : 'NOT VERIFIED'} - rules come from <a href="${ctx}/admin/taxes">Tax rules</a>.</p>
-        </div>
-    </c:forEach>
-    <c:if test="${canManage}">
-        <form method="post" action="${ctx}/tax/profile">
-            <input type="hidden" name="action" value="confirm">
-            <button type="submit" class="primary" onclick="return confirm('Save this assessment with today\'s date?');">Confirm and save this assessment</button>
-        </form>
-    </c:if>
-</div>
-
-<div class="card">
-    <h2>Assessment history</h2>
-    <table>
-        <thead><tr><th>Date</th><th>Period</th><th>Result</th><th>Verification</th><th>By</th></tr></thead>
-        <tbody>
-        <c:forEach var="a" items="${assessments}">
-            <tr><td>${a.assessed_on}</td><td><c:out value="${a.period_label}"/></td><td><c:out value="${a.summary}"/></td><td>${a.verification}</td><td><c:out value="${a.created_name}"/></td></tr>
-        </c:forEach>
-        <c:if test="${empty assessments}"><tr><td colspan="5">No assessment has been saved yet.</td></tr></c:if>
-        </tbody>
-    </table>
+    <p>Kết quả kiểm tra nghĩa vụ và lịch sử đánh giá nằm ở trang <a href="${ctx}/tax/checker">Kiểm tra nghĩa vụ</a>.</p>
 </div>
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
 </body>

@@ -682,6 +682,27 @@ CREATE TABLE TaxReconNotes (
 );
 GO
 
+IF OBJECT_ID('TaxDocuments', 'U') IS NULL
+CREATE TABLE TaxDocuments (
+    doc_id INT IDENTITY(1,1) PRIMARY KEY,
+    doc_name NVARCHAR(150) NOT NULL,
+    category NVARCHAR(20) NOT NULL,
+    period_label NVARCHAR(40) NULL,
+    status NVARCHAR(12) NOT NULL DEFAULT 'MISSING',
+    file_name NVARCHAR(150) NULL,
+    content_type NVARCHAR(100) NULL,
+    size_bytes INT NOT NULL DEFAULT 0,
+    content VARBINARY(MAX) NULL,
+    uploaded_by INT NULL,
+    uploaded_at DATETIME2(3) NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_TaxDocuments_Users FOREIGN KEY (uploaded_by) REFERENCES Users(user_id),
+    CONSTRAINT CHK_TaxDocuments_Status CHECK (status IN ('UPLOADED', 'MISSING', 'REVIEW')),
+    CONSTRAINT CHK_TaxDocuments_Category CHECK (category IN ('REGISTRATION', 'TAX_CODE', 'INVOICE', 'BANK', 'EXPENSE', 'FILING', 'OTHER')),
+    CONSTRAINT CHK_TaxDocuments_Size CHECK (size_bytes >= 0 AND size_bytes <= 10485760)
+);
+GO
+
 IF OBJECT_ID('ChannelPayouts', 'U') IS NULL
 CREATE TABLE ChannelPayouts (
     payout_id INT IDENTITY(1,1) PRIMARY KEY,

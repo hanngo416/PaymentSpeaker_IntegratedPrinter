@@ -28,7 +28,7 @@ import service.TaxService;
 import service.TaxToolsService;
 
 @WebServlet(name = "TaxToolsServlet", urlPatterns = {"/tax/profile", "/tax/calculator", "/tax/obligations", "/tax/payments",
-    "/tax/expenses", "/tax/reconciliation", "/tax/notifications"})
+    "/tax/expenses", "/tax/reconciliation", "/tax/notifications", "/tax/checker"})
 public class TaxToolsServlet extends AffiliateBase {
 
     private static final String VIEW = "/WEB-INF/views/tax/";
@@ -46,6 +46,9 @@ public class TaxToolsServlet extends AffiliateBase {
             switch (request.getServletPath()) {
                 case "/tax/profile":
                     showProfile(request, response, null);
+                    break;
+                case "/tax/checker":
+                    showChecker(request, response);
                     break;
                 case "/tax/calculator":
                     showCalculator(request, response, null, null);
@@ -77,6 +80,7 @@ public class TaxToolsServlet extends AffiliateBase {
         try {
             switch (request.getServletPath()) {
                 case "/tax/profile":
+                case "/tax/checker":
                     postProfile(request, response, actor);
                     break;
                 case "/tax/calculator":
@@ -117,10 +121,16 @@ public class TaxToolsServlet extends AffiliateBase {
         }
         request.setAttribute("errors", errors);
         request.setAttribute("completion", tools.completion(saved));
-        request.setAttribute("checks", tools.check(saved));
-        request.setAttribute("assessments", dao.assessments());
         request.setAttribute("labels", TaxToolsService.LABELS);
         forward(request, response, "profile.jsp");
+    }
+
+    private void showChecker(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        Map<String, String> saved = tools.profile();
+        request.setAttribute("completion", tools.completion(saved));
+        request.setAttribute("checks", tools.check(saved));
+        request.setAttribute("assessments", dao.assessments());
+        forward(request, response, "checker.jsp");
     }
 
     private void postProfile(HttpServletRequest request, HttpServletResponse response, User actor) throws SQLException, ServletException, IOException {
@@ -137,7 +147,7 @@ public class TaxToolsServlet extends AffiliateBase {
             String summary = sb.length() > 480 ? sb.substring(0, 480) : sb.toString();
             dao.addAssessment(Date.valueOf(LocalDate.now()), "Year " + LocalDate.now().getYear(), summary, verified ? "VERIFIED" : "UNVERIFIED", actor.getUserId());
             AuditService.log(actor, "TAX_ASSESSMENT", "TAX", String.valueOf(LocalDate.now().getYear()), "profile", String.valueOf(tools.completion(saved)));
-            redirect(request, response, "/tax/profile", "saved");
+            redirect(request, response, "/tax/checker", "saved");
             return;
         }
         Map<String, String> in = new LinkedHashMap<>();

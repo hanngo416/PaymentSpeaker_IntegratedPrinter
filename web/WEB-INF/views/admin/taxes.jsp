@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pageTitle" value="Tax rules"/>
 <c:set var="nav" value="taxes"/>
+<c:set var="taxTab" value="rules"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <div class="card">
     <h1>Tax rules</h1>
