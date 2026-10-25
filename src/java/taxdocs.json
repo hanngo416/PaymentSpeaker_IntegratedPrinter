@@ -1,0 +1,575 @@
+{
+  "checked": "2026-10-22",
+  "docs": [
+    {
+      "id": "overview",
+      "title": "Tổng quan: từ ý tưởng đến ngày mở cửa",
+      "keywords": [
+        "bắt đầu",
+        "mở quán",
+        "mở cửa hàng",
+        "thành lập",
+        "các bước",
+        "checklist",
+        "quy trình",
+        "cần làm gì"
+      ],
+      "text": "Thứ tự thường gặp khi mở quán cà phê, cửa hàng tiện lợi hay tạp hóa nhỏ: (1) chọn hình thức kinh doanh, quy mô nhỏ thường là hộ kinh doanh; (2) thuê mặt bằng; (3) đăng ký hộ kinh doanh tại cơ quan đăng ký kinh doanh cấp xã, sau đó được hoạt động từ ngày có giấy chứng nhận; (4) làm các điều kiện theo ngành: an toàn thực phẩm, phòng cháy chữa cháy, giấy phép riêng nếu bán mặt hàng có điều kiện; (5) khai thuế: thông báo doanh thu hoặc kê khai theo ngưỡng, thông báo số tài khoản ngân hàng hoặc ví điện tử dùng kinh doanh, thông báo địa điểm kinh doanh; (6) dùng hóa đơn điện tử khi doanh thu năm từ 1 tỷ đồng; (7) ghi sổ kế toán theo Thông tư 152/2025/TT-BTC và lưu chứng từ.",
+      "source": "Nghị định 168/2025/NĐ-CP; Nghị định 68/2026/NĐ-CP đã sửa bởi Nghị định 141/2026/NĐ-CP; Thông tư 18/2026/TT-BTC; Thông tư 152/2025/TT-BTC",
+      "note": "Bản tóm tắt để định hướng. Chi tiết xem các mục sau.",
+      "links": [
+        {
+          "title": "Toàn văn Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-168-2025-nd-cp-ve-dang-ky-doanh-nghiep-119250702175708554.htm"
+        },
+        {
+          "title": "Toàn văn Nghị định 68/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-68-2026-nd-cp-quy-dinh-ve-chinh-sach-thue-quan-ly-thue-voi-ho-kinh-doanh-119260306102906789.htm"
+        },
+        {
+          "title": "Toàn văn Nghị định 141/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-so-141-2026-nd-cp-nang-nguong-doanh-thu-khong-phai-chiu-thue-len-1-ty-dong-119260504154326455.htm"
+        }
+      ]
+    },
+    {
+      "id": "register-hkd",
+      "title": "Đăng ký hộ kinh doanh",
+      "keywords": [
+        "đăng ký",
+        "hộ kinh doanh",
+        "giấy chứng nhận",
+        "hồ sơ",
+        "cấp xã",
+        "tên hộ",
+        "168",
+        "nộp hồ sơ",
+        "giấy phép kinh doanh"
+      ],
+      "text": "Mỗi cá nhân đủ điều kiện chỉ được đăng ký một hộ kinh doanh trong phạm vi toàn quốc (Điều 83 khoản 1). Hồ sơ gồm Giấy đề nghị đăng ký hộ kinh doanh; nếu các thành viên hộ gia đình cùng đăng ký thì kèm văn bản ủy quyền cho một thành viên làm chủ hộ, đã công chứng hoặc chứng thực (Điều 99 khoản 2). Nộp tại cơ quan đăng ký kinh doanh cấp xã trong tỉnh, thành phố nơi đặt trụ sở hộ, bằng cách nộp trực tiếp, qua bưu chính hoặc trực tuyến (Điều 88 khoản 2, Điều 94). Cơ quan đăng ký cấp giấy trong 03 ngày làm việc kể từ khi nhận hồ sơ hợp lệ, hộ được hoạt động từ ngày được cấp giấy (Điều 99 khoản 3, Điều 85 khoản 4). Tên hộ phải bắt đầu bằng cụm từ \"Hộ kinh doanh\" rồi đến tên riêng, không dùng các từ như công ty, tập đoàn, doanh nghiệp, và không trùng tên hộ đã đăng ký trong cùng xã (Điều 86). Đăng ký hộ kinh doanh bao gồm cả đăng ký thuế (Điều 3 khoản 2).",
+      "source": "Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp, Chương VIII (Điều 82-116), toàn văn trên Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "Có thể phải đóng lệ phí đăng ký theo quy định địa phương. Ngành nghề có điều kiện cần giấy phép riêng.",
+      "links": [
+        {
+          "title": "Toàn văn Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-168-2025-nd-cp-ve-dang-ky-doanh-nghiep-119250702175708554.htm"
+        }
+      ]
+    },
+    {
+      "id": "suspend-hkd",
+      "title": "Tạm ngừng kinh doanh của hộ kinh doanh",
+      "keywords": [
+        "tạm ngừng",
+        "ngừng kinh doanh",
+        "nghỉ kinh doanh",
+        "đóng cửa",
+        "chấm dứt"
+      ],
+      "text": "Hộ kinh doanh tạm ngừng hoạt động từ 15 ngày trở lên phải thông báo cho cơ quan đăng ký kinh doanh cấp xã ít nhất 03 ngày làm việc trước ngày tạm ngừng. Mỗi lần tạm ngừng không quá một năm. Cơ quan đăng ký cấp giấy xác nhận trong 01 ngày làm việc kể từ khi nhận hồ sơ hợp lệ. Khi thay đổi hoặc tạm ngừng địa điểm kinh doanh, hộ cũng thông báo cho cơ quan thuế bằng mẫu 01/TB-ĐĐKD.",
+      "source": "Nghị định 168/2025/NĐ-CP (Điều 103 khoản 1-2); Thông tư 18/2026/TT-BTC (Điều 3, mẫu 01/TB-ĐĐKD)",
+      "note": "",
+      "links": [
+        {
+          "title": "Toàn văn Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-168-2025-nd-cp-ve-dang-ky-doanh-nghiep-119250702175708554.htm"
+        },
+        {
+          "title": "Thông tư 18/2026/TT-BTC về hồ sơ, thủ tục quản lý thuế hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/thong-tu-18-2026-tt-btc-quy-dinh-ve-ho-so-thu-tuc-quan-ly-thue-voi-ho-ca-nhan-kinh-doanh-119260309174321852.htm"
+        }
+      ]
+    },
+    {
+      "id": "cafe-permits",
+      "title": "Quán cà phê, quán ăn uống: an toàn thực phẩm và phòng cháy chữa cháy",
+      "keywords": [
+        "quán cà phê",
+        "cafe",
+        "cà phê",
+        "trà sữa",
+        "quán ăn",
+        "ăn uống",
+        "an toàn thực phẩm",
+        "attp",
+        "pccc",
+        "phòng cháy",
+        "giấy chứng nhận cơ sở",
+        "cam kết"
+      ],
+      "text": "An toàn thực phẩm: cơ sở kinh doanh dịch vụ ăn uống thuộc nhóm phải có Giấy chứng nhận cơ sở đủ điều kiện an toàn thực phẩm, trừ các trường hợp Điều 12 Nghị định 15/2018/NĐ-CP liệt kê không thuộc diện cấp giấy (như kinh doanh thực phẩm nhỏ lẻ, thức ăn đường phố); các cơ sở thuộc diện miễn cấp giấy vẫn phải tuân thủ yêu cầu an toàn thực phẩm và có thể phải gửi bản cam kết tới cơ quan do UBND cấp tỉnh phân cấp. Kinh doanh dịch vụ ăn uống không có giấy khi thuộc diện phải có bị xử phạt. Phòng cháy chữa cháy: theo Nghị định 105/2025/NĐ-CP (hiệu lực từ 01/07/2025), cơ sở thuộc Phụ lục I là cơ sở thuộc diện quản lý về PCCC, cần phiếu thông tin cơ sở (mẫu PC01), nội quy PCCC niêm yết nơi dễ thấy, phương tiện chữa cháy tại chỗ và người phụ trách PCCC; Cục Cảnh sát PCCC cho biết pháp luật không quy định cấp chứng nhận PCCC riêng cho loại cơ sở này. Cơ sở kinh doanh dịch vụ ăn uống có tổng diện tích sàn từ 300 m2 trở lên thuộc danh mục phải mua bảo hiểm cháy, nổ bắt buộc.",
+      "source": "Nghị định 15/2018/NĐ-CP (Điều 12) và Nghị định 124/2021/NĐ-CP; Nghị định 105/2025/NĐ-CP; hỏi đáp của Cục Cảnh sát PCCC và Bộ Công an; Cổng Dịch vụ công quốc gia",
+      "note": "Quán nhỏ có thuộc diện miễn giấy an toàn thực phẩm hay không và có thuộc Phụ lục I PCCC hay không phụ thuộc quy mô và quy định địa phương. Hãy hỏi UBND phường/xã, Trạm y tế hoặc Công an phường/xã nơi đặt quán trước khi mở.",
+      "links": [
+        {
+          "title": "Nghị định 15/2018/NĐ-CP về an toàn thực phẩm (vbpl.vn)",
+          "url": "https://vbpl.vn/TW/Pages/vbpq-toanvan.aspx?ItemID=128513"
+        },
+        {
+          "title": "Hỏi đáp về giấy chứng nhận cơ sở đủ điều kiện an toàn thực phẩm (Dịch vụ công quốc gia)",
+          "url": "https://dichvucong.gov.vn/p/home/dvc-chi-tiet-cau-hoi.html?id=15771&row_limit=1"
+        },
+        {
+          "title": "Hỏi đáp của Cục Cảnh sát PCCC về cơ sở kinh doanh",
+          "url": "https://canhsatpccc.gov.vn/vi/faq-contact/citizen-faq/531"
+        },
+        {
+          "title": "Cơ sở phải mua bảo hiểm cháy, nổ bắt buộc (Bộ Công an)",
+          "url": "https://bocongan.gov.vn/chinh-sach-phap-luat/bai-viet/44-co-so-phai-mua-bao-hiem-chay-no-bat-buoc-tu-ngay-0172025-d1-t1734"
+        }
+      ]
+    },
+    {
+      "id": "convenience-store",
+      "title": "Cửa hàng tiện lợi, tạp hóa, tiệm bán lẻ",
+      "keywords": [
+        "cửa hàng tiện lợi",
+        "tạp hóa",
+        "bán lẻ",
+        "siêu thị mini",
+        "minimart",
+        "thực phẩm",
+        "thuốc lá",
+        "rượu",
+        "niêm yết giá",
+        "bán hàng"
+      ],
+      "text": "Cửa hàng bán lẻ đăng ký hộ kinh doanh như mục đăng ký hộ kinh doanh. Nếu bán thực phẩm thì áp dụng quy định an toàn thực phẩm đối với cơ sở kinh doanh thực phẩm; theo hỏi đáp của Cổng Dịch vụ công quốc gia, cơ sở kinh doanh thực phẩm (có hoặc không có giấy chứng nhận đăng ký hộ kinh doanh) không thuộc diện phải cấp Giấy chứng nhận cơ sở đủ điều kiện an toàn thực phẩm nhưng vẫn phải đáp ứng yêu cầu an toàn thực phẩm. Cần đáp ứng yêu cầu PCCC như mục quán cà phê. Mặt hàng có điều kiện như rượu, thuốc lá cần xin giấy phép riêng theo quy định chuyên ngành. Về thuế, bán lẻ hàng hóa thuộc nhóm phân phối, cung cấp hàng hóa (tỷ lệ thấp nhất). Tinky phù hợp để bán lẻ: danh mục hàng hóa, giỏ hàng, thanh toán VietQR hoặc tiền mặt, phiếu thu in tại quầy.",
+      "source": "Cổng Dịch vụ công quốc gia (hỏi đáp về giấy chứng nhận cơ sở đủ điều kiện an toàn thực phẩm); Nghị định 15/2018/NĐ-CP; Nghị định 105/2025/NĐ-CP",
+      "note": "Điều kiện bán rượu, thuốc lá chưa được tra cứu từ văn bản gốc trong bản này. Hãy hỏi cơ quan quản lý công thương địa phương.",
+      "links": [
+        {
+          "title": "Hỏi đáp về giấy chứng nhận cơ sở đủ điều kiện an toàn thực phẩm (Dịch vụ công quốc gia)",
+          "url": "https://dichvucong.gov.vn/p/home/dvc-chi-tiet-cau-hoi.html?id=15771&row_limit=1"
+        },
+        {
+          "title": "Nghị định 15/2018/NĐ-CP về an toàn thực phẩm (vbpl.vn)",
+          "url": "https://vbpl.vn/TW/Pages/vbpq-toanvan.aspx?ItemID=128513"
+        },
+        {
+          "title": "Hỏi đáp của Cục Cảnh sát PCCC về cơ sở kinh doanh",
+          "url": "https://canhsatpccc.gov.vn/vi/faq-contact/citizen-faq/531"
+        }
+      ]
+    },
+    {
+      "id": "tax-structure-2026",
+      "title": "Hộ kinh doanh từ 2026 nộp những loại thuế nào",
+      "keywords": [
+        "thuế khoán",
+        "môn bài",
+        "lệ phí môn bài",
+        "gtgt",
+        "tncn",
+        "2026",
+        "bãi bỏ",
+        "kê khai thực tế",
+        "198",
+        "các loại thuế"
+      ],
+      "text": "Từ 01/01/2026, hộ kinh doanh không áp dụng phương pháp khoán thuế nữa và không còn phải nộp lệ phí môn bài (Nghị quyết 198/2025/QH15). Hộ tự kê khai thuế giá trị gia tăng (GTGT) và thuế thu nhập cá nhân (TNCN) theo doanh thu thực tế; ngoài ra có thể phát sinh các thuế khác theo hoạt động. Người nộp thuế không phải nộp hồ sơ khai lệ phí môn bài từ năm 2026. Hộ chuyển từ khoán sang kê khai từ 2026: cơ quan thuế không dùng doanh thu khai năm 2026 để xác định lại nghĩa vụ các năm trước, trừ trường hợp che giấu doanh thu.",
+      "source": "Nghị quyết 198/2025/QH15; Nghị định 68/2026/NĐ-CP (điều khoản chuyển tiếp); Cục Thuế - Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "",
+      "links": [
+        {
+          "title": "Nghị quyết 198/2025/QH15 (vbpl.vn)",
+          "url": "https://vbpl.vn/botuphap/Pages/vbpq-toanvan.aspx?ItemID=177591"
+        },
+        {
+          "title": "Từ tháng 1/2026 không phải nộp lệ phí môn bài",
+          "url": "https://xaydungchinhsach.chinhphu.vn/tu-thang-1-2026-nguoi-nop-thue-khong-phai-nop-le-phi-mon-bai-119260126110926562.htm"
+        },
+        {
+          "title": "Toàn văn Nghị định 68/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-68-2026-nd-cp-quy-dinh-ve-chinh-sach-thue-quan-ly-thue-voi-ho-kinh-doanh-119260306102906789.htm"
+        }
+      ]
+    },
+    {
+      "id": "threshold-1bn",
+      "title": "Ngưỡng doanh thu 1 tỷ đồng một năm",
+      "keywords": [
+        "ngưỡng",
+        "1 tỷ",
+        "một tỷ",
+        "500 triệu",
+        "miễn thuế",
+        "không chịu thuế",
+        "dưới 1 tỷ",
+        "vượt ngưỡng",
+        "141"
+      ],
+      "text": "Nghị định 68/2026/NĐ-CP (hiệu lực 05/03/2026) ban đầu lấy mốc 500 triệu đồng. Nghị định 141/2026/NĐ-CP ngày 29/04/2026 sửa Nghị định 68, đổi \"500 triệu đồng\" thành \"1 tỷ đồng\" ở các Điều 3, 4, 8, 9, 10, 11, 12, 17 và 18; Chính phủ nêu ngưỡng 1 tỷ đồng được áp dụng từ 01/01/2026. Như vậy hộ kinh doanh có doanh thu năm từ 1 tỷ đồng trở xuống không chịu thuế GTGT và không phải nộp thuế TNCN nhưng vẫn phải thông báo doanh thu; khi doanh thu thực tế vượt 1 tỷ đồng trong năm thì khai và nộp thuế từ quý phát sinh doanh thu vượt ngưỡng. Hộ đã khai nộp thuế theo ngưỡng cũ thì tiền thuế đã nộp được xử lý theo Điều 12 Nghị định 68. Tinky cộng doanh thu các đơn COMPLETED trong năm, so với ngưỡng 1 tỷ và nhắc ở mức 70%, 90%, 100% trên trang Tax và bong bóng trợ lý.",
+      "source": "Nghị định 141/2026/NĐ-CP (29/04/2026) sửa đổi Nghị định 68/2026/NĐ-CP; Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "Một số bài hướng dẫn cũ vẫn nêu ngưỡng 500 triệu, đó là quy định trước khi có Nghị định 141. Luật Thuế TNCN 109/2025/QH15 viết mức 500 triệu đồng, cách áp dụng cụ thể theo Nghị định 141 nên xác nhận với cơ quan thuế.",
+      "links": [
+        {
+          "title": "Toàn văn Nghị định 141/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-so-141-2026-nd-cp-nang-nguong-doanh-thu-khong-phai-chiu-thue-len-1-ty-dong-119260504154326455.htm"
+        },
+        {
+          "title": "Hướng dẫn triển khai Nghị định 141/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/huong-dan-trien-khai-nghi-dinh-so-141-2026-nd-cp-ve-chinh-sach-thue-doi-voi-ho-kinh-doanh-doanh-nghiep-119260502203430701.htm"
+        },
+        {
+          "title": "Toàn văn Nghị định 68/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-68-2026-nd-cp-quy-dinh-ve-chinh-sach-thue-quan-ly-thue-voi-ho-kinh-doanh-119260306102906789.htm"
+        }
+      ]
+    },
+    {
+      "id": "report-under-1bn",
+      "title": "Hộ không phải nộp thuế vẫn phải thông báo doanh thu",
+      "keywords": [
+        "thông báo doanh thu",
+        "31/1",
+        "31/7",
+        "hộ mới",
+        "6 tháng",
+        "hạn",
+        "dưới 1 tỷ",
+        "01/tkn-cnkd",
+        "mới ra kinh doanh"
+      ],
+      "text": "Hộ có doanh thu năm không chịu thuế GTGT, không phải nộp thuế TNCN (kể cả hộ mới ra kinh doanh) thông báo doanh thu thực tế phát sinh trong năm và kê khai các loại thuế khác theo mẫu 01/TKN-CNKD, chậm nhất ngày 31/01 của năm dương lịch tiếp theo. Hộ bắt đầu kinh doanh trong 6 tháng đầu năm thông báo doanh thu từ lúc bắt đầu đến hết ngày 30/6 chậm nhất ngày 31/7, rồi thông báo doanh thu 6 tháng cuối năm chậm nhất ngày 31/01 năm sau. Hộ bắt đầu trong 6 tháng cuối năm thông báo chậm nhất ngày 31/01 năm sau. Nộp tại cơ quan thuế quản lý trực tiếp, chủ yếu bằng điện tử. Tinky cho số doanh thu theo ca, ngày, tháng, năm ở trang Invoices để điền vào thông báo.",
+      "source": "Thông tư 18/2026/TT-BTC (Điều 4, mẫu 01/TKN-CNKD) và Nghị định 68/2026/NĐ-CP, đăng trên Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "Ngưỡng trong các văn bản gốc được đổi từ 500 triệu thành 1 tỷ bởi Nghị định 141/2026/NĐ-CP. Hạn và mẫu có thể được hướng dẫn thêm, hãy xem thông báo mới nhất của cơ quan thuế.",
+      "links": [
+        {
+          "title": "Thông tư 18/2026/TT-BTC về hồ sơ, thủ tục quản lý thuế hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/thong-tu-18-2026-tt-btc-quy-dinh-ve-ho-so-thu-tuc-quan-ly-thue-voi-ho-ca-nhan-kinh-doanh-119260309174321852.htm"
+        },
+        {
+          "title": "Khai thuế, nộp thuế với hộ kinh doanh mới ra kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/quy-dinh-khai-thue-nop-thue-doi-voi-ho-kinh-doanh-ca-nhan-kinh-doanh-moi-ra-kinh-doanh-119260316101008905.htm"
+        },
+        {
+          "title": "Nội dung mới của Nghị định 68/2026 và Thông tư 18/2026",
+          "url": "https://xaydungchinhsach.chinhphu.vn/noi-dung-moi-cua-nghi-dinh-68-2026-nd-cp-va-thong-tu-18-2026-tt-btc-nguoi-nop-thue-can-luu-y-119260312140920747.htm"
+        }
+      ]
+    },
+    {
+      "id": "declare-over-1bn",
+      "title": "Doanh thu vượt ngưỡng: kê khai và nộp thuế theo quý",
+      "keywords": [
+        "kê khai",
+        "nộp thuế",
+        "theo quý",
+        "quý",
+        "hạn nộp",
+        "tờ khai",
+        "01/cnkd",
+        "trên 1 tỷ",
+        "vượt ngưỡng",
+        "quyết toán",
+        "31/3"
+      ],
+      "text": "Hộ có doanh thu vượt ngưỡng khai thuế GTGT, TNCN và các thuế khác theo quý bằng tờ khai mẫu 01/CNKD, hồ sơ nộp chậm nhất vào ngày cuối cùng của tháng đầu tiên của quý tiếp theo (ví dụ quý IV nộp chậm nhất ngày 31/01). Nghĩa vụ này bắt đầu từ quý phát sinh doanh thu vượt ngưỡng. Hộ tính TNCN theo thu nhập tính thuế thì khai GTGT và các thuế khác theo tháng, tạm nộp TNCN theo quý (theo tháng nếu doanh thu năm trên 50 tỷ đồng), quyết toán TNCN theo mẫu 02/CNKD-TNCN-QTT chậm nhất ngày 31/3 năm sau và nộp thêm bảng kê hàng tồn kho, máy móc thiết bị mẫu 01/BK-HTK. Nếu có nhiều địa điểm kinh doanh, khai doanh thu và thuế theo từng địa điểm. Trang Tax của Tinky ước tính VAT và PIT theo doanh thu vượt ngưỡng; đây là số ước tính, không phải số phải nộp.",
+      "source": "Thông tư 18/2026/TT-BTC; Nghị định 68/2026/NĐ-CP; hướng dẫn thủ tục khai thuế (mã TTHC 1.011022) trên Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "",
+      "links": [
+        {
+          "title": "Hướng dẫn thủ tục khai thuế đối với hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/huong-dan-thu-tuc-khai-thue-doi-voi-ho-kinh-doanh-ca-nhan-kinh-doanh-119260530072620314.htm"
+        },
+        {
+          "title": "Thông tư 18/2026/TT-BTC về hồ sơ, thủ tục quản lý thuế hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/thong-tu-18-2026-tt-btc-quy-dinh-ve-ho-so-thu-tuc-quan-ly-thue-voi-ho-ca-nhan-kinh-doanh-119260309174321852.htm"
+        },
+        {
+          "title": "Nội dung mới của Nghị định 68/2026 và Thông tư 18/2026",
+          "url": "https://xaydungchinhsach.chinhphu.vn/noi-dung-moi-cua-nghi-dinh-68-2026-nd-cp-va-thong-tu-18-2026-tt-btc-nguoi-nop-thue-can-luu-y-119260312140920747.htm"
+        }
+      ]
+    },
+    {
+      "id": "vat-rates",
+      "title": "Tỷ lệ thuế GTGT theo ngành nghề",
+      "keywords": [
+        "gtgt",
+        "vat",
+        "giá trị gia tăng",
+        "tỷ lệ",
+        "ngành nghề",
+        "bán lẻ",
+        "ăn uống",
+        "dịch vụ",
+        "sản xuất",
+        "cà phê",
+        "tiện lợi",
+        "1%",
+        "3%",
+        "5%"
+      ],
+      "text": "Hộ chịu thuế GTGT tính thuế theo tỷ lệ phần trăm nhân với doanh thu; tỷ lệ phụ thuộc ngành (theo Luật Thuế GTGT 48/2024/QH15). Bảng Bộ Tài chính nêu: phân phối, cung cấp hàng hóa 1%; dịch vụ, xây dựng không bao thầu nguyên vật liệu 5%; sản xuất, vận tải, dịch vụ có gắn với hàng hóa, xây dựng có bao thầu nguyên vật liệu 3%; hoạt động kinh doanh khác 2%. Trong Tinky ADMIN chọn ngành ở trang Tax rules: GOODS cho cửa hàng bán hàng, PRODUCTION cho quán cà phê và quán ăn uống (thường xếp vào nhóm dịch vụ gắn với hàng hóa), SERVICE cho dịch vụ thuần, OTHER cho phần còn lại. Hộ có nhiều ngành phải tách doanh thu từng ngành; Tinky hiện tính một ngành chung.",
+      "source": "Luật Thuế giá trị gia tăng 48/2024/QH15; hỏi đáp chính sách thuế của Bộ Tài chính; Nghị định 68/2026/NĐ-CP",
+      "note": "Nguồn trực tiếp chưa nêu rõ ăn uống thuộc nhóm nào trong bảng hiện hành; cách xếp ăn uống vào nhóm 3% là cách phân loại truyền thống. Các tỷ lệ trong Tinky đang để trạng thái Not verified, hãy đối chiếu bảng hiện hành với cơ quan thuế.",
+      "links": [
+        {
+          "title": "Thuế suất đối với các hoạt động kinh doanh của hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/thue-suat-doi-voi-cac-hoat-dong-kinh-doanhcua-ho-kinh-doanh-119260407103211289.htm"
+        },
+        {
+          "title": "Chính sách thuế GTGT, TNCN, các khoản thuế khác",
+          "url": "https://xaydungchinhsach.chinhphu.vn/chinh-sach-thue-gia-tri-gia-tang-thue-thu-nhap-ca-nhan-cac-khoan-thue-khac-119260316093129828.htm"
+        },
+        {
+          "title": "Toàn văn Nghị định 68/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-68-2026-nd-cp-quy-dinh-ve-chinh-sach-thue-quan-ly-thue-voi-ho-kinh-doanh-119260306102906789.htm"
+        }
+      ]
+    },
+    {
+      "id": "pit-methods",
+      "title": "Thuế TNCN của hộ kinh doanh: hai phương pháp và thuế suất",
+      "keywords": [
+        "tncn",
+        "thu nhập cá nhân",
+        "phương pháp",
+        "lợi nhuận",
+        "thu nhập tính thuế",
+        "15%",
+        "17%",
+        "20%",
+        "3 tỷ",
+        "50 tỷ",
+        "0,5%",
+        "1,5%",
+        "chi phí"
+      ],
+      "text": "Phương pháp 1 (hộ doanh thu trên ngưỡng đến 3 tỷ đồng): TNCN = thuế suất x phần doanh thu vượt ngưỡng trừ; mức trừ có thể phân bổ cho một hoặc nhiều ngành, địa điểm, miễn tổng không vượt mức trừ mỗi năm. Thuế suất theo nhóm ngành: phân phối, cung cấp hàng hóa 0,5%; dịch vụ, xây dựng không bao thầu nguyên vật liệu 2%; sản xuất, vận tải, dịch vụ gắn với hàng hóa, xây dựng có bao thầu nguyên vật liệu 1,5%; cho thuê tài sản, đại lý bảo hiểm, xổ số, đa cấp 5%; nội dung thông tin số 5%; hoạt động kinh doanh khác 1%. Phương pháp 2: TNCN = thu nhập tính thuế (doanh thu trừ chi phí hợp lý) x thuế suất, thuế suất 15% với doanh thu năm trên ngưỡng đến 3 tỷ đồng, 17% trên 3 tỷ đến 50 tỷ đồng, 20% trên 50 tỷ đồng. Hộ doanh thu trên 3 tỷ đồng phải dùng phương pháp 2; hộ chọn phương pháp 2 phải giữ ổn định 02 năm liên tục; hộ đang dùng phương pháp 1 mà doanh thu thực tế năm vượt 3 tỷ đồng thì từ năm sau chuyển sang phương pháp 2. Tinky chỉ ước tính theo phương pháp 1 và chỉ đến trần 3 tỷ đồng.",
+      "source": "Luật Thuế thu nhập cá nhân 109/2025/QH15 (Điều 7); Nghị định 68/2026/NĐ-CP (Điều 4 khoản 5); Bộ Tài chính và Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "Luật 109/2025/QH15 nêu mức trừ 500 triệu đồng, trong khi Nghị định 141/2026/NĐ-CP nâng ngưỡng lên 1 tỷ đồng; cách áp dụng mức trừ sau Nghị định 141 cần xác nhận với cơ quan thuế.",
+      "links": [
+        {
+          "title": "Phương pháp tính thuế với hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/phuong-phap-tinh-thue-voi-ca-nhan-kinh-doanh-ho-kinh-doanh-119260309100708724.htm"
+        },
+        {
+          "title": "Quy định thuế TNCN đối với thu nhập từ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/quy-dinh-thue-thu-nhap-ca-nhan-doi-voi-thu-nhap-tu-kinh-doanh-119260327063731539.htm"
+        },
+        {
+          "title": "Luật Thuế thu nhập cá nhân 109/2025/QH15 (vbpl.vn)",
+          "url": "https://vbpl.vn/en/van-ban/chi-tiet/luat-thue-thu-nhap-ca-nhan-so-109-2025-qh15--187045"
+        }
+      ]
+    },
+    {
+      "id": "invoice",
+      "title": "Hóa đơn điện tử cho hộ kinh doanh",
+      "keywords": [
+        "hóa đơn",
+        "hóa đơn điện tử",
+        "máy tính tiền",
+        "xuất hóa đơn",
+        "phiếu thu",
+        "hóa đơn có mã",
+        "1 tỷ",
+        "đăng ký hóa đơn"
+      ],
+      "text": "Hộ kinh doanh có doanh thu năm trên 1 tỷ đồng (theo Điều 8 khoản 5 Nghị định 68/2026/NĐ-CP đã sửa đổi) phải dùng hóa đơn điện tử có mã của cơ quan thuế hoặc hóa đơn điện tử khởi tạo từ máy tính tiền có kết nối truyền dữ liệu với cơ quan thuế. Hộ có nhiều địa điểm dùng chung một mã số thuế và ghi mã từng địa điểm trên hóa đơn. Hộ doanh thu từ 1 tỷ đồng trở xuống có thể dùng nếu đủ điều kiện và có nhu cầu. Hộ mới ra kinh doanh, hoặc doanh thu lũy kế trong năm đạt 1 tỷ đồng, phải chuyển sang hóa đơn điện tử và đăng ký trong 30 ngày kể từ ngày cuối cùng của kỳ tính thuế mà doanh thu đạt mức đó. Phiếu thu in từ Tinky là biên nhận bán hàng, không phải hóa đơn điện tử; khi doanh thu tiến gần 1 tỷ đồng cần đăng ký hóa đơn điện tử hoặc phần mềm máy tính tiền được cơ quan thuế chấp nhận và dùng song song với Tinky.",
+      "source": "Nghị định 68/2026/NĐ-CP (Điều 8 khoản 5) đã sửa đổi bởi Nghị định 141/2026/NĐ-CP; Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "Quy định về đối tượng được miễn hoặc điều kiện chi tiết hãy hỏi cơ quan thuế.",
+      "links": [
+        {
+          "title": "Toàn văn Nghị định 141/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-so-141-2026-nd-cp-nang-nguong-doanh-thu-khong-phai-chiu-thue-len-1-ty-dong-119260504154326455.htm"
+        },
+        {
+          "title": "Nội dung mới của Nghị định 68/2026 và Thông tư 18/2026",
+          "url": "https://xaydungchinhsach.chinhphu.vn/noi-dung-moi-cua-nghi-dinh-68-2026-nd-cp-va-thong-tu-18-2026-tt-btc-nguoi-nop-thue-can-luu-y-119260312140920747.htm"
+        },
+        {
+          "title": "Toàn văn Nghị định 68/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-68-2026-nd-cp-quy-dinh-ve-chinh-sach-thue-quan-ly-thue-voi-ho-kinh-doanh-119260306102906789.htm"
+        }
+      ]
+    },
+    {
+      "id": "bookkeeping",
+      "title": "Sổ sách kế toán của hộ kinh doanh",
+      "keywords": [
+        "sổ sách",
+        "sổ kế toán",
+        "ghi sổ",
+        "s1a",
+        "s2a",
+        "152",
+        "kế toán",
+        "chứng từ",
+        "lưu trữ",
+        "sổ doanh thu"
+      ],
+      "text": "Từ 01/01/2026 hộ kinh doanh áp dụng Thông tư 152/2025/TT-BTC của Bộ Tài chính (3 chương, 8 điều) về tổ chức kế toán, sổ kế toán và lưu trữ tài liệu. Thông tư chia ba nhóm: hộ không chịu thuế GTGT và không nộp TNCN; hộ chịu GTGT và nộp TNCN; hộ có hoạt động chịu các thuế khác. Hộ không chịu thuế dùng Sổ doanh thu bán hàng hóa, dịch vụ (Điều 4). Hộ nộp thuế theo tỷ lệ trên doanh thu dùng Sổ doanh thu bán hàng hóa, dịch vụ mẫu S2a-HKD. Tài liệu kế toán lưu trữ tối thiểu 05 năm. Tinky lưu mọi đơn, giao dịch và báo cáo theo ca, ngày, tháng, năm; đây là dữ liệu nguồn để ghi sổ nhưng không phải sổ kế toán chính thức.",
+      "source": "Thông tư 152/2025/TT-BTC (Công báo, Cổng Xây dựng chính sách pháp luật của Chính phủ)",
+      "note": "Mẫu sổ cho hộ tính TNCN theo thu nhập tính thuế (các sổ chi tiết doanh thu, chi phí, hàng hóa, tiền) chưa được đối chiếu từ văn bản gốc trong bản này. Hãy xem phụ lục Thông tư 152/2025/TT-BTC.",
+      "links": [
+        {
+          "title": "Thông tư 152/2025/TT-BTC (Công báo)",
+          "url": "https://congbao.chinhphu.vn/van-ban/thong-tu-so-152-2025-tt-btc-468714.htm"
+        }
+      ]
+    },
+    {
+      "id": "bank-statement",
+      "title": "Tài khoản ngân hàng và sao kê",
+      "keywords": [
+        "tài khoản ngân hàng",
+        "sao kê",
+        "đối chiếu",
+        "ví điện tử",
+        "01/bk-stk",
+        "vietqr",
+        "chuyển khoản",
+        "tài khoản nhận tiền",
+        "thông báo tài khoản"
+      ],
+      "text": "Hộ kinh doanh thông báo điện tử cho cơ quan thuế tất cả số tài khoản mở tại tổ chức cung ứng dịch vụ thanh toán và số hiệu ví điện tử liên quan đến sản xuất, kinh doanh, bằng mẫu 01/BK-STK. Hộ đang hoạt động nộp kèm tờ khai thuế đầu tiên của năm 2026 (hoặc chậm nhất 20/4/2026 với nhóm được quy định riêng); hộ mới ra kinh doanh nộp kèm thông báo doanh thu hoặc tờ khai đầu tiên; khi đổi số tài khoản hoặc ví thì thông báo lại. Trong Tinky, tài khoản nhận tiền đặt trong sepay.properties và hiện trên mã VietQR; Tinky đọc giao dịch của tài khoản đó từ SePay. Cuối ngày hoặc cuối tháng, đối chiếu trang Transactions và báo cáo trong Invoices với sao kê ngân hàng; giao dịch lệch tiền, trùng hoặc không có đơn sẽ có cảnh báo ở trang Alerts.",
+      "source": "Nghị định 68/2026/NĐ-CP; Thông tư 18/2026/TT-BTC (mẫu 01/BK-STK); Cổng Xây dựng chính sách pháp luật của Chính phủ",
+      "note": "Nên dùng tài khoản riêng cho kinh doanh để sao kê gọn, đây là lời khuyên thực hành chứ không phải điều bắt buộc trong các văn bản đã đối chiếu.",
+      "links": [
+        {
+          "title": "Thông tư 18/2026/TT-BTC về hồ sơ, thủ tục quản lý thuế hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/thong-tu-18-2026-tt-btc-quy-dinh-ve-ho-so-thu-tuc-quan-ly-thue-voi-ho-ca-nhan-kinh-doanh-119260309174321852.htm"
+        },
+        {
+          "title": "Nội dung mới của Nghị định 68/2026 và Thông tư 18/2026",
+          "url": "https://xaydungchinhsach.chinhphu.vn/noi-dung-moi-cua-nghi-dinh-68-2026-nd-cp-va-thong-tu-18-2026-tt-btc-nguoi-nop-thue-can-luu-y-119260312140920747.htm"
+        }
+      ]
+    },
+    {
+      "id": "how-to-file",
+      "title": "Kê khai và nộp thuế ở đâu, bằng cách nào",
+      "keywords": [
+        "nộp ở đâu",
+        "cổng",
+        "dịch vụ công",
+        "thuế điện tử",
+        "etax",
+        "ứng dụng",
+        "mã số thuế",
+        "cơ quan thuế",
+        "thuế cơ sở",
+        "nộp thuế",
+        "cách nộp",
+        "định danh"
+      ],
+      "text": "Cơ quan giải quyết là thuế cơ sở. Hộ nộp hồ sơ khai thuế bằng điện tử qua Cổng Dịch vụ công quốc gia hoặc ứng dụng định danh quốc gia (VNeID); người cao tuổi, người khuyết tật, người ở vùng đặc biệt khó khăn hoặc trường hợp bất khả kháng không giao dịch điện tử được thì nộp trực tiếp hoặc qua bưu chính tại Trung tâm Phục vụ hành chính công cấp xã. Mỗi hồ sơ gồm 01 bộ: tờ khai 01/CNKD hoặc thông báo 01/TKN-CNKD, thông báo tài khoản 01/BK-STK, và bảng kê hàng tồn kho 01/BK-HTK nếu tính TNCN theo thu nhập. Tờ khai có mục thông tin nộp ngân sách (số tiền, chương, tiểu mục, địa bàn, cơ quan thu, hạn nộp) để chuyển tiền thuế vào ngân sách nhà nước. Không mất lệ phí khi nộp hồ sơ.",
+      "source": "Thủ tục khai thuế đối với hộ kinh doanh, cá nhân kinh doanh (mã TTHC 1.011022); Thông tư 18/2026/TT-BTC; Thông tư 50/2026/TT-BTC sửa đổi Thông tư 18",
+      "note": "Hình thức trả tiền thuế chi tiết (ngân hàng, ví) hãy xem hướng dẫn của cơ quan thuế vì phần này chưa được đối chiếu từ văn bản gốc.",
+      "links": [
+        {
+          "title": "Hướng dẫn thủ tục khai thuế đối với hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/huong-dan-thu-tuc-khai-thue-doi-voi-ho-kinh-doanh-ca-nhan-kinh-doanh-119260530072620314.htm"
+        },
+        {
+          "title": "Thông tư 18/2026/TT-BTC về hồ sơ, thủ tục quản lý thuế hộ kinh doanh",
+          "url": "https://xaydungchinhsach.chinhphu.vn/thong-tu-18-2026-tt-btc-quy-dinh-ve-ho-so-thu-tuc-quan-ly-thue-voi-ho-ca-nhan-kinh-doanh-119260309174321852.htm"
+        }
+      ]
+    },
+    {
+      "id": "penalties",
+      "title": "Nộp chậm hoặc khai sai thì sao",
+      "keywords": [
+        "phạt",
+        "chậm nộp",
+        "nộp muộn",
+        "khai sai",
+        "tiền chậm nộp",
+        "vi phạm",
+        "xử phạt",
+        "che giấu doanh thu"
+      ],
+      "text": "Nộp chậm tiền thuế bị tính tiền chậm nộp, nộp chậm hồ sơ khai thuế, khai sai hoặc không dùng hóa đơn khi bắt buộc có thể bị xử phạt vi phạm hành chính. Nghị định 68/2026/NĐ-CP có quy định chuyển tiếp: hộ đã khai nộp theo Thông tư 40/2021/TT-BTC không phải điều chỉnh lại; hộ chưa khai thì thực hiện theo Thông tư mới mà không bị xử phạt đối với phần nghĩa vụ chuyển tiếp; riêng hành vi che giấu doanh thu dẫn đến thiếu thuế vẫn bị xử lý. Cách tránh: khai đúng kỳ, giữ sổ sách và dữ liệu bán hàng đầy đủ, theo dõi cảnh báo mức doanh thu trên bong bóng trợ lý của Tinky.",
+      "source": "Nghị định 68/2026/NĐ-CP (điều khoản chuyển tiếp); Luật Quản lý thuế 108/2025/QH15",
+      "note": "Mức tiền chậm nộp và mức phạt cụ thể chưa được đối chiếu từ văn bản gốc trong bản này. Hãy xem Luật Quản lý thuế 108/2025/QH15 và nghị định xử phạt hiện hành.",
+      "links": [
+        {
+          "title": "Toàn văn Nghị định 68/2026/NĐ-CP",
+          "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-68-2026-nd-cp-quy-dinh-ve-chinh-sach-thue-quan-ly-thue-voi-ho-kinh-doanh-119260306102906789.htm"
+        },
+        {
+          "title": "Nội dung mới của Nghị định 68/2026 và Thông tư 18/2026",
+          "url": "https://xaydungchinhsach.chinhphu.vn/noi-dung-moi-cua-nghi-dinh-68-2026-nd-cp-va-thong-tu-18-2026-tt-btc-nguoi-nop-thue-can-luu-y-119260312140920747.htm"
+        }
+      ]
+    },
+    {
+      "id": "tinky-tax-howto",
+      "title": "Dùng Tinky để theo dõi thuế",
+      "keywords": [
+        "tinky",
+        "trang tax",
+        "cảnh báo thuế",
+        "bong bóng",
+        "chọn ngành",
+        "tax rules",
+        "ước tính",
+        "doanh thu năm",
+        "business sector"
+      ],
+      "text": "Trong Tinky: trang Tax cho doanh thu năm tính từ các đơn COMPLETED, tiến độ so với ngưỡng 1 tỷ đồng, ước tính VAT và PIT và danh sách việc cần làm. ADMIN chọn ngành nghề (thẻ Business sector) và chỉnh tỷ lệ ở trang Tax rules; mỗi quy tắc có nguồn pháp lý và dấu Verified. Bong bóng trợ lý nhắc khi doanh thu chạm 70%, 90% và 100% ngưỡng và gửi mail cho ADMIN, STORE_MANAGER. Trang Invoices cho báo cáo doanh thu theo ca, ngày, tháng, năm. Con số của Tinky chỉ là ước tính để chuẩn bị, không phải số tiền phải nộp và không thay thế kê khai chính thức.",
+      "source": "Chức năng của Tinky",
+      "note": "",
+      "links": []
+    },
+    {
+      "id": "who-to-ask",
+      "title": "Khi cần hỏi thêm",
+      "keywords": [
+        "hỏi ai",
+        "tư vấn",
+        "kế toán",
+        "liên hệ",
+        "hỗ trợ",
+        "đường dây nóng",
+        "tra cứu văn bản"
+      ],
+      "text": "Khi chưa chắc, hỏi cơ quan thuế quản lý địa điểm kinh doanh (thuế cơ sở), bộ phận đăng ký kinh doanh của UBND cấp xã về hộ kinh doanh, Công an phường hoặc xã về phòng cháy chữa cháy và cơ quan y tế địa phương về an toàn thực phẩm. Văn bản gốc tra trên Công báo điện tử của Chính phủ (congbao.chinhphu.vn), Cổng Xây dựng chính sách pháp luật (xaydungchinhsach.chinhphu.vn), Cơ sở dữ liệu quốc gia về văn bản pháp luật (vbpl.vn) và Cổng thông tin Bộ Tài chính. Mang theo giấy chứng nhận đăng ký hộ kinh doanh, mã số thuế và báo cáo doanh thu từ Tinky để được hướng dẫn nhanh.",
+      "source": "Hướng dẫn chung",
+      "note": "",
+      "links": [
+        {
+          "title": "Công báo điện tử Chính phủ",
+          "url": "https://congbao.chinhphu.vn/"
+        },
+        {
+          "title": "Cơ sở dữ liệu quốc gia về văn bản pháp luật",
+          "url": "https://vbpl.vn/"
+        }
+      ]
+    },
+    {
+      "id": "shopee-revenue-export",
+      "title": "Cách xuất Báo Cáo Doanh Thu trên Kênh Người Bán Shopee",
+      "keywords": [
+        "shopee",
+        "kênh người bán",
+        "doanh thu",
+        "xuất báo cáo",
+        "báo cáo doanh thu",
+        "đã thanh toán",
+        "báo cáo thu nhập",
+        "tải về",
+        "import shopee",
+        "bước 1",
+        "bước 2",
+        "bước 3",
+        "bước 4"
+      ],
+      "text": "Để xuất Báo Cáo Doanh Thu trên Kênh Người Bán Shopee (mục Doanh thu): Bước 1: Tại mục Chi tiết, lựa chọn mục Đã thanh toán. Bước 2: Nhấn chọn Khung thời gian và chọn khoảng thời gian bạn muốn xem dữ liệu. Bước 3: Nhấn Xuất. Bước 4: Nhấn vào biểu tượng menu và chọn Tải về Báo cáo gần nhất bạn đã xuất. Sau khi tải file, vào menu Sales > Import trên Tinky, chọn kênh SHOPEE và tải file lên để ghi nhận vào sổ bán hàng.",
+      "source": "Học viện Shopee Uni (banhang.shopee.vn/edu/article/2072)",
+      "note": "Báo cáo đã xuất trong vòng 6 tháng qua cũng được lưu tại mục Báo cáo của tôi trên Kênh Người Bán.",
+      "links": [
+        {
+          "title": "Hướng dẫn xuất Báo Cáo Doanh Thu Shopee",
+          "url": "https://banhang.shopee.vn/edu/article/2072"
+        }
+      ]
+    }
+  ]
+}
