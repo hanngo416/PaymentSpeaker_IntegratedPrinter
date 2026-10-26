@@ -78,11 +78,13 @@ SELECT N'tax_sector', N'GOODS'
 WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'tax_sector');
 GO
 
-DELETE FROM DiscountCodes;
-INSERT INTO DiscountCodes (code, kind, value, holder, max_uses, valid_from, valid_to) VALUES
+INSERT INTO DiscountCodes (code, kind, value, holder, max_uses, valid_from, valid_to)
+SELECT v.code, v.kind, v.value, v.holder, v.max_uses, v.valid_from, v.valid_to FROM (VALUES
 (N'SUMMER10', N'PERCENT', 10, NULL, NULL, '2026-10-01', '2026-12-31'),
 (N'WELCOME20K', N'FIXED', 20000, NULL, 200, '2026-10-01', '2026-12-31'),
-(N'TINKY123', N'PERCENT', 15, N'Nguyen Van An', 1, '2026-10-01', '2026-12-31');
+(N'TINKY123', N'PERCENT', 15, N'Nguyen Van An', 1, '2026-10-01', '2026-12-31')
+) AS v(code, kind, value, holder, max_uses, valid_from, valid_to)
+WHERE NOT EXISTS (SELECT 1 FROM DiscountCodes d WHERE d.code = v.code);
 GO
 
 INSERT INTO Categories (category_name, display_order)
