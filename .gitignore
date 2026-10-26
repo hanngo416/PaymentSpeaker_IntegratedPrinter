@@ -42,6 +42,7 @@ src/java/gemini.properties
 # Agent, Claude, AI configs and tools
 AGENTS.md
 CLAUDE.md
+AI_CONTEXT.md
 .agents/
 .claude/
 .gemini/

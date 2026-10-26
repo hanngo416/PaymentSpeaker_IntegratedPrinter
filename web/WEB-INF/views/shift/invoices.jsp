@@ -1,16 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="pageTitle" value="Invoices"/>
+<c:set var="pageTitle" value="Shift Reports"/>
 <c:set var="nav" value="invoices"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <div class="card">
-    <h1>Invoices</h1>
+    <h1>Shift & Sales Reports</h1>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
     <c:if test="${not empty error}"><div class="alert-banner"><c:out value="${error}"/></div></c:if>
     <p class="hint">Totals of the completed orders against the money that really reached the account. Choose a day, a month or a year.</p>
 
-    <form method="get" action="${ctx}/invoices" class="filters">
+    <form method="get" action="${ctx}/reports/shifts" class="filters">
         <label>Period
             <select name="type">
                 <option value="day" ${type == 'day' ? 'selected' : ''}>Day</option>
@@ -23,8 +23,8 @@
         <label>Year <input type="number" name="year" min="2000" max="2100" value="<c:out value='${year}'/>"></label>
         <button type="submit" class="primary">Show</button>
         <c:if test="${report != null}">
-            <a class="btn" href="${ctx}/invoices?type=${type}&day=${day}&month=${month}&year=${year}&format=print" target="_blank">Print</a>
-            <a class="btn" href="${ctx}/invoices?type=${type}&day=${day}&month=${month}&year=${year}&format=csv">Export CSV</a>
+            <a class="btn" href="${ctx}/reports/shifts?type=${type}&day=${day}&month=${month}&year=${year}&format=print" target="_blank">Print</a>
+            <a class="btn" href="${ctx}/reports/shifts?type=${type}&day=${day}&month=${month}&year=${year}&format=csv">Export CSV</a>
         </c:if>
     </form>
 </div>
