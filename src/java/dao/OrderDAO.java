@@ -30,12 +30,12 @@ public class OrderDAO {
             + "expires_at, created_at, DATEDIFF(SECOND, GETDATE(), expires_at) AS remaining_seconds "
             + "FROM Orders ";
 
-    private static final String RELEASE_PREFIX = "DECLARE @c TABLE (code NVARCHAR(30), order_id INT); "
+    private static final String RELEASE_PREFIX = "SET XACT_ABORT ON; BEGIN TRAN; DECLARE @c TABLE (code NVARCHAR(30), order_id INT); "
             + "UPDATE Orders SET status = N'CANCELLED' OUTPUT inserted.discount_code, inserted.order_id INTO @c ";
     private static final String RELEASE_SUFFIX = "; UPDATE d SET used_count = d.used_count - (SELECT COUNT(*) FROM @c WHERE code = d.code) "
             + "FROM DiscountCodes d WHERE d.code IN (SELECT code FROM @c); "
             + "UPDATE Commissions SET status = N'REVERSED', amount = 0, reason = N'Order cancelled', updated_at = SYSDATETIME() "
-            + "WHERE order_id IN (SELECT order_id FROM @c) AND status IN (N'PENDING', N'APPROVED', N'ON_HOLD', N'AVAILABLE')";
+            + "WHERE order_id IN (SELECT order_id FROM @c) AND status IN (N'PENDING', N'APPROVED', N'ON_HOLD', N'AVAILABLE'); COMMIT";
 
     public void insert(Order order, int validMinutes) throws SQLException {
         insert(order, validMinutes, null);
