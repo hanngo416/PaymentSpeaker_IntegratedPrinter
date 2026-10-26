@@ -47,7 +47,7 @@
         <p class="hint"><b>How it is worked out:</b> the tax is taken on this year's revenue up to the end of the period, minus what the same rules give for the revenue before the period. Rules used: <c:out value="${result.stamp}"/>. They are <b>${result.verified ? 'verified' : 'not all verified'}</b>.</p>
         <c:if test="${canManage}">
             <form method="post" action="${ctx}/tax/calculator" class="filters">
-                <input type="hidden" name="period" value="${param.period}">
+                <input type="hidden" name="period" value="<c:out value='${param.period}'/>">
                 <input type="hidden" name="revenue" value="<c:out value='${param.revenue}'/>">
                 <input type="hidden" name="adjustment" value="<c:out value='${param.adjustment}'/>">
                 <label>Note <input type="text" name="note" maxlength="200"></label>
