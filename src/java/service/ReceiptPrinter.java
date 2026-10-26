@@ -141,7 +141,7 @@ public class ReceiptPrinter {
 
     private static String ascii(String s) {
         String d = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("\\p{M}", "")
-                .replace('đ', 'd').replace('Đ', 'D');
+                .replace('\u0111', 'd').replace('\u0110', 'D');
         StringBuilder sb = new StringBuilder();
         for (char c : d.toCharArray()) {
             sb.append(c >= 32 && c < 127 ? c : '?');
