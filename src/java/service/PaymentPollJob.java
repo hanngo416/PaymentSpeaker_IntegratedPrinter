@@ -22,6 +22,9 @@ public class PaymentPollJob implements Runnable {
     private static final Logger LOG = Logger.getLogger(PaymentPollJob.class.getName());
     private static final int OVERLAP_MINUTES = 10;
     private static final int MAX_LOOK_BACK_DAYS = 7;
+    private static final int RETRY_LOOK_BACK_MINUTES = 120;
+
+    private boolean retryWide;
 
     private final SepayClient client = new SepayClient();
     private final TransactionIngestService ingestService = new TransactionIngestService();
@@ -33,6 +36,9 @@ public class PaymentPollJob implements Runnable {
         long from = latest != null
                 ? Math.min(latest.getTime(), now) - OVERLAP_MINUTES * 60000L
                 : now - client.getWindowMinutes() * 60000L;
+        if (retryWide) {
+            from = Math.min(from, now - RETRY_LOOK_BACK_MINUTES * 60000L);
+        }
         return new Date(Math.max(from, now - MAX_LOOK_BACK_DAYS * 86400000L));
     }
 
@@ -57,6 +63,7 @@ public class PaymentPollJob implements Runnable {
                             + " " + e.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             }
+            retryWide = failed > 0;
             LOG.log(Level.INFO, "POLL_OK fetched={0} new={1} bad={2} failed={3}", new Object[]{items.size(), created, bad, failed});
         } catch (Exception e) {
             LOG.log(Level.WARNING, "POLL_FAILED " + e.getClass().getSimpleName() + ": " + e.getMessage());
