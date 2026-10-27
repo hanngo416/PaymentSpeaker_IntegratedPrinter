@@ -216,12 +216,55 @@ public class SalesImportService {
         Long ship = optional(rec, col, "shipping_fee", problems);
         Long commission = optional(rec, col, "commission", problems);
         Long cost = optional(rec, col, "cost", problems);
+
+        Long buyerPaid = optional(rec, col, "buyer_paid_amount", problems);
+        Long sellerDisc = optional(rec, col, "seller_discount", problems);
+        Long platDisc = optional(rec, col, "platform_discount", problems);
+        Long serviceFee = optional(rec, col, "service_fee", problems);
+        Long transFee = optional(rec, col, "transaction_fee", problems);
+        Long settleAmt = optional(rec, col, "settlement_amount", problems);
+        String traffic = cell(rec, col, "traffic_source");
+        String sku = cell(rec, col, "sku_code");
+        String pName = cell(rec, col, "product_name");
+        String varName = cell(rec, col, "variation_name");
+        String qtyRaw = cell(rec, col, "quantity");
+
         if (problems.isEmpty()) {
             s.setGoodsAmount(BigDecimal.valueOf(goods));
             s.setPlatformFee(BigDecimal.valueOf(fee));
             s.setShippingFee(BigDecimal.valueOf(ship));
             s.setAffiliateCommission(BigDecimal.valueOf(commission));
             s.setCostAmount(BigDecimal.valueOf(cost));
+
+            s.setBuyerPaidAmount(BigDecimal.valueOf(buyerPaid > 0 ? buyerPaid : goods));
+            s.setSellerDiscount(BigDecimal.valueOf(sellerDisc));
+            s.setPlatformDiscount(BigDecimal.valueOf(platDisc));
+            s.setServiceFee(BigDecimal.valueOf(serviceFee));
+            s.setTransactionFee(BigDecimal.valueOf(transFee));
+            if (settleAmt > 0) {
+                s.setSettlementAmount(BigDecimal.valueOf(settleAmt));
+            }
+            if (!traffic.isEmpty()) {
+                s.setTrafficSource(traffic);
+            }
+            if (!sku.isEmpty() || !pName.isEmpty()) {
+                model.ChannelSaleItem item = new model.ChannelSaleItem();
+                item.setSkuCode(!sku.isEmpty() ? sku : ref);
+                item.setProductName(!pName.isEmpty() ? pName : "Product " + ref);
+                item.setVariationName(!varName.isEmpty() ? varName : null);
+                int q = 1;
+                try {
+                    if (!qtyRaw.isEmpty()) {
+                        q = Math.max(1, Integer.parseInt(qtyRaw));
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+                item.setQuantity(q);
+                item.setUnitPrice(BigDecimal.valueOf(goods));
+                item.setSubtotal(BigDecimal.valueOf(goods));
+                item.setCostPrice(BigDecimal.valueOf(cost));
+                s.getItems().add(item);
+            }
         }
         return s;
     }

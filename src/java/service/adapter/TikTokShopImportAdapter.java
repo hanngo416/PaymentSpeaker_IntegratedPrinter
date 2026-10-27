@@ -18,6 +18,17 @@ public class TikTokShopImportAdapter implements ChannelImportAdapter {
         alias("shipping_fee", "seller_shipping_fee", "original_shipping_fee", "shipping_fee");
         alias("commission", "creator_commission", "affiliate_commission", "commission");
         alias("cost", "cost_of_goods", "cost", "cogs");
+        alias("buyer_paid_amount", "buyer_paid_amount", "buyer_paid");
+        alias("seller_discount", "seller_discount", "seller_voucher");
+        alias("platform_discount", "platform_discount", "tiktok_discount");
+        alias("service_fee", "platform_commission", "commission_fee");
+        alias("transaction_fee", "payment_platform_fee", "transaction_fee");
+        alias("settlement_amount", "settlement_amount", "actual_settlement");
+        alias("traffic_source", "traffic_type", "traffic_source", "source");
+        alias("sku_code", "seller_sku", "sku_id", "sku");
+        alias("product_name", "product_name");
+        alias("variation_name", "variation");
+        alias("quantity", "quantity", "qty");
     }
 
     private void alias(String canon, String... names) {
