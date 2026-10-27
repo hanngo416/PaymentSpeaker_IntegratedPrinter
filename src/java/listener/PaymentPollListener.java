@@ -57,5 +57,15 @@ public class PaymentPollListener implements ServletContextListener {
         if (scheduler != null) {
             scheduler.shutdownNow();
         }
+        java.util.Enumeration<java.sql.Driver> drivers = java.sql.DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            java.sql.Driver driver = drivers.nextElement();
+            if (driver.getClass().getClassLoader() == getClass().getClassLoader()) {
+                try {
+                    java.sql.DriverManager.deregisterDriver(driver);
+                } catch (java.sql.SQLException ignored) {
+                }
+            }
+        }
     }
 }
