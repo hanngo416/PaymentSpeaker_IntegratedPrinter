@@ -134,8 +134,8 @@ public class PayoutDAO {
                     String bank = "";
                     try (PreparedStatement ps = con.prepareStatement(
                             "SELECT ISNULL(bank_name + N' ' + bank_account, N'') AS bank, "
-                            + "ISNULL((SELECT SUM(amount) FROM Commissions WITH (UPDLOCK) WHERE affiliate_id = a.affiliate_id AND status = N'AVAILABLE'), 0) "
-                            + "+ ISNULL((SELECT SUM(amount) FROM CommissionAdjustments WITH (UPDLOCK) WHERE affiliate_id = a.affiliate_id AND payout_id IS NULL), 0) AS gross "
+                            + "ISNULL((SELECT SUM(amount) FROM Commissions WITH (UPDLOCK, HOLDLOCK) WHERE affiliate_id = a.affiliate_id AND status = N'AVAILABLE'), 0) "
+                            + "+ ISNULL((SELECT SUM(amount) FROM CommissionAdjustments WITH (UPDLOCK, HOLDLOCK) WHERE affiliate_id = a.affiliate_id AND payout_id IS NULL), 0) AS gross "
                             + "FROM Affiliates a WHERE a.affiliate_id = ? AND a.status <> N'SUSPENDED' AND a.bank_account IS NOT NULL")) {
                         ps.setInt(1, affId);
                         try (ResultSet rs = ps.executeQuery()) {
