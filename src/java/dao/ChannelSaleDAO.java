@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -58,9 +59,11 @@ public class ChannelSaleDAO {
 
     public void insert(Connection con, ChannelSale s) throws SQLException {
         String sql = "INSERT INTO ChannelSales (channel, external_ref, sold_at, status, goods_amount, platform_fee, "
-                + "shipping_fee, affiliate_id, affiliate_commission, cost_amount, note, created_by) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+                + "shipping_fee, affiliate_id, affiliate_commission, cost_amount, note, created_by, "
+                + "buyer_paid_amount, seller_discount, platform_discount, service_fee, transaction_fee, "
+                + "settled_at, settlement_amount, settlement_status, traffic_source, cancel_reason) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, s.getChannel());
             ps.setString(2, s.getExternalRef());
             ps.setTimestamp(3, s.getSoldAt());
@@ -77,7 +80,43 @@ public class ChannelSaleDAO {
             ps.setBigDecimal(10, s.getCostAmount());
             ps.setString(11, s.getNote());
             ps.setInt(12, s.getCreatedBy());
+            ps.setBigDecimal(13, s.getBuyerPaidAmount() != null ? s.getBuyerPaidAmount() : BigDecimal.ZERO);
+            ps.setBigDecimal(14, s.getSellerDiscount() != null ? s.getSellerDiscount() : BigDecimal.ZERO);
+            ps.setBigDecimal(15, s.getPlatformDiscount() != null ? s.getPlatformDiscount() : BigDecimal.ZERO);
+            ps.setBigDecimal(16, s.getServiceFee() != null ? s.getServiceFee() : BigDecimal.ZERO);
+            ps.setBigDecimal(17, s.getTransactionFee() != null ? s.getTransactionFee() : BigDecimal.ZERO);
+            ps.setTimestamp(18, s.getSettledAt());
+            if (s.getSettlementAmount() == null) {
+                ps.setNull(19, Types.DECIMAL);
+            } else {
+                ps.setBigDecimal(19, s.getSettlementAmount());
+            }
+            ps.setString(20, s.getSettlementStatus() != null ? s.getSettlementStatus() : "SETTLED");
+            ps.setString(21, s.getTrafficSource());
+            ps.setString(22, s.getCancelReason());
             ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    s.setSaleId(rs.getInt(1));
+                }
+            }
+        }
+        if (s.getItems() != null && !s.getItems().isEmpty() && s.getSaleId() > 0) {
+            String itemSql = "INSERT INTO ChannelSaleItems (sale_id, sku_code, product_name, variation_name, quantity, unit_price, subtotal, cost_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement ips = con.prepareStatement(itemSql)) {
+                for (model.ChannelSaleItem it : s.getItems()) {
+                    ips.setInt(1, s.getSaleId());
+                    ips.setString(2, it.getSkuCode());
+                    ips.setString(3, it.getProductName());
+                    ips.setString(4, it.getVariationName());
+                    ips.setInt(5, it.getQuantity());
+                    ips.setBigDecimal(6, it.getUnitPrice());
+                    ips.setBigDecimal(7, it.getSubtotal());
+                    ips.setBigDecimal(8, it.getCostPrice());
+                    ips.addBatch();
+                }
+                ips.executeBatch();
+            }
         }
     }
 

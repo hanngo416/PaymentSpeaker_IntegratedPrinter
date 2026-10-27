@@ -21,6 +21,18 @@ public class ChannelSale {
     private Timestamp createdAt;
     private String affiliateName;
 
+    private BigDecimal buyerPaidAmount = BigDecimal.ZERO;
+    private BigDecimal sellerDiscount = BigDecimal.ZERO;
+    private BigDecimal platformDiscount = BigDecimal.ZERO;
+    private BigDecimal serviceFee = BigDecimal.ZERO;
+    private BigDecimal transactionFee = BigDecimal.ZERO;
+    private Timestamp settledAt;
+    private BigDecimal settlementAmount;
+    private String settlementStatus = "SETTLED";
+    private String trafficSource;
+    private String cancelReason;
+    private java.util.List<ChannelSaleItem> items = new java.util.ArrayList<>();
+
     public ChannelSale() {
     }
 
@@ -142,5 +154,93 @@ public class ChannelSale {
 
     public void setAffiliateName(String affiliateName) {
         this.affiliateName = affiliateName;
+    }
+
+    public BigDecimal getBuyerPaidAmount() {
+        return buyerPaidAmount;
+    }
+
+    public void setBuyerPaidAmount(BigDecimal buyerPaidAmount) {
+        this.buyerPaidAmount = buyerPaidAmount;
+    }
+
+    public BigDecimal getSellerDiscount() {
+        return sellerDiscount;
+    }
+
+    public void setSellerDiscount(BigDecimal sellerDiscount) {
+        this.sellerDiscount = sellerDiscount;
+    }
+
+    public BigDecimal getPlatformDiscount() {
+        return platformDiscount;
+    }
+
+    public void setPlatformDiscount(BigDecimal platformDiscount) {
+        this.platformDiscount = platformDiscount;
+    }
+
+    public BigDecimal getServiceFee() {
+        return serviceFee;
+    }
+
+    public void setServiceFee(BigDecimal serviceFee) {
+        this.serviceFee = serviceFee;
+    }
+
+    public BigDecimal getTransactionFee() {
+        return transactionFee;
+    }
+
+    public void setTransactionFee(BigDecimal transactionFee) {
+        this.transactionFee = transactionFee;
+    }
+
+    public Timestamp getSettledAt() {
+        return settledAt;
+    }
+
+    public void setSettledAt(Timestamp settledAt) {
+        this.settledAt = settledAt;
+    }
+
+    public BigDecimal getSettlementAmount() {
+        return settlementAmount;
+    }
+
+    public void setSettlementAmount(BigDecimal settlementAmount) {
+        this.settlementAmount = settlementAmount;
+    }
+
+    public String getSettlementStatus() {
+        return settlementStatus;
+    }
+
+    public void setSettlementStatus(String settlementStatus) {
+        this.settlementStatus = settlementStatus;
+    }
+
+    public String getTrafficSource() {
+        return trafficSource;
+    }
+
+    public void setTrafficSource(String trafficSource) {
+        this.trafficSource = trafficSource;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public java.util.List<ChannelSaleItem> getItems() {
+        return items;
+    }
+
+    public void setItems(java.util.List<ChannelSaleItem> items) {
+        this.items = items;
     }
 }

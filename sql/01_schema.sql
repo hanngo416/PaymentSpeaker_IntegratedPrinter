@@ -352,6 +352,53 @@ CREATE TABLE ChannelSales (
 );
 GO
 
+IF COL_LENGTH('ChannelSales', 'buyer_paid_amount') IS NULL
+ALTER TABLE ChannelSales ADD buyer_paid_amount DECIMAL(18,2) NOT NULL DEFAULT 0;
+GO
+IF COL_LENGTH('ChannelSales', 'seller_discount') IS NULL
+ALTER TABLE ChannelSales ADD seller_discount DECIMAL(18,2) NOT NULL DEFAULT 0;
+GO
+IF COL_LENGTH('ChannelSales', 'platform_discount') IS NULL
+ALTER TABLE ChannelSales ADD platform_discount DECIMAL(18,2) NOT NULL DEFAULT 0;
+GO
+IF COL_LENGTH('ChannelSales', 'service_fee') IS NULL
+ALTER TABLE ChannelSales ADD service_fee DECIMAL(18,2) NOT NULL DEFAULT 0;
+GO
+IF COL_LENGTH('ChannelSales', 'transaction_fee') IS NULL
+ALTER TABLE ChannelSales ADD transaction_fee DECIMAL(18,2) NOT NULL DEFAULT 0;
+GO
+IF COL_LENGTH('ChannelSales', 'settled_at') IS NULL
+ALTER TABLE ChannelSales ADD settled_at DATETIME2(3) NULL;
+GO
+IF COL_LENGTH('ChannelSales', 'settlement_amount') IS NULL
+ALTER TABLE ChannelSales ADD settlement_amount DECIMAL(18,2) NULL;
+GO
+IF COL_LENGTH('ChannelSales', 'settlement_status') IS NULL
+ALTER TABLE ChannelSales ADD settlement_status NVARCHAR(20) NOT NULL DEFAULT 'SETTLED';
+GO
+IF COL_LENGTH('ChannelSales', 'traffic_source') IS NULL
+ALTER TABLE ChannelSales ADD traffic_source NVARCHAR(50) NULL;
+GO
+IF COL_LENGTH('ChannelSales', 'cancel_reason') IS NULL
+ALTER TABLE ChannelSales ADD cancel_reason NVARCHAR(255) NULL;
+GO
+
+IF OBJECT_ID('ChannelSaleItems', 'U') IS NULL
+CREATE TABLE ChannelSaleItems (
+    item_id INT IDENTITY(1,1) PRIMARY KEY,
+    sale_id INT NOT NULL,
+    sku_code NVARCHAR(50) NOT NULL,
+    product_name NVARCHAR(255) NOT NULL,
+    variation_name NVARCHAR(100) NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    unit_price DECIMAL(18,2) NOT NULL DEFAULT 0,
+    subtotal DECIMAL(18,2) NOT NULL DEFAULT 0,
+    cost_price DECIMAL(18,2) NOT NULL DEFAULT 0,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_ChannelSaleItems_Sale FOREIGN KEY (sale_id) REFERENCES ChannelSales(sale_id) ON DELETE CASCADE
+);
+GO
+
 IF OBJECT_ID('Invoices', 'U') IS NULL
 CREATE TABLE Invoices (
     invoice_id INT IDENTITY(1,1) PRIMARY KEY,
