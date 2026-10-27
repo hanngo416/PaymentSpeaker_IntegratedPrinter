@@ -9,13 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light only">
     <title><c:out value="${report.title}"/></title>
-    <link rel="stylesheet" href="${ctx}/assets/css/base.css?v=38">
-    <link rel="stylesheet" href="${ctx}/assets/css/guide.css?v=38">
-    <link rel="stylesheet" href="${ctx}/assets/css/dashboard.css?v=38">
-    <link rel="stylesheet" href="${ctx}/assets/css/auth.css?v=38">
-    <link rel="stylesheet" href="${ctx}/assets/css/receipt.css?v=38">
-    <link rel="stylesheet" href="${ctx}/assets/css/screens.css?v=38">
-    <link rel="stylesheet" href="${ctx}/assets/css/tools.css?v=38">
+    <link rel="stylesheet" href="${ctx}/assets/css/base.css?v=42">
+    <link rel="stylesheet" href="${ctx}/assets/css/guide.css?v=42">
+    <link rel="stylesheet" href="${ctx}/assets/css/dashboard.css?v=42">
+    <link rel="stylesheet" href="${ctx}/assets/css/auth.css?v=42">
+    <link rel="stylesheet" href="${ctx}/assets/css/receipt.css?v=42">
+    <link rel="stylesheet" href="${ctx}/assets/css/screens.css?v=42">
+    <link rel="stylesheet" href="${ctx}/assets/css/tools.css?v=42">
     <style>
         @page {
             size: 80mm auto;
