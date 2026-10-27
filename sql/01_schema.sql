@@ -793,3 +793,39 @@ CREATE TABLE GuideProgress (
     CONSTRAINT UQ_GuideProgress UNIQUE (user_id, article_id, kind)
 );
 GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Orders_CreatedBy' AND object_id = OBJECT_ID(N'Orders'))
+CREATE INDEX IX_Orders_CreatedBy ON Orders(created_by);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Orders_Referral' AND object_id = OBJECT_ID(N'Orders'))
+CREATE INDEX IX_Orders_Referral ON Orders(referred_by_affiliate_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Orders_Status' AND object_id = OBJECT_ID(N'Orders'))
+CREATE INDEX IX_Orders_Status ON Orders(status, created_at);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Transactions_OrderId' AND object_id = OBJECT_ID(N'Transactions'))
+CREATE INDEX IX_Transactions_OrderId ON Transactions(order_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_FraudAlerts_TransId' AND object_id = OBJECT_ID(N'FraudAlerts'))
+CREATE INDEX IX_FraudAlerts_TransId ON FraudAlerts(trans_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_AuditLogs_CreatedAt' AND object_id = OBJECT_ID(N'AuditLogs'))
+CREATE INDEX IX_AuditLogs_CreatedAt ON AuditLogs(created_at);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_InvoiceLines_InvoiceId' AND object_id = OBJECT_ID(N'InvoiceLines'))
+CREATE INDEX IX_InvoiceLines_InvoiceId ON InvoiceLines(invoice_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Commissions_Payout' AND object_id = OBJECT_ID(N'Commissions'))
+CREATE INDEX IX_Commissions_Payout ON Commissions(payout_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ChPayItems_Commission' AND object_id = OBJECT_ID(N'ChannelPayoutItems'))
+CREATE INDEX IX_ChPayItems_Commission ON ChannelPayoutItems(commission_id);
+GO
