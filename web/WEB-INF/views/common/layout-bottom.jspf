@@ -15,7 +15,7 @@
     </div>
 </div>
 <div id="announcer" hidden data-poll-url="${ctx}/speaker/poll" data-ack-url="${ctx}/speaker/ack" data-print-url="${ctx}/printer/print"></div>
-<script src="${ctx}/assets/js/announcer.js?v=4" charset="UTF-8"></script>
+<script src="${ctx}/assets/js/announcer.js?v=5" charset="UTF-8"></script>
 </c:if>
 <div class="tax-bot level0" id="taxBot" data-feed-url="<c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">${ctx}/bot/feed</c:if>" data-chat-url="${ctx}/bot/chat" data-ctx="${ctx}">
     <div class="bot-panel" id="botPanel" hidden>

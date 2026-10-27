@@ -135,12 +135,13 @@
     function confirm() {
         if (queue.length === 0) { return; }
         var item = queue[0];
-        printReceipt(item);
         confirmed[item.id] = true;
         remove(item.id);
         var body = new URLSearchParams();
         body.append('id', item.id);
-        fetch(ackUrl, { method: 'POST', body: body, credentials: 'same-origin', keepalive: true }).catch(function () { });
+        fetch(ackUrl, { method: 'POST', body: body, credentials: 'same-origin', keepalive: true })
+            .then(function (res) { if (res.status === 204) { printReceipt(item); } })
+            .catch(function () { });
         drop(SAID_PREFIX + item.id);
         save(ACKED_KEY, item.id + '@' + Date.now());
         addHistory(item);

@@ -42,12 +42,13 @@ public class SpeakerServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        boolean first;
         try {
-            transactionDAO.markAnnounced(id);
+            first = transactionDAO.markAnnounced(id);
         } catch (SQLException e) {
             throw new ServletException("Cannot mark the transaction as announced", e);
         }
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        response.setStatus(first ? HttpServletResponse.SC_NO_CONTENT : HttpServletResponse.SC_CONFLICT);
     }
 
     private void writePollJson(HttpServletResponse response) throws ServletException, IOException {
