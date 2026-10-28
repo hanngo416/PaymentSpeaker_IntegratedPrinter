@@ -628,3 +628,15 @@ PRINT N'>>> Database and sample data for PaymentSpeaker loaded successfully!';
 GO
 SET NOEXEC OFF;
 GO
+
+INSERT INTO Settings (setting_key, setting_value)
+SELECT N'stock_low_threshold', N'5'
+WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'stock_low_threshold');
+GO
+
+INSERT INTO StockMovements (product_id, quantity_change, quantity_after, reason, note)
+SELECT p.product_id, p.stock_quantity, p.stock_quantity, N'INITIAL', N'Opening balance'
+FROM Products p
+WHERE p.stock_quantity <> 0
+  AND NOT EXISTS (SELECT 1 FROM StockMovements m WHERE m.product_id = p.product_id);
+GO

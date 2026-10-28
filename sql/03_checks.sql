@@ -105,3 +105,9 @@ GO
 SELECT o.obligation_id FROM TaxObligations o
 WHERE o.status = 'PAID' AND (o.confirmed_amount IS NULL OR o.confirmed_amount > ISNULL((SELECT SUM(amount) FROM TaxPayments p WHERE p.obligation_id = o.obligation_id), 0));
 GO
+
+-- CHECK: a product that has stock movements shows the quantity_after of its latest movement. Expect no rows
+SELECT p.product_id, p.product_code, p.stock_quantity FROM Products p
+WHERE EXISTS (SELECT 1 FROM StockMovements m WHERE m.product_id = p.product_id)
+  AND p.stock_quantity <> (SELECT TOP 1 m.quantity_after FROM StockMovements m WHERE m.product_id = p.product_id ORDER BY m.movement_id DESC);
+GO

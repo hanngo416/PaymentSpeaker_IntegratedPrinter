@@ -16,6 +16,7 @@ IF OBJECT_ID('Expenses', 'U') IS NOT NULL DROP TABLE Expenses;
 IF OBJECT_ID('CommissionAdjustments', 'U') IS NOT NULL DROP TABLE CommissionAdjustments;
 IF OBJECT_ID('Commissions', 'U') IS NOT NULL DROP TABLE Commissions;
 IF OBJECT_ID('Payouts', 'U') IS NOT NULL DROP TABLE Payouts;
+IF OBJECT_ID('StockMovements', 'U') IS NOT NULL DROP TABLE StockMovements;
 IF OBJECT_ID('OrderItems', 'U') IS NOT NULL DROP TABLE OrderItems;
 IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
 IF OBJECT_ID('Campaigns', 'U') IS NOT NULL DROP TABLE Campaigns;

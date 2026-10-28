@@ -834,3 +834,29 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Payouts_OneRequest' A
 AND NOT EXISTS (SELECT 1 FROM Payouts WHERE status = N'REQUESTED' GROUP BY affiliate_id HAVING COUNT(*) > 1)
 CREATE UNIQUE INDEX UX_Payouts_OneRequest ON Payouts(affiliate_id) WHERE status = N'REQUESTED';
 GO
+
+IF OBJECT_ID('StockMovements', 'U') IS NULL
+CREATE TABLE StockMovements (
+    movement_id INT IDENTITY(1,1) PRIMARY KEY,
+    product_id INT NOT NULL,
+    quantity_change INT NOT NULL,
+    quantity_after INT NOT NULL,
+    reason NVARCHAR(10) NOT NULL,
+    order_id INT NULL,
+    note NVARCHAR(200) NULL,
+    created_by INT NULL,
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT CK_StockMovements_Reason CHECK (reason IN (N'INITIAL', N'SALE', N'RESTOCK', N'ADJUST')),
+    CONSTRAINT FK_StockMovements_Products FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
+    CONSTRAINT FK_StockMovements_Orders FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    CONSTRAINT FK_StockMovements_Users FOREIGN KEY (created_by) REFERENCES Users(user_id)
+);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_StockMovements_Product' AND object_id = OBJECT_ID(N'StockMovements'))
+CREATE INDEX IX_StockMovements_Product ON StockMovements(product_id, created_at);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_StockMovements_Order' AND object_id = OBJECT_ID(N'StockMovements'))
+CREATE INDEX IX_StockMovements_Order ON StockMovements(order_id);
+GO
