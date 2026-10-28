@@ -829,3 +829,8 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ChPayItems_Commission' AND object_id = OBJECT_ID(N'ChannelPayoutItems'))
 CREATE INDEX IX_ChPayItems_Commission ON ChannelPayoutItems(commission_id);
 GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Payouts_OneRequest' AND object_id = OBJECT_ID(N'Payouts'))
+AND NOT EXISTS (SELECT 1 FROM Payouts WHERE status = N'REQUESTED' GROUP BY affiliate_id HAVING COUNT(*) > 1)
+CREATE UNIQUE INDEX UX_Payouts_OneRequest ON Payouts(affiliate_id) WHERE status = N'REQUESTED';
+GO

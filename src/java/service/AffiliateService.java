@@ -130,7 +130,14 @@ public class AffiliateService {
         if (payoutDAO.hasOpenRequest(a.getAffiliateId())) {
             throw new IllegalArgumentException("A payout request is already waiting.");
         }
-        payoutDAO.request(a.getAffiliateId(), w.getAvailable(), deduction(a, w.getAvailable()), a.getBankName() + " " + a.getBankAccount());
+        try {
+            payoutDAO.request(a.getAffiliateId(), w.getAvailable(), deduction(a, w.getAvailable()), a.getBankName() + " " + a.getBankAccount());
+        } catch (SQLException e) {
+            if (util.SqlErrors.isDuplicateKey(e)) {
+                throw new IllegalArgumentException("A payout request is already waiting.");
+            }
+            throw e;
+        }
     }
 
     private int intSetting(String key, int fallback) throws SQLException {
