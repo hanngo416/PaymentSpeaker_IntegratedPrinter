@@ -6,6 +6,7 @@ import filter.RolePermissions;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,6 +40,15 @@ public class DeviceServlet extends HttpServlet {
             java.util.List<Device> devices = deviceDAO.findAll();
             new service.PrinterStatusService().apply(devices);
             request.setAttribute("devices", devices);
+
+            Map<String, String> sepayStatus = new LinkedHashMap<>();
+            dao.SettingDAO settingDAO = new dao.SettingDAO();
+            sepayStatus.put("lastPollTime", settingDAO.get("sepay_last_poll_time", "-"));
+            sepayStatus.put("lastStatus", settingDAO.get("sepay_last_status", "UNKNOWN"));
+            sepayStatus.put("lastCount", settingDAO.get("sepay_last_count", "0"));
+            sepayStatus.put("lastError", settingDAO.get("sepay_last_error", ""));
+            sepayStatus.put("consecutiveFailures", settingDAO.get("sepay_consecutive_failures", "0"));
+            request.setAttribute("sepayStatus", sepayStatus);
         } catch (SQLException e) {
             throw new ServletException("Cannot load devices", e);
         }

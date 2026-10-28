@@ -11,6 +11,67 @@
 </div>
 
 <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h2 style="margin: 0; font-size: 1.25rem;">Payment Gateway (SePay)</h2>
+            <p class="hint" style="margin: 0.25rem 0 0 0;">Automatic background synchronization for VietQR bank transfers.</p>
+        </div>
+        <div>
+            <c:choose>
+                <c:when test="${sepayStatus.lastStatus == 'SUCCESS' && sepayStatus.consecutiveFailures == '0'}">
+                    <span class="pill ACTIVE">ONLINE</span>
+                </c:when>
+                <c:when test="${sepayStatus.consecutiveFailures > 0 && sepayStatus.consecutiveFailures < 5}">
+                    <span class="pill PENDING">DEGRADED (<c:out value="${sepayStatus.consecutiveFailures}"/> errors)</span>
+                </c:when>
+                <c:when test="${sepayStatus.consecutiveFailures >= 5}">
+                    <span class="pill LOCKED">DISCONNECTED</span>
+                </c:when>
+                <c:otherwise>
+                    <span class="pill PENDING"><c:out value="${sepayStatus.lastStatus}"/></span>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div style="padding: 0.85rem; border-radius: 12px; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6);">
+            <div style="font-size: 0.8rem; color: #6b7280; text-transform: uppercase; font-weight: 600;">Last Sync Time</div>
+            <div style="font-size: 1.05rem; font-weight: 600; margin-top: 0.25rem; color: #1f2937;">
+                <c:out value="${sepayStatus.lastPollTime}"/>
+            </div>
+        </div>
+        <div style="padding: 0.85rem; border-radius: 12px; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6);">
+            <div style="font-size: 0.8rem; color: #6b7280; text-transform: uppercase; font-weight: 600;">Sync Status</div>
+            <div style="font-size: 1.05rem; font-weight: 600; margin-top: 0.25rem; color: #1f2937;">
+                <c:out value="${sepayStatus.lastStatus}"/>
+            </div>
+        </div>
+        <div style="padding: 0.85rem; border-radius: 12px; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6);">
+            <div style="font-size: 0.8rem; color: #6b7280; text-transform: uppercase; font-weight: 600;">Last Ingested</div>
+            <div style="font-size: 1.05rem; font-weight: 600; margin-top: 0.25rem; color: #1f2937;">
+                <c:out value="${sepayStatus.lastCount}"/> orders
+            </div>
+        </div>
+        <div style="padding: 0.85rem; border-radius: 12px; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6);">
+            <div style="font-size: 0.8rem; color: #6b7280; text-transform: uppercase; font-weight: 600;">Failures / Backoff</div>
+            <div style="font-size: 1.05rem; font-weight: 600; margin-top: 0.25rem; color: #1f2937;">
+                <c:choose>
+                    <c:when test="${sepayStatus.consecutiveFailures == '0'}">Normal (5s)</c:when>
+                    <c:when test="${sepayStatus.consecutiveFailures == '1'}">Backoff (15s)</c:when>
+                    <c:when test="${sepayStatus.consecutiveFailures == '2'}">Backoff (30s)</c:when>
+                    <c:otherwise>Backoff (60s max)</c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+    </div>
+    <c:if test="${not empty sepayStatus.lastError}">
+        <div style="margin-top: 0.85rem; padding: 0.65rem 0.85rem; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.85rem; color: #b91c1c;">
+            <strong>Recent Error:</strong> <c:out value="${sepayStatus.lastError}"/>
+        </div>
+    </c:if>
+</div>
+
+<div class="card">
     <table>
         <thead>
         <tr><th>Code</th><th>Type</th><th>Model</th><th>Status</th><th>Last seen</th><c:if test="${canWrite}"><th>Action</th></c:if></tr>
