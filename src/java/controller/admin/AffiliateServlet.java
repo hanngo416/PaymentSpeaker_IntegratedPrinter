@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.Affiliate;
 import model.Page;
 import model.User;
+import model.enums.Role;
 import service.AffiliateService;
 import service.AuditService;
 import util.SqlErrors;
@@ -137,10 +138,19 @@ public class AffiliateServlet extends AffiliateBase {
         }
         a.setName(name);
         a.setEmail(trim(request.getParameter("email")));
+        String oldEmail = current.getEmail() == null ? "" : current.getEmail();
+        String newEmail = a.getEmail() == null ? "" : a.getEmail();
+        boolean emailChanged = !oldEmail.equalsIgnoreCase(newEmail);
+        if (emailChanged && actor.getRole() != Role.ADMIN) {
+            errors.put("email", "Only an administrator can change the affiliate email.");
+        }
         readProfile(request, a, errors);
         if (errors.isEmpty()) {
             try {
                 affiliateDAO.updateProfile(a);
+                if (emailChanged) {
+                    AuditService.log(actor, "AFFILIATE_EMAIL_CHANGE", "AFFILIATE", a.getReferralCode(), "from", oldEmail, "to", newEmail);
+                }
                 AuditService.log(actor, "AFFILIATE_UPDATE", "AFFILIATE", a.getReferralCode());
                 redirect(request, response, "/admin/affiliates?id=" + a.getAffiliateId(), "saved");
                 return;
