@@ -22,6 +22,16 @@ public class ChannelAnalyticsService {
         public List<ChannelAnalyticsDAO.TrafficMetric> trafficMetrics;
         public List<ChannelAnalyticsDAO.DailyTrend> dailyTrends;
         public ChannelAnalyticsDAO.DataAvailability availability;
+
+        public String getPeriod() { return period; }
+        public String getChannel() { return channel; }
+        public List<ChannelAnalyticsDAO.ChannelMetric> getChannelMetrics() { return channelMetrics; }
+        public ChannelAnalyticsDAO.FeeWaterfall getShopeeWaterfall() { return shopeeWaterfall; }
+        public ChannelAnalyticsDAO.FeeWaterfall getTiktokWaterfall() { return tiktokWaterfall; }
+        public List<ChannelAnalyticsDAO.SkuPerformance> getTopSkus() { return topSkus; }
+        public List<ChannelAnalyticsDAO.TrafficMetric> getTrafficMetrics() { return trafficMetrics; }
+        public List<ChannelAnalyticsDAO.DailyTrend> getDailyTrends() { return dailyTrends; }
+        public ChannelAnalyticsDAO.DataAvailability getAvailability() { return availability; }
     }
 
     public AnalyticsBundle getAnalytics(String period, String channel) throws SQLException {

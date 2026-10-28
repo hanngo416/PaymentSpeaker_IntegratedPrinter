@@ -29,6 +29,22 @@ public class ChannelAnalyticsDAO {
         public BigDecimal averageOrderValue = BigDecimal.ZERO;
         public BigDecimal cancelRatePct = BigDecimal.ZERO;
         public BigDecimal returnRatePct = BigDecimal.ZERO;
+
+        public String getChannel() { return channel; }
+        public int getCompletedOrders() { return completedOrders; }
+        public int getCancelledOrders() { return cancelledOrders; }
+        public int getReturnedOrders() { return returnedOrders; }
+        public int getTotalOrders() { return totalOrders; }
+        public BigDecimal getGmv() { return gmv; }
+        public BigDecimal getGrossRevenue() { return grossRevenue; }
+        public BigDecimal getTotalDeductions() { return totalDeductions; }
+        public BigDecimal getNetRevenue() { return netRevenue; }
+        public BigDecimal getCogs() { return cogs; }
+        public BigDecimal getNetProfit() { return netProfit; }
+        public BigDecimal getProfitMarginPct() { return profitMarginPct; }
+        public BigDecimal getAverageOrderValue() { return averageOrderValue; }
+        public BigDecimal getCancelRatePct() { return cancelRatePct; }
+        public BigDecimal getReturnRatePct() { return returnRatePct; }
     }
 
     public static class FeeWaterfall {
@@ -46,6 +62,21 @@ public class ChannelAnalyticsDAO {
         public BigDecimal netProfit = BigDecimal.ZERO;
         public BigDecimal settledAmount = BigDecimal.ZERO;
         public BigDecimal pendingEscrow = BigDecimal.ZERO;
+
+        public String getChannel() { return channel; }
+        public BigDecimal getGrossRevenue() { return grossRevenue; }
+        public BigDecimal getFixedFee() { return fixedFee; }
+        public BigDecimal getServiceFee() { return serviceFee; }
+        public BigDecimal getTransactionFee() { return transactionFee; }
+        public BigDecimal getShippingFee() { return shippingFee; }
+        public BigDecimal getAffiliateFee() { return affiliateFee; }
+        public BigDecimal getTotalFees() { return totalFees; }
+        public BigDecimal getNetRevenue() { return netRevenue; }
+        public BigDecimal getCogs() { return cogs; }
+        public BigDecimal getTaxReserve() { return taxReserve; }
+        public BigDecimal getNetProfit() { return netProfit; }
+        public BigDecimal getSettledAmount() { return settledAmount; }
+        public BigDecimal getPendingEscrow() { return pendingEscrow; }
     }
 
     public static class SkuPerformance {
@@ -57,6 +88,15 @@ public class ChannelAnalyticsDAO {
         public BigDecimal cost = BigDecimal.ZERO;
         public BigDecimal profit = BigDecimal.ZERO;
         public BigDecimal marginPct = BigDecimal.ZERO;
+
+        public String getSkuCode() { return skuCode; }
+        public String getProductName() { return productName; }
+        public String getVariationName() { return variationName; }
+        public int getUnitsSold() { return unitsSold; }
+        public BigDecimal getRevenue() { return revenue; }
+        public BigDecimal getCost() { return cost; }
+        public BigDecimal getProfit() { return profit; }
+        public BigDecimal getMarginPct() { return marginPct; }
     }
 
     public static class TrafficMetric {
@@ -64,6 +104,11 @@ public class ChannelAnalyticsDAO {
         public int orderCount;
         public BigDecimal revenue = BigDecimal.ZERO;
         public BigDecimal sharePct = BigDecimal.ZERO;
+
+        public String getSource() { return source; }
+        public int getOrderCount() { return orderCount; }
+        public BigDecimal getRevenue() { return revenue; }
+        public BigDecimal getSharePct() { return sharePct; }
     }
 
     public static class DailyTrend {
@@ -72,12 +117,25 @@ public class ChannelAnalyticsDAO {
         public BigDecimal shopeeRevenue = BigDecimal.ZERO;
         public BigDecimal tiktokRevenue = BigDecimal.ZERO;
         public BigDecimal totalProfit = BigDecimal.ZERO;
+
+        public String getDate() { return date; }
+        public BigDecimal getStoreRevenue() { return storeRevenue; }
+        public BigDecimal getShopeeRevenue() { return shopeeRevenue; }
+        public BigDecimal getTiktokRevenue() { return tiktokRevenue; }
+        public BigDecimal getTotalProfit() { return totalProfit; }
     }
 
     public static class DataAvailability {
         public boolean hasItemData;
         public boolean hasTrafficData;
         public boolean hasSettlementData;
+
+        public boolean isHasItemData() { return hasItemData; }
+        public boolean getHasItemData() { return hasItemData; }
+        public boolean isHasTrafficData() { return hasTrafficData; }
+        public boolean getHasTrafficData() { return hasTrafficData; }
+        public boolean isHasSettlementData() { return hasSettlementData; }
+        public boolean getHasSettlementData() { return hasSettlementData; }
     }
 
     public DataAvailability checkAvailability(Timestamp from, Timestamp to) throws SQLException {

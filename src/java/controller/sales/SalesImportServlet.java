@@ -25,13 +25,13 @@ public class SalesImportServlet extends HttpServlet {
     private static final String VIEW = "/WEB-INF/views/sales/import.jsp";
     private static final int MAX_SHOWN = 50;
     private static final String SHOPEE_TEMPLATE
-            = "M\u00e3 \u0111\u01a1n h\u00e0ng,Ng\u00e0y \u0111\u1eb7t h\u00e0ng,Tr\u1ea1ng th\u00e1i \u0111\u01a1n h\u00e0ng,T\u1ed5ng s\u1ed1 ti\u1ec1n ng\u01b0\u1eddi mua thanh to\u00e1n,Ph\u00ed d\u1ecbch v\u1ee5,Ph\u00ed v\u1eadn chuy\u1ec3n ng\u01b0\u1eddi b\u00e1n tr\u1ea3,Ph\u00ed ti\u1ebfp th\u1ecb li\u00ean k\u1ebft,Gi\u00e1 v\u1ed1n\r\n"
-            + "261031SP001,2026-10-31 09:30:00,Ho\u00e0n th\u00e0nh,350000,28000,0,14000,180000\r\n"
-            + "261031SP002,2026-10-31 10:15:00,\u0110\u00e3 giao,420000,33600,15000,0,210000\r\n";
+            = "M\u00e3 \u0111\u01a1n h\u00e0ng,Ng\u00e0y \u0111\u1eb7t h\u00e0ng,Tr\u1ea1ng th\u00e1i \u0111\u01a1n h\u00e0ng,M\u00e3 SKU,T\u00ean s\u1ea3n ph\u1ea9m,T\u00ean ph\u00e2n lo\u1ea1i h\u00e0ng,S\u1ed1 l\u01b0\u1ee3ng,T\u1ed5ng gi\u00e1 b\u00e1n s\u1ea3n ph\u1ea9m,M\u00e3 gi\u1ea3m gi\u00e1 c\u1ee7a Shop,M\u00e3 gi\u1ea3m gi\u00e1 c\u1ee7a Shopee,Ph\u00ed d\u1ecbch v\u1ee5,Ph\u00ed x\u1eed l\u00fd giao d\u1ecbch,Ph\u00ed v\u1eadn chuy\u1ec3n ng\u01b0\u1eddi b\u00e1n tr\u1ea3,Ph\u00ed ti\u1ebfp th\u1ecb li\u00ean k\u1ebft,S\u1ed1 ti\u1ec1n th\u1ef1c nh\u1eadn,K\u00eanh b\u00e1n h\u00e0ng,Gi\u00e1 v\u1ed1n\r\n"
+            + "261031SP001,2026-10-31 09:30:00,Ho\u00e0n th\u00e0nh,CF-DEN-01,C\u00e0 ph\u00ea \u0111en Tinky,Ly l\u1edbn,2,70000,5000,10000,5600,2100,0,3500,53800,LIVE,28000\r\n"
+            + "261031SP002,2026-10-31 10:15:00,\u0110\u00e3 giao,CF-SUA-02,C\u00e0 ph\u00ea s\u1eefa \u0111\u00e1 Tinky,Ly v\u1eeba,3,105000,0,15000,8400,3150,10000,5250,78200,Video,45000\r\n";
     private static final String TIKTOK_TEMPLATE
-            = "Order ID,Created Time,Order Status,SKU Subtotal After Discount,Payment Platform Fee,Seller Shipping Fee,Creator Commission,Cost of Goods\r\n"
-            + "TT261031TK01,2026-10-31 08:45:00,Delivered,420000,25200,0,21000,210000\r\n"
-            + "TT261031TK02,2026-10-31 09:20:00,Completed,550000,33000,20000,27500,270000\r\n";
+            = "Order ID,Created Time,Order Status,Seller SKU,Product Name,Variation,Quantity,Subtotal after seller discounts,Seller discounts,TikTok discounts,TikTok Shop commission fee,Transaction fee,Seller Shipping Fee,Creator Commission,Total settlement amount,Traffic Type,Cost of Goods\r\n"
+            + "TT261031TK01,2026-10-31 08:45:00,Completed,CF-DEN-01,C\u00e0 ph\u00ea \u0111en Tinky,Ly l\u1edbn,2,70000,-5000,-10000,-4200,-2100,0,-3500,55200,LIVE,28000\r\n"
+            + "TT261031TK02,2026-10-31 09:20:00,Delivered,CF-SUA-02,C\u00e0 ph\u00ea s\u1eefa \u0111\u00e1 Tinky,Ly v\u1eeba,3,105000,0,-15000,-6300,-3150,-12000,-5250,78300,Video,45000\r\n";
 
     private final SalesImportService service = new SalesImportService();
 

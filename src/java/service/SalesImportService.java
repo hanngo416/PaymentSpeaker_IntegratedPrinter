@@ -230,6 +230,12 @@ public class SalesImportService {
         String qtyRaw = cell(rec, col, "quantity");
 
         if (problems.isEmpty()) {
+            if (fee == 0 && (serviceFee > 0 || transFee > 0)) {
+                fee = serviceFee + transFee;
+            }
+            if (serviceFee == 0 && transFee == 0 && fee > 0) {
+                serviceFee = fee;
+            }
             s.setGoodsAmount(BigDecimal.valueOf(goods));
             s.setPlatformFee(BigDecimal.valueOf(fee));
             s.setShippingFee(BigDecimal.valueOf(ship));
@@ -274,7 +280,7 @@ public class SalesImportService {
         if (raw.isEmpty()) {
             return 0L;
         }
-        Long v = parseAmount(raw);
+        Long v = parseSignedAmount(raw);
         if (v == null) {
             problems.add(name + " must be a whole number from 0 to 50,000,000, or empty.");
         }
@@ -300,6 +306,16 @@ public class SalesImportService {
         }
         long v = Long.parseLong(digits);
         return v > MAX_AMOUNT ? null : v;
+    }
+
+    static Long parseSignedAmount(String raw) {
+        String t = raw.trim();
+        if (t.startsWith("-")) {
+            t = t.substring(1).trim();
+        } else if (t.startsWith("(") && t.endsWith(")")) {
+            t = t.substring(1, t.length() - 1).trim();
+        }
+        return parseAmount(t);
     }
 
     static Timestamp parseDate(String raw) {

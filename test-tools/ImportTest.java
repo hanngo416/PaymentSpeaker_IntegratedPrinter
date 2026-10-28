@@ -120,9 +120,26 @@ public class ImportTest {
         check("shopee adapter parsed rows", pShopee.rows.size(), 1);
         check("shopee adapter no errors", pShopee.errors.size(), 0);
 
+        String fullShopee = "Mã đơn hàng,Ngày đặt hàng,Trạng thái đơn hàng,Mã SKU,Tên sản phẩm,Tên phân loại hàng,Số lượng,Tổng giá bán sản phẩm,Mã giảm giá của Shop,Mã giảm giá của Shopee,Phí dịch vụ,Phí xử lý giao dịch,Phí vận chuyển người bán trả,Phí tiếp thị liên kết,Số tiền thực nhận,Kênh bán hàng,Giá vốn\n"
+                + "261031SP001,2026-10-31 09:30:00,Hoàn thành,CF-DEN-01,Cà phê đen Tinky,Ly lớn,2,70000,5000,10000,5600,2100,0,3500,53800,LIVE,28000\n";
+        SalesImportService.Parsed pFullShopee = SalesImportService.parse(in(fullShopee), "SHOPEE");
+        check("full shopee parsed rows", pFullShopee.rows.size(), 1);
+        check("full shopee items parsed", pFullShopee.rows.get(0).getItems().size(), 1);
+        check("full shopee traffic parsed", pFullShopee.rows.get(0).getTrafficSource(), "LIVE");
+
         SalesImportService.Parsed pTikTok = SalesImportService.parse(in(tiktokCsv), "TIKTOK");
         check("tiktok adapter parsed rows", pTikTok.rows.size(), 1);
         check("tiktok adapter no errors", pTikTok.errors.size(), 0);
+
+        String fullTikTok = "Order ID,Created Time,Order Status,Seller SKU,Product Name,Variation,Quantity,Subtotal after seller discounts,Seller discounts,TikTok discounts,TikTok Shop commission fee,Transaction fee,Seller Shipping Fee,Creator Commission,Total settlement amount,Traffic Type,Cost of Goods\n"
+                + "TT261031TK01,2026-10-31 08:45:00,Completed,CF-DEN-01,Cà phê đen Tinky,Ly lớn,2,70000,-5000,-10000,-4200,-2100,0,-3500,55200,LIVE,28000\n";
+        SalesImportService.Parsed pFullTikTok = SalesImportService.parse(in(fullTikTok), "TIKTOK");
+        check("full tiktok parsed rows", pFullTikTok.rows.size(), 1);
+        check("full tiktok items parsed", pFullTikTok.rows.get(0).getItems().size(), 1);
+        check("full tiktok traffic parsed", pFullTikTok.rows.get(0).getTrafficSource(), "LIVE");
+        check("full tiktok service fee parsed", pFullTikTok.rows.get(0).getServiceFee().toPlainString(), "4200");
+        check("full tiktok transaction fee parsed", pFullTikTok.rows.get(0).getTransactionFee().toPlainString(), "2100");
+        check("full tiktok seller discount parsed", pFullTikTok.rows.get(0).getSellerDiscount().toPlainString(), "5000");
 
         SalesImportService.Parsed pMismatch = SalesImportService.parse(in(tiktokCsv), "SHOPEE");
         check("tiktok file on shopee adapter rejected", pMismatch.errors.size() > 0 && pMismatch.rows.isEmpty(), true);

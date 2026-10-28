@@ -100,17 +100,22 @@
     </c:when>
 
     <c:when test="${activeTab == 'fees'}">
+        <div class="alert-banner" style="margin-bottom: 16px; background: #eff6ff; border-color: #3b82f6; color: #1e40af;">
+            <strong>Tax Accounting Principle:</strong> 
+            <strong>Doanh thu chịu thuế (Total Revenue)</strong> = <em>Subtotal after seller discounts</em> (Tiền hàng sau khi trừ voucher shop). 
+            Các khoản chi phí sàn (Phí giao dịch, Phí hoa hồng sàn, Phí vận chuyển, Phí tiếp thị) được khấu trừ vào tiền quyết toán về ví (<strong>Total settlement amount</strong>), nhưng theo quy định thuế <u>không được giảm trừ</u> khỏi doanh thu tính thuế GTGT/TNCN.
+        </div>
         <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
             <div class="card">
                 <h2>Shopee Financial Waterfall</h2>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-                    <div style="display: flex; justify-content: space-between;"><span>1. Gross Revenue (Tiền hàng):</span><strong><fmt:formatNumber value="${bundle.shopeeWaterfall.grossRevenue}" pattern="#,##0"/> VND</strong></div>
+                    <div style="display: flex; justify-content: space-between;"><span>1. Total Revenue (Doanh thu chịu thuế):</span><strong><fmt:formatNumber value="${bundle.shopeeWaterfall.grossRevenue}" pattern="#,##0"/> VND</strong></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Fixed Platform Commission:</span><span>-<fmt:formatNumber value="${bundle.shopeeWaterfall.fixedFee}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Service Package Fee (Xtra):</span><span>-<fmt:formatNumber value="${bundle.shopeeWaterfall.serviceFee}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Payment Processing Fee:</span><span>-<fmt:formatNumber value="${bundle.shopeeWaterfall.transactionFee}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Seller Shipping Subsidy:</span><span>-<fmt:formatNumber value="${bundle.shopeeWaterfall.shippingFee}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Affiliate / AMS Fee:</span><span>-<fmt:formatNumber value="${bundle.shopeeWaterfall.affiliateFee}" pattern="#,##0"/> VND</span></div>
-                    <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line);"><strong>2. Net Revenue (Thực thu sàn):</strong><strong><fmt:formatNumber value="${bundle.shopeeWaterfall.netRevenue}" pattern="#,##0"/> VND</strong></div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line);"><strong>2. Total Settlement (Tiền quyết toán thực nhận):</strong><strong><fmt:formatNumber value="${bundle.shopeeWaterfall.netRevenue}" pattern="#,##0"/> VND</strong></div>
                     <div style="display: flex; justify-content: space-between;"><span>- Cost of Goods Sold (COGS):</span><span>-<fmt:formatNumber value="${bundle.shopeeWaterfall.cogs}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line);"><strong>3. Net Profit:</strong><strong class="accent"><fmt:formatNumber value="${bundle.shopeeWaterfall.netProfit}" pattern="#,##0"/> VND</strong></div>
                     <div style="margin-top: 10px; padding: 10px; background: #f8fafc; border-radius: 8px;">
@@ -123,12 +128,12 @@
             <div class="card">
                 <h2>TikTok Shop Financial Waterfall</h2>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-                    <div style="display: flex; justify-content: space-between;"><span>1. Gross Revenue (Tiền hàng):</span><strong><fmt:formatNumber value="${bundle.tiktokWaterfall.grossRevenue}" pattern="#,##0"/> VND</strong></div>
-                    <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Platform Commission:</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.fixedFee}" pattern="#,##0"/> VND</span></div>
-                    <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Payment Platform Fee:</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.transactionFee}" pattern="#,##0"/> VND</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>1. Total Revenue (Doanh thu chịu thuế):</span><strong><fmt:formatNumber value="${bundle.tiktokWaterfall.grossRevenue}" pattern="#,##0"/> VND</strong></div>
+                    <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- TikTok Shop Commission Fee:</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.fixedFee}" pattern="#,##0"/> VND</span></div>
+                    <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Transaction Fee:</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.transactionFee}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Seller Shipping Subsidy:</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.shippingFee}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; color: #dc2626;"><span>- Creator Commission:</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.affiliateFee}" pattern="#,##0"/> VND</span></div>
-                    <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line);"><strong>2. Net Revenue (Thực thu sàn):</strong><strong><fmt:formatNumber value="${bundle.tiktokWaterfall.netRevenue}" pattern="#,##0"/> VND</strong></div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line);"><strong>2. Total Settlement (Tiền quyết toán thực nhận):</strong><strong><fmt:formatNumber value="${bundle.tiktokWaterfall.netRevenue}" pattern="#,##0"/> VND</strong></div>
                     <div style="display: flex; justify-content: space-between;"><span>- Cost of Goods Sold (COGS):</span><span>-<fmt:formatNumber value="${bundle.tiktokWaterfall.cogs}" pattern="#,##0"/> VND</span></div>
                     <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line);"><strong>3. Net Profit:</strong><strong class="accent"><fmt:formatNumber value="${bundle.tiktokWaterfall.netProfit}" pattern="#,##0"/> VND</strong></div>
                     <div style="margin-top: 10px; padding: 10px; background: #f8fafc; border-radius: 8px;">

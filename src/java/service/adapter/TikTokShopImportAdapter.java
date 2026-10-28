@@ -12,18 +12,18 @@ public class TikTokShopImportAdapter implements ChannelImportAdapter {
         alias("order_ref", "order_id", "order_number", "order_ref", "ma_don_hang");
         alias("sold_at", "created_time", "order_time", "paid_time", "sold_at", "order_date", "date", "created_at");
         alias("status", "order_status", "status", "trang_thai");
-        alias("goods_amount", "sku_subtotal_after_discount", "product_amount", "total_customer_payment", "gmv",
-                "goods_amount", "total_amount", "amount");
-        alias("platform_fee", "payment_platform_fee", "platform_commission", "transaction_fee", "commission_fee", "platform_fee");
+        alias("goods_amount", "sku_subtotal_after_discount", "subtotal_after_seller_discounts", "total_revenue", "doanh_thu_chiu_thue",
+                "product_amount", "goods_amount", "total_amount", "amount");
+        alias("platform_fee", "total_fees", "phi_san", "platform_fee", "total_platform_fee");
+        alias("service_fee", "tiktok_shop_commission_fee", "platform_commission", "commission_fee", "service_fee");
+        alias("transaction_fee", "transaction_fee", "payment_platform_fee");
         alias("shipping_fee", "seller_shipping_fee", "original_shipping_fee", "shipping_fee");
         alias("commission", "creator_commission", "affiliate_commission", "commission");
         alias("cost", "cost_of_goods", "cost", "cogs");
-        alias("buyer_paid_amount", "buyer_paid_amount", "buyer_paid");
-        alias("seller_discount", "seller_discount", "seller_voucher");
-        alias("platform_discount", "platform_discount", "tiktok_discount");
-        alias("service_fee", "platform_commission", "commission_fee");
-        alias("transaction_fee", "payment_platform_fee", "transaction_fee");
-        alias("settlement_amount", "settlement_amount", "actual_settlement");
+        alias("buyer_paid_amount", "buyer_paid_amount", "buyer_paid", "total_customer_payment");
+        alias("seller_discount", "seller_discounts", "seller_discount", "seller_voucher");
+        alias("platform_discount", "platform_discount", "tiktok_discount", "tiktok_shop_discounts");
+        alias("settlement_amount", "total_settlement_amount", "settlement_amount", "actual_settlement");
         alias("traffic_source", "traffic_type", "traffic_source", "source");
         alias("sku_code", "seller_sku", "sku_id", "sku");
         alias("product_name", "product_name");
