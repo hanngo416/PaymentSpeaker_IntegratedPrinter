@@ -77,6 +77,10 @@
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         <span class="nav-text">Sales Book</span>
                     </a>
+                    <a href="${ctx}/analytics" class="${nav == 'analytics' ? 'active' : ''}" title="Channel Analytics">
+                        <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        <span class="nav-text">Channel Analytics</span>
+                    </a>
                 </c:if>
 
                 <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR' || not empty myAffiliate}">
@@ -119,7 +123,7 @@
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>
                         <span class="nav-text">Tax 2026</span>
                     </a>
-                    <a href="${ctx}/invoices/manage" class="${nav == 'e-invoices' ? 'active' : ''}" title="E-Invoices">
+                    <a href="${ctx}/invoices/manage" class="${nav == 'einvoices' ? 'active' : ''}" title="E-Invoices">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                         <span class="nav-text">E-Invoices</span>
                     </a>
