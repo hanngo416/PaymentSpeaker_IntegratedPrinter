@@ -39,6 +39,7 @@ public class SepayClient {
     private static final String LIST_URL = "https://my.sepay.vn/userapi/transactions/list";
 
     private static final int PAGE_LIMIT = 1000;
+    private static final int MAX_PAGES = 5;
 
     private final Properties config = ConfigUtil.load("sepay.properties");
 
@@ -51,21 +52,31 @@ public class SepayClient {
         format.setTimeZone(AppConfig.BANK_ZONE);
         String from = format.format(since);
 
-        String url = LIST_URL
-                + "?account_number=" + enc(config.getProperty("account.number").trim())
-                + "&transaction_date_min=" + enc(from)
-                + "&limit=" + PAGE_LIMIT;
-
-        JsonObject body = new JsonParser().parse(get(url)).getAsJsonObject();
         List<Map<String, String>> result = new ArrayList<>();
-        if (!body.has("transactions") || !body.get("transactions").isJsonArray()) {
-            return result;
-        }
-        JsonArray items = body.getAsJsonArray("transactions");
-        for (JsonElement element : items) {
-            if (element.isJsonObject()) {
-                result.add(toPayload(element.getAsJsonObject()));
+        int page = 1;
+        while (page <= MAX_PAGES) {
+            String url = LIST_URL
+                    + "?account_number=" + enc(config.getProperty("account.number").trim())
+                    + "&transaction_date_min=" + enc(from)
+                    + "&limit=" + PAGE_LIMIT
+                    + "&page=" + page;
+
+            JsonObject body = new JsonParser().parse(get(url)).getAsJsonObject();
+            if (!body.has("transactions") || !body.get("transactions").isJsonArray()) {
+                break;
             }
+            JsonArray items = body.getAsJsonArray("transactions");
+            int count = 0;
+            for (JsonElement element : items) {
+                if (element.isJsonObject()) {
+                    result.add(toPayload(element.getAsJsonObject()));
+                    count++;
+                }
+            }
+            if (count < PAGE_LIMIT) {
+                break;
+            }
+            page++;
         }
         Collections.sort(result, new Comparator<Map<String, String>>() {
             @Override
@@ -120,6 +131,9 @@ public class SepayClient {
         conn.setRequestProperty("Content-Type", "application/json");
 
         int status = conn.getResponseCode();
+        if (status == 429) {
+            throw new IOException("SePay rate limit exceeded (HTTP 429)");
+        }
         InputStream in = status >= 400 ? conn.getErrorStream() : conn.getInputStream();
         if (in == null) {
             throw new IOException("SePay returned HTTP " + status + " with no body");
