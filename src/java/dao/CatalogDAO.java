@@ -44,7 +44,7 @@ public class CatalogDAO {
     }
 
     public List<Product> findActiveProducts() throws SQLException {
-        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.active, p.display_order, "
+        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.stock_quantity, p.active, p.display_order, "
                 + "g.group_name, g.category_id, c.category_name "
                 + "FROM Products p "
                 + "JOIN [Groups] g ON p.group_id = g.group_id "
@@ -63,6 +63,7 @@ public class CatalogDAO {
                 p.setProductName(rs.getString("product_name"));
                 p.setPrice(rs.getBigDecimal("price"));
                 p.setCostPrice(rs.getBigDecimal("cost_price"));
+                p.setStockQuantity(rs.getInt("stock_quantity"));
                 p.setActive(rs.getBoolean("active"));
                 p.setDisplayOrder(rs.getInt("display_order"));
                 p.setGroupName(rs.getString("group_name"));
@@ -75,7 +76,7 @@ public class CatalogDAO {
     }
 
     public Product findProductById(int productId) throws SQLException {
-        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.active, p.display_order, "
+        String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.stock_quantity, p.active, p.display_order, "
                 + "g.group_name, g.category_id, c.category_name "
                 + "FROM Products p "
                 + "JOIN [Groups] g ON p.group_id = g.group_id "
@@ -93,6 +94,7 @@ public class CatalogDAO {
                     p.setProductName(rs.getString("product_name"));
                     p.setPrice(rs.getBigDecimal("price"));
                     p.setCostPrice(rs.getBigDecimal("cost_price"));
+                    p.setStockQuantity(rs.getInt("stock_quantity"));
                     p.setActive(rs.getBoolean("active"));
                     p.setDisplayOrder(rs.getInt("display_order"));
                     p.setGroupName(rs.getString("group_name"));
@@ -122,7 +124,7 @@ public class CatalogDAO {
                     total = rs.getInt(1);
                 }
             }
-            String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.active, p.display_order, "
+            String sql = "SELECT p.product_id, p.group_id, p.product_code, p.product_name, p.price, p.cost_price, p.stock_quantity, p.active, p.display_order, "
                     + "g.group_name, g.category_id, c.category_name " + from
                     + "ORDER BY c.display_order, g.display_order, p.display_order, p.product_name "
                     + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
@@ -139,6 +141,7 @@ public class CatalogDAO {
                         p.setProductName(rs.getString("product_name"));
                         p.setPrice(rs.getBigDecimal("price"));
                         p.setCostPrice(rs.getBigDecimal("cost_price"));
+                        p.setStockQuantity(rs.getInt("stock_quantity"));
                         p.setActive(rs.getBoolean("active"));
                         p.setDisplayOrder(rs.getInt("display_order"));
                         p.setGroupName(rs.getString("group_name"));
@@ -166,7 +169,7 @@ public class CatalogDAO {
     }
 
     public void insertProduct(Product p) throws SQLException {
-        String sql = "INSERT INTO Products (group_id, product_code, product_name, price, cost_price, active, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Products (group_id, product_code, product_name, price, cost_price, stock_quantity, active, display_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, p.getGroupId());
@@ -174,14 +177,15 @@ public class CatalogDAO {
             ps.setString(3, p.getProductName());
             ps.setBigDecimal(4, p.getPrice());
             ps.setBigDecimal(5, p.getCostPrice());
-            ps.setBoolean(6, p.isActive());
-            ps.setInt(7, p.getDisplayOrder());
+            ps.setInt(6, p.getStockQuantity());
+            ps.setBoolean(7, p.isActive());
+            ps.setInt(8, p.getDisplayOrder());
             ps.executeUpdate();
         }
     }
 
     public void updateProduct(Product p) throws SQLException {
-        String sql = "UPDATE Products SET group_id = ?, product_code = ?, product_name = ?, price = ?, cost_price = ?, active = ?, display_order = ? WHERE product_id = ?";
+        String sql = "UPDATE Products SET group_id = ?, product_code = ?, product_name = ?, price = ?, cost_price = ?, stock_quantity = ?, active = ?, display_order = ? WHERE product_id = ?";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, p.getGroupId());
@@ -189,9 +193,10 @@ public class CatalogDAO {
             ps.setString(3, p.getProductName());
             ps.setBigDecimal(4, p.getPrice());
             ps.setBigDecimal(5, p.getCostPrice());
-            ps.setBoolean(6, p.isActive());
-            ps.setInt(7, p.getDisplayOrder());
-            ps.setInt(8, p.getProductId());
+            ps.setInt(6, p.getStockQuantity());
+            ps.setBoolean(7, p.isActive());
+            ps.setInt(8, p.getDisplayOrder());
+            ps.setInt(9, p.getProductId());
             ps.executeUpdate();
         }
     }

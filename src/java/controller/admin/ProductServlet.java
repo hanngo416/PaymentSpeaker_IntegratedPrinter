@@ -51,6 +51,7 @@ public class ProductServlet extends HttpServlet {
                     request.setAttribute("form", p);
                     request.setAttribute("formPrice", p.getPrice().toBigInteger().toString());
                     request.setAttribute("formCost", p.getCostPrice().toBigInteger().toString());
+                    request.setAttribute("formStock", String.valueOf(p.getStockQuantity()));
                 }
             }
         } catch (SQLException e) {
@@ -145,6 +146,16 @@ public class ProductServlet extends HttpServlet {
             p.setCostPrice(new BigDecimal(rawCost));
         }
 
+        String rawStock = trim(request.getParameter("stockQuantity")).replaceAll("[.,\\s]", "");
+        if (rawStock.isEmpty()) {
+            rawStock = "0";
+        }
+        if (rawStock.matches("\\d{1,7}")) {
+            p.setStockQuantity(Integer.parseInt(rawStock));
+        } else {
+            errors.put("stockQuantity", "A whole number from 0 to 9999999.");
+        }
+
         String rawOrder = trim(request.getParameter("displayOrder"));
         if (rawOrder.isEmpty()) {
             p.setDisplayOrder(0);
@@ -178,6 +189,7 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("form", p);
         request.setAttribute("formPrice", trim(request.getParameter("price")));
         request.setAttribute("formCost", trim(request.getParameter("costPrice")));
+        request.setAttribute("formStock", trim(request.getParameter("stockQuantity")));
         request.setAttribute("formOrder", rawOrder);
         show(request, response);
     }

@@ -10,6 +10,7 @@ public class Product {
     private String productName;
     private BigDecimal price;
     private BigDecimal costPrice;
+    private int stockQuantity;
     private boolean active;
     private int displayOrder;
     private String groupName;
@@ -97,6 +98,14 @@ public class Product {
 
     public void setCostPrice(BigDecimal costPrice) {
         this.costPrice = costPrice;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
     }
 
     public String getCategoryName() {

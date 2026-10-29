@@ -53,6 +53,11 @@
             <span class="hint">What the product costs you. Leave empty for 0. Cannot be more than the price.</span>
             <c:if test="${not empty errors.costPrice}"><div class="field-error"><c:out value="${errors.costPrice}"/></div></c:if>
         </label>
+        <label>Stock quantity
+            <input type="text" name="stockQuantity" inputmode="numeric" maxlength="9" value="<c:out value='${formStock}'/>">
+            <span class="hint">Units on hand, counted by hand. It does not drop when an order is paid. Leave empty for 0.</span>
+            <c:if test="${not empty errors.stockQuantity}"><div class="field-error"><c:out value="${errors.stockQuantity}"/></div></c:if>
+        </label>
         <label>Display order
             <input type="text" name="displayOrder" inputmode="numeric" maxlength="4" value="<c:out value='${empty formOrder ? (editing ? form.displayOrder : "") : formOrder}'/>">
             <span class="hint">Smaller numbers show first. Leave empty for 0.</span>
@@ -84,7 +89,7 @@
     </form>
     <table>
         <thead>
-        <tr><th>Code</th><th>Name</th><th>Category / group</th><th>Price</th><th>Cost</th><th>Status</th><th>Action</th></tr>
+        <tr><th>Code</th><th>Name</th><th>Category / group</th><th>Price</th><th>Cost</th><th>Stock</th><th>Status</th><th>Action</th></tr>
         </thead>
         <tbody>
         <c:forEach var="p" items="${result.items}">
@@ -94,6 +99,7 @@
                 <td><c:out value="${p.categoryName}"/> / <c:out value="${p.groupName}"/></td>
                 <td><fmt:formatNumber value="${p.price}" pattern="#,##0"/> VND</td>
                 <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0"/> VND</td>
+                <td><fmt:formatNumber value="${p.stockQuantity}" pattern="#,##0"/></td>
                 <td><span class="pill ${p.active ? 'ACTIVE' : 'CANCELLED'}">${p.active ? 'ON SALE' : 'HIDDEN'}</span></td>
                 <td>
                     <a class="btn" href="${ctx}/admin/products?edit=${p.productId}">Edit</a>

@@ -317,6 +317,10 @@ IF COL_LENGTH('Products', 'cost_price') IS NULL
 ALTER TABLE Products ADD cost_price DECIMAL(18,2) NOT NULL CONSTRAINT DF_Products_Cost DEFAULT 0;
 GO
 
+IF COL_LENGTH('Products', 'stock_quantity') IS NULL
+ALTER TABLE Products ADD stock_quantity INT NOT NULL CONSTRAINT DF_Products_Stock DEFAULT 0;
+GO
+
 IF OBJECT_ID('Affiliates', 'U') IS NULL
 CREATE TABLE Affiliates (
     affiliate_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -755,3 +759,4 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChCommissions_Affiliate' AND object_id = OBJECT_ID('ChannelCommissions'))
 CREATE INDEX IX_ChCommissions_Affiliate ON ChannelCommissions(affiliate_id, status);
 GO
+
