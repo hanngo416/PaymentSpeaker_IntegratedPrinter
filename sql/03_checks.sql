@@ -111,3 +111,9 @@ SELECT p.product_id, p.product_code, p.stock_quantity FROM Products p
 WHERE EXISTS (SELECT 1 FROM StockMovements m WHERE m.product_id = p.product_id)
   AND p.stock_quantity <> (SELECT TOP 1 m.quantity_after FROM StockMovements m WHERE m.product_id = p.product_id ORDER BY m.movement_id DESC);
 GO
+
+-- CHECK: a transaction linked by review points to a completed order and has a note. Expect no rows
+SELECT t.trans_id FROM Transactions t
+LEFT JOIN Orders o ON o.order_id = t.linked_order_id
+WHERE t.resolution = 'LINKED' AND (o.status IS NULL OR o.status <> 'COMPLETED' OR t.resolution_note IS NULL);
+GO

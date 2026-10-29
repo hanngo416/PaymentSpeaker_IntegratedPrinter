@@ -860,3 +860,24 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_StockMovements_Order' AND object_id = OBJECT_ID(N'StockMovements'))
 CREATE INDEX IX_StockMovements_Order ON StockMovements(order_id);
 GO
+
+IF COL_LENGTH('Transactions', 'resolution') IS NULL
+ALTER TABLE Transactions ADD resolution NVARCHAR(10) NULL, close_category NVARCHAR(30) NULL, resolution_note NVARCHAR(200) NULL,
+    resolved_by INT NULL, resolved_at DATETIME2(3) NULL, linked_order_id INT NULL;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = N'CK_Trans_Resolution')
+ALTER TABLE Transactions ADD CONSTRAINT CK_Trans_Resolution CHECK (resolution IS NULL OR resolution IN (N'LINKED', N'CLOSED'));
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Trans_ResolvedBy')
+ALTER TABLE Transactions ADD CONSTRAINT FK_Trans_ResolvedBy FOREIGN KEY (resolved_by) REFERENCES Users(user_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Trans_LinkedOrder')
+ALTER TABLE Transactions ADD CONSTRAINT FK_Trans_LinkedOrder FOREIGN KEY (linked_order_id) REFERENCES Orders(order_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Transactions_LinkedOrder' AND object_id = OBJECT_ID(N'Transactions'))
+CREATE UNIQUE INDEX UX_Transactions_LinkedOrder ON Transactions(linked_order_id) WHERE linked_order_id IS NOT NULL;
+GO
