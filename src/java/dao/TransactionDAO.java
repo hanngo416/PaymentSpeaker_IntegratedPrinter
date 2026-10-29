@@ -119,6 +119,8 @@ public class TransactionDAO {
                             finalVerdict = Verdict.flag(TxLabel.ORDER_CLOSED, "ORDER_NOT_PENDING",
                                     "The order changed state before the payment was recorded.", Verdict.MEDIUM)
                                     .withExtras(verdict.getExtras());
+                        } else {
+                            StockDAO.deductForOrder(con, t.getOrderId());
                         }
                     }
                 }

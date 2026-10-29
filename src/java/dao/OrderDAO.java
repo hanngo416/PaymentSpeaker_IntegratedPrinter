@@ -77,6 +77,9 @@ public class OrderDAO {
                 }
                 if (items != null && !items.isEmpty()) {
                     OrderItemDAO.insertBatch(con, order.getOrderId(), items);
+                    if (order.getStatus() == OrderStatus.COMPLETED) {
+                        StockDAO.deductForOrder(con, order.getOrderId());
+                    }
                 }
                 if (attribution != null) {
                     CommissionDAO.insert(con, order.getOrderId(), order.getAmount().longValue(), attribution);
