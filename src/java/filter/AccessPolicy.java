@@ -63,6 +63,7 @@ public final class AccessPolicy {
             new Rule("/orders", ORDER_CREATE, ORDER_CREATE),
             new Rule("/speaker", SPEAKER_USE, SPEAKER_USE),
             new Rule("/printer", SPEAKER_USE, SPEAKER_USE),
+            new Rule("/transactions/review", TRANSACTION_RESOLVE, TRANSACTION_RESOLVE),
             new Rule("/transactions", TRANSACTION_READ, TRANSACTION_READ),
             new Rule("/alerts", ALERT_READ, ALERT_WRITE),
             new Rule("/tax/profile", TAX_READ, TAX_MANAGE),
