@@ -1,0 +1,1658 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-10-31",
+  "categories": [
+    {
+      "id": "preparation",
+      "title": "Chuẩn Bị Khởi Sự",
+      "description": "Nghiên cứu thị trường, chọn sản phẩm, tính toán vốn khởi nghiệp và xây dựng thương hiệu.",
+      "icon": "🎯",
+      "order": 1
+    },
+    {
+      "id": "legal-tax",
+      "title": "Pháp Lý & Thuế Việt Nam",
+      "description": "Thủ tục đăng ký kinh doanh cấp xã, điều kiện ATTP/PCCC, chính sách thuế 2026 và sổ sách kế toán.",
+      "icon": "⚖️",
+      "order": 2
+    },
+    {
+      "id": "pos-operations",
+      "title": "Vận Hành Cửa Hàng Offline (POS)",
+      "description": "Thiết bị quầy thu ngân, quản lý ca bán hàng, thanh toán VietQR, in bill nhiệt và quản lý tồn kho.",
+      "icon": "🏪",
+      "order": 3
+    },
+    {
+      "id": "shopee-seller",
+      "title": "Kinh Doanh Trên Sàn Shopee",
+      "description": "Thiết lập gian hàng chuẩn SEO, bóc tách biểu phí, quản lý đơn hàng, đóng gói và đối soát ví Escrow.",
+      "icon": "🛒",
+      "order": 4
+    },
+    {
+      "id": "tiktok-seller",
+      "title": "Kinh Doanh Trên TikTok Shop",
+      "description": "Video ngắn, Livestream, tiếp thị liên kết KOC Affiliate, biểu phí sàn và đối soát doanh thu chịu thuế.",
+      "icon": "📱",
+      "order": 5
+    },
+    {
+      "id": "finance-omnichannel",
+      "title": "Tài Chính, Hòa Vốn & Đa Kênh",
+      "description": "Phân biệt giá vốn, doanh thu, lợi nhuận, tính điểm hòa vốn và hợp nhất vận hành đa kênh Omnichannel.",
+      "icon": "📊",
+      "order": 6
+    }
+  ],
+  "articles": [
+    {
+      "id": "idea-evaluation",
+      "category_id": "preparation",
+      "title": "Tìm Kiếm & Đánh Giá Ý Tưởng Sản Phẩm Khả Thi",
+      "slug": "tim-kiem-danh-gia-y-tuong-san-pham",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "ý tưởng",
+        "chọn sản phẩm",
+        "khách hàng mục tiêu",
+        "nghiên cứu thị trường",
+        "sản phẩm ngách"
+      ],
+      "summary": "Cách tìm kiếm và đánh giá ý tưởng kinh doanh thực tế, chọn sản phẩm ngách phù hợp năng lực và thẩm định nhu cầu khách hàng trước khi bỏ vốn.",
+      "content": {
+        "overview": "Khởi sự kinh doanh thành công bắt đầu từ việc chọn đúng sản phẩm giải quyết được một vấn đề thực tế của khách hàng, thay vì bán thứ mình thích nhưng thị trường không cần.",
+        "why_it_matters": "Hơn 70% người mới thất bại vì nhập hàng theo cảm tính, hàng tồn đọng không bán được và cạn kiệt vốn lưu động trong 3 tháng đầu.",
+        "when_to_do": "Thực hiện ở giai đoạn đầu tiên (Giai đoạn 1) trước khi ký hợp đồng thuê mặt bằng hoặc đặt cọc nhập hàng.",
+        "steps": [
+          "Bước 1: Liệt kê danh sách 3 nhóm sản phẩm bạn có hiểu biết hoặc có lợi thế tiếp cận nguồn hàng.",
+          "Bước 2: Phân tích khách hàng mục tiêu: Họ là ai, độ tuổi bao nhiêu, mức sẵn sàng chi trả là bao nhiêu.",
+          "Bước 3: Mua thử và trải nghiệm sản phẩm của top 3 đối thủ đang bán chạy nhất trong ngành.",
+          "Bước 4: Đánh giá tính khả thi vận hành: Hạn sử dụng, độ cồng kềnh, độ dễ vỡ khi đóng gói giao hàng."
+        ],
+        "checklist": [
+          "Đã phỏng vấn ít nhất 15-20 khách hàng tiềm năng về mức giá mong muốn",
+          "Đã dùng thử sản phẩm của ít nhất 2 đối thủ cạnh tranh trực tiếp",
+          "Đã tính toán tỷ lệ hao hụt hoặc vỡ hỏng trong quá trình vận chuyển dưới 3%"
+        ],
+        "costs": "Chi phí khảo sát mẫu thử đối thủ: khoảng 500.000 - 1.500.000 VNĐ.",
+        "common_mistakes": [
+          "Chọn sản phẩm quá đại trà cạnh tranh trực tiếp về giá với các tổng kho lớn.",
+          "Không tính đến thời hạn bảo quản của nguyên liệu tươi sống."
+        ],
+        "real_case": "Anh Nam muốn mở tiệm nước giải khát. Thay vì mở quán trà sữa trân châu truyền thống vốn đang bão hòa, anh chọn ngách 'Trà mãng cầu và trà trái cây tươi ít ngọt' nhắm vào giới văn phòng văn phòng ăn kiêng.",
+        "faqs": [
+          {
+            "q": "Nên chọn sản phẩm giá rẻ hay giá trung bình - cao?",
+            "a": "Người mới nên chọn phân khúc trung bình để có đủ biên lợi nhuận bù đắp chi phí mặt bằng và quảng cáo ban đầu."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy chuẩn kinh doanh hàng hóa lưu thông trên thị trường (Bộ Công Thương)",
+            "url": "https://moit.gov.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Hỏi Trợ lý AI về tính khả thi ý tưởng của bạn",
+        "url": "/bot/chat",
+        "required_permission": "NONE"
+      }
+    },
+    {
+      "id": "startup-budget",
+      "category_id": "preparation",
+      "title": "Lập Dự Toán Vốn Ban Đầu & Quỹ Dự Phòng Sinh Tồn",
+      "slug": "lap-du-toan-von-quy-du-phong-sinh-ton",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "dự toán vốn",
+        "chi phí cố định",
+        "quỹ sinh tồn",
+        "vốn lưu động",
+        "ngân sách"
+      ],
+      "summary": "Phương pháp bóc tách chi phí cố định, chi phí biến đổi và nguyên tắc trích lập quỹ dự phòng sinh tồn tối thiểu 3-6 tháng để không bị đứt dòng tiền.",
+      "content": {
+        "overview": "Ngân sách khởi sự kinh doanh gồm 3 phần: Vốn đầu tư ban đầu (mặt bằng, thiết bị), Vốn nhập hàng đợt 1 và Quỹ dự phòng sinh tồn (Safety Runway).",
+        "why_it_matters": "Quán mới mở thường chưa có lãi ngay trong 3 tháng đầu. Nếu không có quỹ dự phòng, bạn sẽ phải đóng cửa vì không đủ tiền trả tiền nhà và lương nhân viên dù quán đang bắt đầu có khách.",
+        "when_to_do": "Lập trước khi quyết định ký hợp đồng thuê nhà hoặc đặt cọc máy móc thiết bị.",
+        "steps": [
+          "Bước 1: Tính Chi phí Cố định một lần (Cọc nhà, bảng hiệu, máy POS, máy in nhiệt, tủ lạnh).",
+          "Bước 2: Tính Chi phí Cố định hàng tháng (Tiền thuê mặt bằng, điện nước mạng, lương cứng nhân viên).",
+          "Bước 3: Dự toán tiền nhập lô hàng đầu tiên (đủ bán trong 2 tuần đến 1 tháng).",
+          "Bước 4: Trích lập Quỹ sinh tồn = Chi phí cố định hàng tháng x 3 đến 6 tháng."
+        ],
+        "checklist": [
+          "Đã có bảng tính Excel chi tiết từng khoản mục chi phí không bỏ sót",
+          "Đã chuẩn bị riêng quỹ dự phòng sinh tồn tách biệt với tiền nhập hàng",
+          "Không vay nóng hoặc vay lãi suất cao vượt quá 30% tổng vốn khởi sự"
+        ],
+        "costs": "Tùy mô hình: Quán cafe nhỏ mang đi (30-60 triệu VNĐ); Shop online sàn (15-30 triệu VNĐ); Cửa hàng bán lẻ tại chỗ (80-200 triệu VNĐ).",
+        "common_mistakes": [
+          "Dùng hết 100% số vốn có trong tay để decor trang trí cửa hàng thật đẹp rồi không còn tiền nhập hàng.",
+          "Quên tính tiền đặt cọc mặt bằng (thường mất từ 1 đến 3 tháng tiền thuê)."
+        ],
+        "real_case": "Chị Lan có 100 triệu mở tiệm bánh nhỏ. Chị chi 50 triệu mua lò nướng và bàn ghế, 20 triệu nhập bột bơ hộp, và giữ nguyên 30 triệu làm quỹ sinh tồn để trả tiền nhà 6 triệu/tháng trong 5 tháng đầu.",
+        "faqs": [
+          {
+            "q": "Nếu thiếu vốn thì có nên tìm người góp vốn chung không?",
+            "a": "Nên rõ ràng bằng văn bản thỏa thuận góp vốn, phân định rành mạch quyền hạn điều hành và tỷ lệ chia lãi lỗ ngay từ đầu."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về hợp đồng hợp tác kinh doanh cá nhân (Bộ luật Dân sự 2015)",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Thử nghiệm tính toán chi phí trên Tinky",
+        "url": "/tax/calculator",
+        "required_permission": "TAX_READ"
+      }
+    },
+    {
+      "id": "location-sourcing",
+      "category_id": "preparation",
+      "title": "Khảo Sát Mặt Bằng & Tìm Kiếm Nguồn Hàng Uy Tín",
+      "slug": "khao-sat-mat-bang-nguon-hang-uy-tin",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "mặt bằng",
+        "chọn vị trí",
+        "tìm nguồn hàng",
+        "nhà cung cấp",
+        "hợp đồng thuê nhà"
+      ],
+      "summary": "Kỹ năng khảo sát đo đạc lưu lượng khách qua lại tại mặt bằng kinh doanh, đàm phán hợp đồng thuê nhà và chọn lọc nhà cung ứng ổn định có hóa đơn.",
+      "content": {
+        "overview": "Vị trí mặt bằng quyết định 50% thành bại của cửa hàng offline. Nguồn hàng ổn định với giá gốc hợp lý quyết định biên lợi nhuận của toàn bộ mô hình.",
+        "why_it_matters": "Thuê nhầm mặt bằng bị khuất tầm nhìn, đường một chiều, hoặc nhà cung cấp đứt gãy nguồn hàng giữa chừng sẽ làm gián đoạn toàn bộ việc bán hàng.",
+        "when_to_do": "Thực hiện sau khi đã xác định rõ chân dung khách hàng mục tiêu và trước khi đăng ký kinh doanh.",
+        "steps": [
+          "Bước 1: Khảo sát thực tế lưu lượng người đi qua mặt bằng vào 3 khung giờ: Sáng (7h-9h), Trưa (11h-13h) và Tối (17h-20h).",
+          "Bước 2: Kiểm tra hướng di chuyển, chỗ để xe của khách, tình trạng ngập nước khi mưa lớn.",
+          "Bước 3: Đàm phán các điều khoản hợp đồng thuê nhà: Thời hạn thuê (tối thiểu 1-2 năm), thời gian sửa chữa miễn phí tiền nhà, mức tăng giá hàng năm không quá 10%.",
+          "Bước 4: So sánh ít nhất 3 nhà cung cấp nguyên vật liệu về giá cả, chất lượng mẫu, chính sách giao hàng và công nợ."
+        ],
+        "checklist": [
+          "Mặt bằng có vỉa hè hoặc bãi gửi xe an toàn cho khách",
+          "Hợp đồng thuê nhà có chữ ký chủ sở hữu nhà hợp pháp (kiểm tra sổ đỏ)",
+          "Nhà cung cấp cam kết cung cấp được hóa đơn VAT và phiếu kiểm nghiệm chất lượng"
+        ],
+        "costs": "Tiền cọc mặt bằng: 1-3 tháng tiền thuê; Chi phí lấy mẫu thử nghiệm nguyên liệu: 500.000 - 2.000.000 VNĐ.",
+        "common_mistakes": [
+          "Chỉ đứng ngắm mặt bằng vào buổi sáng chủ nhật (lúc vắng) rồi quyết định vội vàng.",
+          "Phụ thuộc duy nhất vào 1 nhà cung ứng, khi họ hết hàng thì cửa hàng phải đóng cửa nghỉ bán."
+        ],
+        "real_case": "Quán trà sữa Tinky khảo sát mặt bằng gần cổng trường THPT, đếm được trung bình 450 lượt học sinh đi qua vào khung giờ tan trường 11h30 và 17h, đàm phán được 15 ngày miễn phí tiền nhà để thi công quầy bar.",
+        "faqs": [
+          {
+            "q": "Hợp đồng thuê nhà có bắt buộc phải công chứng không?",
+            "a": "Bộ luật Dân sự không bắt buộc công chứng hợp đồng thuê nhà, nhưng công chứng sẽ giúp bảo vệ người thuê tránh bị chủ nhà đòi nhà đột xuất."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về hợp đồng thuê tài sản (Điều 472-482 Bộ luật Dân sự 2015)",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Cập nhật danh sách nhà cung cấp & giá vốn sản phẩm",
+        "url": "/admin/products",
+        "required_permission": "CATALOG_MANAGE"
+      }
+    },
+    {
+      "id": "branding-identity",
+      "category_id": "preparation",
+      "title": "Đặt Tên Thương Hiệu & Thiết Kế Bộ Nhận Diện Cơ Bản",
+      "slug": "dat-ten-thuong-hieu-thiet-ke-nhan-dien",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 4,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "thương hiệu",
+        "đặt tên quán",
+        "logo",
+        "nhận diện",
+        "bảng hiệu"
+      ],
+      "summary": "Nguyên tắc đặt tên cửa hàng dễ nhớ, dễ phát âm, không vi phạm nhãn hiệu và thiết kế bộ nhận diện tối giản gồm logo, menu, bảng hiệu, nhãn dán ly hộp.",
+      "content": {
+        "overview": "Thương hiệu không chỉ là logo đẹp mà là ấn tượng đầu tiên giúp khách hàng ghi nhớ và phân biệt bạn với hàng trăm đối thủ khác trên thị trường.",
+        "why_it_matters": "Đặt tên quá dài, khó đọc hoặc trùng với các thương hiệu lớn đã bảo hộ độc quyền có thể khiến bạn bị khiếu nại bản quyền và khách không thể tìm thấy bạn trên mạng xã hội.",
+        "when_to_do": "Hoàn thiện trước khi làm biển hiệu, in ấn bao bì và trước khi nộp đơn đăng ký hộ kinh doanh.",
+        "steps": [
+          "Bước 1: Đặt tên theo công thức: [Tên riêng độc đáo] + [Loại hình kinh doanh] (VD: Tinky Coffee, Gốm Mộc, Mì Cay Sasin).",
+          "Bước 2: Kiểm tra tên miền website, tên Fanpage, kênh TikTok và tên gian hàng Shopee xem đã bị người khác dùng chưa.",
+          "Bước 3: Thiết kế logo tối giản: Rõ nét ở kích thước nhỏ (ảnh avatar tròn trên Facebook/TikTok và nhãn dán ly 4cm).",
+          "Bước 4: Chuẩn hóa 2 tông màu chủ đạo cho toàn bộ quán: bảng hiệu, đồng phục, menu, tem nhãn dán."
+        ],
+        "checklist": [
+          "Tên thương hiệu không chứa từ ngữ thô tục, không vi phạm thuần phong mỹ tục",
+          "Đã có file thiết kế logo định dạng vector hoặc PNG nền trong suốt sắc nét",
+          "Nội dung trên bảng hiệu có đầy đủ thông tin: Tên hộ kinh doanh, địa chỉ, số điện thoại"
+        ],
+        "costs": "Chi phí thiết kế logo và menu cơ bản: 500.000 - 2.000.000 VNĐ; In tem nhãn dán: 200 - 500 VNĐ/tem.",
+        "common_mistakes": [
+          "Chọn font chữ cách điệu quá rườm rà khiến khách đi xe máy ngang qua không thể đọc được tên quán.",
+          "Dùng logo tải miễn phí trên mạng có hình ảnh của nhãn hiệu khác đã được Cục Sở hữu Trí tuệ bảo hộ."
+        ],
+        "real_case": "Tiệm cafe Tinky chọn tên ngắn gọn 2 âm tiết, logo hình chiếc cốc cafe mỉm cười màu cam ấm, in trên hóa đơn nhiệt và dán trên nắp ly, tạo ấn tượng thân thiện và dễ nhớ cho khách gọi lại.",
+        "faqs": [
+          {
+            "q": "Có cần đăng ký bảo hộ nhãn hiệu tại Cục Sở hữu Trí tuệ ngay không?",
+            "a": "Khi mới mở quy mô nhỏ chưa bắt buộc, nhưng khi quán hoạt động ổn định và muốn mở chuỗi thì nên đăng ký bảo hộ sớm."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Luật Sở hữu Trí tuệ 2005 (sửa đổi, bổ sung 2022) về bảo hộ nhãn hiệu",
+            "url": "https://ipvietnam.gov.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Cấu hình tên thương hiệu xuất hiện trên hóa đơn",
+        "url": "/settings",
+        "required_permission": "SETTING_MANAGE"
+      }
+    },
+    {
+      "id": "legal-models",
+      "category_id": "legal-tax",
+      "title": "Phân Biệt Cá Nhân Kinh Doanh, Hộ Kinh Doanh Và Doanh Nghiệp",
+      "slug": "phan-biet-ca-nhan-ho-kinh-doanh-doanh-nghiep",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "mô hình pháp lý",
+        "hộ kinh doanh",
+        "cá nhân kinh doanh",
+        "doanh nghiệp",
+        "tnhh"
+      ],
+      "summary": "So sánh chi tiết ưu nhược điểm giữa mô hình Cá nhân, Hộ kinh doanh và Công ty TNHH giúp bạn chọn mô hình ít rủi ro và tối ưu thuế nhất khi mới bắt đầu.",
+      "content": {
+        "overview": "Pháp luật Việt Nam phân chia người kinh doanh thành các hình thức: Cá nhân kinh doanh, Hộ kinh doanh (HKD), và Doanh nghiệp (Doanh nghiệp tư nhân, Công ty TNHH, Công ty Cổ phần).",
+        "why_it_matters": "Chọn sai mô hình dẫn đến việc phải chịu gánh nặng chi phí kế toán phức tạp, hoặc ngược lại không đủ tư cách pháp nhân để mở rộng quy mô kinh doanh.",
+        "when_to_do": "Quyết định trước khi tiến hành bất kỳ thủ tục đăng ký kinh doanh chính thức nào.",
+        "steps": [
+          "Bước 1: Đánh giá số lượng người tham gia: Một mình tự làm hay có người góp vốn chung.",
+          "Bước 2: Dự kiến quy mô doanh thu: Dưới 1 tỷ/năm hay trên 3 tỷ/năm.",
+          "Bước 3: Xem xét đối tượng khách hàng: Nếu khách hàng là người tiêu dùng cá nhân (B2C) -> Chọn Hộ kinh doanh; Nếu khách hàng là công ty đòi xuất hóa đơn VAT khấu trừ (B2B) -> Chọn Công ty TNHH."
+        ],
+        "checklist": [
+          "Hiểu rõ trách nhiệm tài sản: Hộ kinh doanh chịu trách nhiệm vô hạn bằng toàn bộ tài sản cá nhân",
+          "Đã thống nhất tỷ lệ sở hữu nếu có người thân cùng đứng tên hộ kinh doanh",
+          "Xác định được mức chi phí kế toán hàng tháng tương ứng với từng mô hình"
+        ],
+        "costs": "Đăng ký Hộ kinh doanh: 50.000 - 100.000 VNĐ; Thành lập Công ty TNHH: 1.500.000 - 3.000.000 VNĐ (kèm chữ ký số, con dấu, lệ phí môn bài).",
+        "common_mistakes": [
+          "Vừa mở quán nhỏ đã thành lập công ty TNHH, dẫn đến việc hàng tháng phải tốn tiền thuê dịch vụ kế toán nộp báo cáo thuế định kỳ dù chưa có doanh thu.",
+          "Bán hàng quy mô lớn nhưng vẫn để tư cách cá nhân không đăng ký, bị phạt trốn đăng ký kinh doanh."
+        ],
+        "real_case": "Anh Tuấn mở tiệm giặt ủi nhỏ tại nhà với số vốn 40 triệu. Anh chọn hình thức Hộ kinh doanh tại UBND xã, thủ tục đơn giản, chế độ sổ sách gọn nhẹ theo Thông tư 152, không tốn chi phí thuê kế toán công ty.",
+        "faqs": [
+          {
+            "q": "Hộ kinh doanh có được thuê nhân viên không?",
+            "a": "Theo Nghị định 01/2021/NĐ-CP và Nghị định 168/2025/NĐ-CP, hộ kinh doanh được quyền thuê lao động không giới hạn số lượng."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp và hộ kinh doanh",
+            "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-168-2025-nd-cp-ve-dang-ky-doanh-nghiep-119250702175708554.htm",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Kiểm tra điều kiện mô hình kinh doanh của bạn",
+        "url": "/tax/profile",
+        "required_permission": "TAX_READ"
+      }
+    },
+    {
+      "id": "register-hkd-2026",
+      "category_id": "legal-tax",
+      "title": "Thủ Tục Đăng Ký Hộ Kinh Doanh Tại Cấp Xã (Nghị Định 168/2025/NĐ-CP)",
+      "slug": "thu-tuc-dang-ky-ho-kinh-doanh-cap-xa-2026",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "đăng ký hộ kinh doanh",
+        "ubnd xã",
+        "nghị định 168/2025",
+        "thủ tục đkkd",
+        "mã số thuế hộ"
+      ],
+      "summary": "Hướng dẫn chi tiết từng bước chuẩn bị hồ sơ, quy tắc đặt tên và thủ tục đăng ký Hộ kinh doanh tại UBND cấp xã/phường có tích hợp cấp mã số thuế tự động.",
+      "content": {
+        "overview": "Đăng ký Hộ kinh doanh là thủ tục bắt buộc theo Nghị định 168/2025/NĐ-CP đối với các cá nhân, hộ gia đình mở cửa hàng, quán cafe hoặc bán hàng online thường xuyên.",
+        "why_it_matters": "Kinh doanh không đăng ký có thể bị xử phạt hành chính từ 5.000.000 đến 10.000.000 VNĐ và bị đình chỉ hoạt động.",
+        "when_to_do": "Nộp hồ sơ trước ngày chính thức khai trương mở bán từ 1 đến 2 tuần.",
+        "steps": [
+          "Bước 1: Soạn Giấy đề nghị đăng ký hộ kinh doanh theo mẫu quy định (ghi rõ ngành nghề, vốn, số lao động).",
+          "Bước 2: Chuẩn bị bản sao công chứng Căn cước công dân của chủ hộ và các thành viên gia đình góp vốn.",
+          "Bước 3: Chuẩn bị hợp đồng thuê mặt bằng hoặc giấy tờ quyền sử dụng đất hợp pháp.",
+          "Bước 4: Nộp trực tiếp tại Bộ phận Một cửa của UBND xã/phường hoặc nộp trực tuyến qua Cổng Dịch vụ công.",
+          "Bước 5: Nhận kết quả Giấy chứng nhận đăng ký hộ kinh doanh kiêm Mã số thuế trong vòng 03 ngày làm việc."
+        ],
+        "checklist": [
+          "Tên hộ có đủ 2 thành tố: 'Hộ kinh doanh' + 'Tên riêng' (không dùng từ Công ty/Tập đoàn)",
+          "Chủ hộ chưa đứng tên bất kỳ hộ kinh doanh nào khác trên phạm vi toàn quốc",
+          "Địa điểm kinh doanh rõ ràng số nhà, ngõ ngách, tên đường"
+        ],
+        "costs": "Lệ phí đăng ký: 50.000 - 100.000 VNĐ tùy tỉnh thành (nhiều nơi miễn phí khi nộp trực tuyến).",
+        "common_mistakes": [
+          "Đặt tên hộ trùng lặp với tên hộ khác đã đăng ký trong cùng địa bàn xã/phường.",
+          "Một cá nhân đứng tên mở 2 hộ kinh doanh ở 2 nơi khác nhau (bị hệ thống từ chối)."
+        ],
+        "real_case": "Chị Mai đến UBND phường nộp hồ sơ mở 'Hộ kinh doanh Trà Sữa Mai Cha', vốn đăng ký 50 triệu đồng. Sau 3 ngày làm việc, chị nhận được Giấy chứng nhận kèm mã số thuế gồm 10 chữ số để kích hoạt gian hàng Shopee.",
+        "faqs": [
+          {
+            "q": "Sau khi có giấy phép thì có cần đi làm mã số thuế riêng ở chi cục thuế nữa không?",
+            "a": "Không. Hiện nay mã số hộ kinh doanh chính là mã số thuế được cấp liên thông tự động."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Nghị định 168/2025/NĐ-CP Chương VIII (Điều 82 - 116)",
+            "url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-168-2025-nd-cp-ve-dang-ky-doanh-nghiep-119250702175708554.htm",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Lưu mã số thuế và hồ sơ vào hệ thống Tinky",
+        "url": "/tax/profile",
+        "required_permission": "TAX_READ"
+      }
+    },
+    {
+      "id": "permits-attp-pccc",
+      "category_id": "legal-tax",
+      "title": "Giấy Phép An Toàn Thực Phẩm & Hồ Sơ PCCC Cho Quán Cafe, Ăn Uống",
+      "slug": "giay-phep-attp-pccc-quan-cafe-an-uong",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE"
+      ],
+      "keywords": [
+        "an toàn thực phẩm",
+        "pccc",
+        "phòng cháy chữa cháy",
+        "quán cafe",
+        "giấy phép con"
+      ],
+      "summary": "Quy chuẩn cơ sở đạt điều kiện vệ sinh ATTP, hồ sơ quản lý PCCC cơ sở mẫu PC01 và trang bị phương tiện chữa cháy cho quán cafe, trà sữa, nhà hàng ăn uống.",
+      "content": {
+        "overview": "Kinh doanh dịch vụ ăn uống (F&B) thuộc nhóm ngành có điều kiện, bắt buộc phải có Giấy chứng nhận cơ sở đủ điều kiện ATTP và đáp ứng tiêu chuẩn PCCC cơ sở.",
+        "why_it_matters": "Kinh doanh không có chứng nhận ATTP có thể bị phạt từ 20.000.000 đến 30.000.000 VNĐ. Vi phạm PCCC có thể bị đình chỉ hoạt động kinh doanh ngay lập tức.",
+        "when_to_do": "Làm hồ sơ sau khi đã hoàn thiện thi công quầy bar/bếp và trước khi mở cửa đón khách chính thức.",
+        "steps": [
+          "Bước 1: Đưa chủ cơ sở và nhân viên pha chế/bếp đi khám sức khỏe thẻ xanh và tham gia tập huấn kiến thức ATTP.",
+          "Bước 2: Thiết kế khu vực pha chế/bếp theo nguyên tắc một chiều, có thùng rác nắp đậy, tủ lưu mẫu thức ăn.",
+          "Bước 3: Nộp hồ sơ xin cấp Giấy chứng nhận ATTP tại Phòng Y tế hoặc Trung tâm Y tế huyện/quận.",
+          "Bước 4: Trang bị tối thiểu 02 bình chữa cháy xách tay (Bình bột MFZ4 hoặc khí CO2 MT3) có tem kiểm định.",
+          "Bước 5: Lập hồ sơ theo dõi quản lý PCCC cơ sở mẫu PC01 và niêm yết Nội quy, Tiêu lệnh chữa cháy."
+        ],
+        "checklist": [
+          "Có đầy đủ giấy khám sức khỏe và giấy xác nhận tập huấn ATTP của nhân viên",
+          "Có hóa đơn chứng từ chứng minh nguồn gốc nguyên liệu hạt cafe, sữa, trà",
+          "Bình chữa cháy còn nguyên niêm phong kẹp chì và kim đồng hồ đo áp suất ở vạch xanh"
+        ],
+        "costs": "Khám sức khỏe: 150.000 - 300.000 VNĐ/người; Thẩm định ATTP: 700.000 - 1.000.000 VNĐ; Bình chữa cháy: 300.000 - 600.000 VNĐ/bình.",
+        "common_mistakes": [
+          "Sử dụng nguyên liệu trôi nổi mua ngoài chợ không có tem nhãn phụ tiếng Việt và không có hóa đơn chứng từ.",
+          "Treo biển PCCC ở góc khuất bị tủ kệ che lấp không nhìn thấy."
+        ],
+        "real_case": "Quán Cafe Tinky hoàn thiện hồ sơ ATTP với đầy đủ hợp đồng mua hạt cafe rang mộc từ xưởng có chứng nhận HACCP, được đoàn kiểm tra liên ngành quận thẩm định đạt chuẩn và cấp chứng nhận trong vòng 15 ngày làm việc.",
+        "faqs": [
+          {
+            "q": "Quán cafe nhỏ vỉa hè có cần làm giấy chứng nhận ATTP không?",
+            "a": "Kinh doanh thức ăn đường phố nhỏ lẻ được miễn cấp giấy chứng nhận nhưng vẫn phải ký cam kết bảo đảm an toàn thực phẩm với UBND phường/xã."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Nghị định 15/2018/NĐ-CP hướng dẫn Luật An toàn thực phẩm",
+            "url": "https://vbpl.vn",
+            "verified": true
+          },
+          {
+            "title": "Nghị định 105/2025/NĐ-CP quy định chi tiết Luật Phòng cháy và chữa cháy",
+            "url": "https://xaydungchinhsach.chinhphu.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Quản lý danh sách thiết bị và trạng thái vận hành",
+        "url": "/admin/devices",
+        "required_permission": "DEVICE_MANAGE"
+      }
+    },
+    {
+      "id": "tax-threshold-1bn",
+      "category_id": "legal-tax",
+      "title": "Chính Sách Thuế Hộ KD 2026: Ngưỡng 1 Tỷ Đồng & Tỷ Lệ Thuế",
+      "slug": "chinh-sach-thue-nguong-1-ty-dong-2026",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "ngưỡng 1 tỷ",
+        "thuế hộ kinh doanh 2026",
+        "miễn thuế",
+        "tỷ lệ thuế",
+        "141/2026",
+        "68/2026"
+      ],
+      "summary": "Căn cứ Nghị định 141/2026/NĐ-CP, ngưỡng doanh thu miễn thuế cho hộ kinh doanh được nâng lên 1 tỷ đồng/năm. Hướng dẫn tính thuế GTGT và TNCN khi vượt ngưỡng.",
+      "content": {
+        "overview": "Từ năm 2026, hộ kinh doanh có doanh thu dưới 1.000.000.000 VNĐ/năm được miễn hoàn toàn thuế GTGT và thuế TNCN. Doanh thu trên 1 tỷ đồng bắt buộc nộp thuế theo tỷ lệ % và áp dụng hóa đơn điện tử.",
+        "why_it_matters": "Không theo dõi doanh thu cộng dồn dẫn đến việc bị ấn định thuế hồi tố và bị phạt chậm nộp khi doanh thu thực tế vượt ngưỡng mà không chuyển đổi phương pháp kê khai.",
+        "when_to_do": "Theo dõi lũy kế doanh thu hàng ngày trên hệ thống POS. Khi đạt 70% (700 triệu), 90% (900 triệu) phải chuẩn bị thủ tục kê khai thuế.",
+        "steps": [
+          "Bước 1: Xác định mã ngành kinh doanh chính (GOODS: hàng hóa 1.5%; FOOD_BEVERAGE: ăn uống 3.0%).",
+          "Bước 2: Cài đặt tỷ lệ thuế tương ứng trong phân hệ Quản lý thuế của Tinky.",
+          "Bước 3: Theo dõi doanh thu bán tại quán cộng dồn với đơn sàn Shopee/TikTok Shop.",
+          "Bước 4: Khi vượt ngưỡng 1 tỷ, liên hệ nhà mạng kích hoạt hóa đơn điện tử máy tính tiền."
+        ],
+        "checklist": [
+          "Đã có mã số thuế hộ kinh doanh chính chủ",
+          "Đã thông báo tài khoản ngân hàng kinh doanh bằng mẫu 01/BK-STK",
+          "Đã mở Sổ doanh thu Mẫu S1a-HKD hoặc S2a-HKD theo Thông tư 152/2025/TT-BTC"
+        ],
+        "costs": "Dưới 1 tỷ/năm: 0 VNĐ thuế; Từ 1 tỷ trở lên: 1.5% - 3.0% doanh thu + chi phí hóa đơn điện tử ~1.200.000 VNĐ/năm.",
+        "common_mistakes": [
+          "Tưởng rằng tiền gửi về tài khoản ngân hàng cá nhân thì cơ quan thuế không biết.",
+          "Lấy số tiền rút về ví sàn (đã trừ phí) để tính thuế thay vì lấy tổng doanh thu sau voucher của shop."
+        ],
+        "real_case": "Quán Tinky Coffee năm 2026 bán tại quán được 600 triệu, bán trên TikTok Shop được 500 triệu. Tổng doanh thu 1,1 tỷ đồng (vượt ngưỡng 1 tỷ). Quán phải nộp thuế theo tỷ lệ trên doanh thu.",
+        "faqs": [
+          {
+            "q": "Ngưỡng 1 tỷ tính riêng cho từng quán hay cộng dồn cả chuỗi/kênh?",
+            "a": "Tính cộng dồn toàn bộ doanh thu của tất cả các kênh phát sinh dưới cùng 1 mã số thuế hộ kinh doanh."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Toàn văn Nghị định 141/2026/NĐ-CP nâng ngưỡng doanh thu miễn thuế lên 1 tỷ đồng",
+            "url": "https://xaydungchinhsach.chinhphu.vn",
+            "verified": true
+          },
+          {
+            "title": "Toàn văn Nghị định 68/2026/NĐ-CP về chính sách thuế hộ kinh doanh",
+            "url": "https://xaydungchinhsach.chinhphu.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Xem thanh tiến độ doanh thu của bạn",
+        "url": "/tax",
+        "required_permission": "TAX_READ"
+      }
+    },
+    {
+      "id": "bank-account-01bkstk",
+      "category_id": "legal-tax",
+      "title": "Đăng Ký Tài Khoản Ngân Hàng / Ví Điện Tử Kinh Doanh (Mẫu 01/BK-STK)",
+      "slug": "dang-ky-tai-khoan-ngan-hang-kinh-doanh-01-bk-stk",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "tài khoản ngân hàng",
+        "ví điện tử",
+        "01/bk-stk",
+        "thông tư 18/2026",
+        "kê khai tài khoản"
+      ],
+      "summary": "Nghĩa vụ pháp lý kê khai toàn bộ số tài khoản ngân hàng và ví điện tử dùng kinh doanh theo Thông tư 18/2026/TT-BTC và rủi ro khi dùng tài khoản cá nhân.",
+      "content": {
+        "overview": "Hộ kinh doanh bắt buộc phải thông báo toàn bộ số tài khoản mở tại ngân hàng và số hiệu ví điện tử có liên quan đến hoạt động sản xuất kinh doanh cho cơ quan thuế.",
+        "why_it_matters": "Cơ quan thuế có cơ chế đối soát dữ liệu với Ngân hàng Nhà nước. Nếu phát hiện tài khoản nhận tiền bán hàng nhưng không khai báo, chủ hộ sẽ bị phạt vi phạm về đăng ký thuế và truy thu doanh thu ẩn.",
+        "when_to_do": "Nộp Mẫu 01/BK-STK kèm theo tờ khai thuế đầu tiên khi bắt đầu kinh doanh, hoặc trong vòng 10 ngày khi mở thêm tài khoản mới.",
+        "steps": [
+          "Bước 1: Mở một tài khoản ngân hàng riêng chuyên dùng nhận tiền bán lẻ và tiền quyết toán sàn.",
+          "Bước 2: Điền thông tin vào Mẫu 01/BK-STK (Tên ngân hàng, số tài khoản, tên chủ tài khoản, ngày mở).",
+          "Bước 3: Nộp qua Cổng Thông tin Thuế điện tử (`thuedientu.gdt.gov.vn`) hoặc nộp trực tiếp tại chi cục thuế.",
+          "Bước 4: Cài đặt số tài khoản này vào hệ thống Tinky để tạo mã VietQR động."
+        ],
+        "checklist": [
+          "Tài khoản ngân hàng đứng tên chính chủ hộ kinh doanh",
+          "Đã tách biệt 100% tài khoản chi tiêu gia đình với tài khoản thu tiền quán",
+          "Đã lưu bản sao Mẫu 01/BK-STK có dấu tiếp nhận của cơ quan thuế"
+        ],
+        "costs": "Mở tài khoản ngân hàng: Miễn phí; Nộp mẫu thông báo: 0 VNĐ.",
+        "common_mistakes": [
+          "Dùng tài khoản cá nhân nhận tiền chuyển khoản của khách rồi rút ra chi tiêu cá nhân không theo dõi dòng tiền.",
+          "Đổi số tài khoản ngân hàng mới nhưng quên không nộp tờ khai điều chỉnh cho cơ quan thuế."
+        ],
+        "real_case": "Anh Hùng mở tài khoản MB Bank riêng cho quán cafe Tinky, nộp mẫu 01/BK-STK cho Đội thuế liên xã, kết nối vào cổng SePay trên Tinky để khách quét mã VietQR tự động khớp đơn hàng.",
+        "faqs": [
+          {
+            "q": "Nhận tiền chuyển khoản cá nhân (người nhà gửi) vào tài khoản kinh doanh có bị tính thuế không?",
+            "a": "Cơ quan thuế sẽ xem xét toàn bộ dòng tiền vào tài khoản đã đăng ký. Do đó không nên nhận tiền cá nhân vào tài khoản này để tránh phải giải trình phức tạp."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Thông tư 18/2026/TT-BTC về thủ tục quản lý thuế hộ kinh doanh (Mẫu 01/BK-STK)",
+            "url": "https://xaydungchinhsach.chinhphu.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Cấu hình tài khoản VietQR nhận tiền trên Tinky",
+        "url": "/settings",
+        "required_permission": "SETTING_MANAGE"
+      }
+    },
+    {
+      "id": "bookkeeping-tt152",
+      "category_id": "legal-tax",
+      "title": "Chế Độ Sổ Sách Kế Toán Thông Tư 152/2025/TT-BTC (Mẫu S1a-HKD & S2a-HKD)",
+      "slug": "che-do-so-sach-ke-toan-thong-tu-152-2025",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "thông tư 152",
+        "sổ kế toán",
+        "s1a-hkd",
+        "s2a-hkd",
+        "sổ doanh thu",
+        "lưu trữ chứng từ"
+      ],
+      "summary": "Quy chuẩn lập Sổ doanh thu bán hàng hóa, dịch vụ theo Thông tư 152/2025/TT-BTC thay thế Thông tư 88 cũ, phân biệt Mẫu S1a-HKD (dưới 1 tỷ) và Mẫu S2a-HKD (trên 1 tỷ).",
+      "content": {
+        "overview": "Từ ngày 01/01/2026, Thông tư 152/2025/TT-BTC chính thức có hiệu lực, quy định chế độ kế toán tinh gọn cho hộ kinh doanh: Hộ không chịu thuế dùng Mẫu S1a-HKD; Hộ nộp thuế tỷ lệ % dùng Mẫu S2a-HKD.",
+        "why_it_matters": "Khi cơ quan thuế kiểm tra đột xuất, nếu hộ không xuất trình được sổ kế toán và chứng từ lưu trữ tối thiểu 5 năm sẽ bị phạt vi phạm chế độ kế toán và bị áp dụng quyền ấn định thuế.",
+        "when_to_do": "Mở sổ từ đầu năm hoặc ngày bắt đầu bán hàng; ghi chép định kỳ hàng ngày hoặc sau mỗi ca bán hàng.",
+        "steps": [
+          "Bước 1: Chọn mẫu sổ phù hợp: Doanh thu dưới 1 tỷ chọn S1a-HKD; Doanh thu trên 1 tỷ chọn S2a-HKD.",
+          "Bước 2: Ghi chép từng dòng: Ngày ghi sổ, Số chứng từ (Mã đơn TINKYxxxxx), Diễn giải nội dung, Số tiền doanh thu.",
+          "Bước 3: Cuối mỗi tháng tổng cộng doanh thu phát sinh và đối chiếu với sao kê ngân hàng và báo cáo sàn.",
+          "Bước 4: Lưu trữ file điện tử hoặc in đóng thành tập sổ có chữ ký chủ hộ, lưu trữ tối thiểu 05 năm."
+        ],
+        "checklist": [
+          "Đã mở sổ theo đúng mẫu ban hành kèm Thông tư 152/2025/TT-BTC",
+          "Số liệu doanh thu trên sổ khớp với tổng doanh thu trên hệ thống POS Tinky",
+          "Lưu giữ đầy đủ hóa đơn đầu vào, phiếu thu, phiếu chi, sao kê ngân hàng"
+        ],
+        "costs": "Tự ghi sổ: 0 VNĐ; Sử dụng chức năng báo cáo trích xuất trên Tinky: Đã tích hợp sẵn.",
+        "common_mistakes": [
+          "Lấy nguyên file Excel từ TikTok Shop/Shopee nộp cho cơ quan thuế (Bị từ chối vì không đúng mẫu S1a/S2a).",
+          "Vứt bỏ hóa đơn chứng từ đầu vào sau khi kiểm hàng."
+        ],
+        "real_case": "Cửa hàng tiện lợi Tinky ghi chép Sổ S1a-HKD trên máy tính. Cuối ngày chốt ca trên Tinky, hệ thống xuất báo cáo tổng doanh thu bán lẻ tại quầy và đơn Shopee, chủ hộ cập nhật một dòng vào sổ, lưu trữ an toàn.",
+        "faqs": [
+          {
+            "q": "Sổ kế toán lưu trên máy tính dưới dạng file Excel có hợp lệ không?",
+            "a": "Hoàn toàn hợp lệ, miễn là đúng cấu trúc cột và khi cơ quan thuế yêu cầu có thể in ra hoặc xuất file định dạng chuẩn."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Thông tư số 152/2025/TT-BTC ngày 31/12/2025 của Bộ Tài chính (Công báo điện tử)",
+            "url": "https://congbao.chinhphu.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Xem báo cáo ca để trích xuất số liệu ghi sổ",
+        "url": "/reports/shifts",
+        "required_permission": "REPORT_VIEW"
+      }
+    },
+    {
+      "id": "pos-hardware-setup",
+      "category_id": "pos-operations",
+      "title": "Trang Bị Phần Cứng: Máy POS, Máy In Nhiệt & Loa Thông Báo",
+      "slug": "trang-bi-phan-cung-may-pos-in-nhiet-loa-thong-bao",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE"
+      ],
+      "keywords": [
+        "máy pos",
+        "máy in nhiệt",
+        "loa thông báo",
+        "phần cứng quầy thu ngân",
+        "printer"
+      ],
+      "summary": "Hướng dẫn lựa chọn máy POS, máy in hóa đơn nhiệt khổ 58mm/80mm, loa thông báo chuyển khoản tự động và thiết lập quầy thu ngân chuyên nghiệp.",
+      "content": {
+        "overview": "Một quầy thu ngân tiêu chuẩn chỉ cần 3 thiết bị cốt lõi: 1 màn hình thao tác (Máy tính/Laptop/Tablet), 1 máy in nhiệt (58mm hoặc 80mm) và 1 loa phát âm thanh thông báo chuyển khoản.",
+        "why_it_matters": "Thiết bị hoạt động ổn định giúp thu ngân order nhanh trong giờ cao điểm, in hóa đơn rõ ràng cho khách đối soát và chống lại chiêu trò làm giả bill chuyển khoản.",
+        "when_to_do": "Lắp đặt và chạy thử nghiệm thiết bị trước ngày khai trương quán tối thiểu 3 ngày.",
+        "steps": [
+          "Bước 1: Kết nối máy in nhiệt với máy tính qua cổng USB hoặc mạng LAN; cài đặt driver máy in trên Windows.",
+          "Bước 2: Mở menu Cài đặt trên Tinky (`/settings`) -> Chọn khổ giấy máy in (58mm hoặc 80mm).",
+          "Bước 3: Bấm nút 'Print test slip' để in thử hóa đơn mẫu 32 cột kiểm tra độ nét và dao cắt giấy.",
+          "Bước 4: Bật tính năng 'Payment Announcer' (Loa thông báo), bấm 'Test voice' kiểm tra âm lượng loa."
+        ],
+        "checklist": [
+          "Máy in nhiệt đã lắp đúng chiều cuộn giấy (mặt cảm nhiệt hướng lên trên)",
+          "Loa ngoài có âm lượng đủ lớn để thu ngân nghe rõ trong môi trường quán đông đúc",
+          "Có sẵn ít nhất 5 cuộn giấy in nhiệt dự phòng tại quầy"
+        ],
+        "costs": "Máy in nhiệt K80: 900.000 - 1.500.000 VNĐ; Loa mini cắm máy tính: 150.000 - 300.000 VNĐ; Giấy in K80: 6.000 VNĐ/cuộn.",
+        "common_mistakes": [
+          "Mua máy in văn phòng dùng mực in A4 thay vì máy in nhiệt (tốn mực, in chậm, không cắt giấy tự động).",
+          "Không chuẩn bị dây mạng LAN dự phòng, khi wifi chập chờn thì không in được hóa đơn."
+        ],
+        "real_case": "Quán Tinky trang bị 1 máy tính để bàn mini kết nối máy in Xprinter K80 và loa để bàn. Khi khách chuyển khoản QR, chỉ 1 giây sau loa tự đọc 'Đã nhận 45.000 đồng đơn TINKY00102' và máy in tự nhả bill đưa cho khách.",
+        "faqs": [
+          {
+            "q": "Tinky có hỗ trợ máy in không dây Bluetooth không?",
+            "a": "Tinky in trực tiếp qua Windows Spooler nên hỗ trợ mọi máy in nhận driver trên Windows (USB, LAN, Wifi, Bluetooth)."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về hóa đơn và phiếu thu tiền bán lẻ (Nghị định 123/2020/NĐ-CP)",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Kiểm tra kết nối máy in và thiết bị",
+        "url": "/admin/devices",
+        "required_permission": "DEVICE_MANAGE"
+      }
+    },
+    {
+      "id": "catalog-sku-standard",
+      "category_id": "pos-operations",
+      "title": "Chuẩn Hóa Danh Mục Sản Phẩm: Ngành Hàng - Nhóm Hàng - Mã SKU",
+      "slug": "chuan-hoa-danh-muc-nganh-hang-nhom-hang-sku",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "danh mục",
+        "mã sku",
+        "ngành hàng",
+        "nhóm hàng",
+        "quản lý sản phẩm"
+      ],
+      "summary": "Cách xây dựng cây danh mục sản phẩm 3 cấp khoa học, quy tắc đặt mã SKU ngắn gọn giúp thu ngân bấm chọn nhanh và đồng bộ dễ dàng lên sàn TMĐT.",
+      "content": {
+        "overview": "Cấu trúc danh mục bán lẻ chuẩn gồm 3 cấp: Ngành hàng (Category) -> Nhóm hàng (Group) -> Sản phẩm & Biến thể (Product & Variations), gắn liền với mã định danh duy nhất (SKU - Stock Keeping Unit).",
+        "why_it_matters": "Danh mục lộn xộn khiến thu ngân tìm món rất lâu khi khách xếp hàng đông, gây sai sót giá tiền và không thể đồng bộ tồn kho sang Shopee/TikTok Shop.",
+        "when_to_do": "Thiết lập danh mục hoàn chỉnh trước khi bắt đầu tạo đơn hàng đầu tiên.",
+        "steps": [
+          "Bước 1: Tạo Ngành hàng tại `/admin/categories` (VD: Đồ uống, Đồ ăn vặt, Hạt cafe đóng gói).",
+          "Bước 2: Tạo Nhóm hàng tại `/admin/groups` trực thuộc ngành hàng (VD: Cà phê, Trà hoa quả, Bánh ngọt).",
+          "Bước 3: Tạo Sản phẩm tại `/admin/products`: Nhập Tên món, Mã SKU, Giá bán lẻ (đã gồm VAT) và Giá vốn COGS.",
+          "Bước 4: Sắp xếp thứ tự hiển thị ưu tiên cho các món bán chạy nhất để hiển thị đầu tiên trên màn hình POS."
+        ],
+        "checklist": [
+          "Quy tắc mã SKU ngắn gọn: [VIET-TAT-NHOM]-[TEN-MON]-[SIZE] (VD: `CF-DEN-L`, `CF-SUA-M`)",
+          "Mỗi sản phẩm đều có nhập giá vốn để hệ thống tính được biên lợi nhuận lãi gộp",
+          "Giá bán trên menu đã thống nhất gồm thuế VAT hoặc chưa gồm thuế theo cấu hình Settings"
+        ],
+        "costs": "Thiết lập trên phần mềm: Hoàn toàn miễn phí.",
+        "common_mistakes": [
+          "Đặt mã SKU bằng tiếng Việt có dấu hoặc có khoảng trắng (VD: 'ca phe sua đá lon') gây lỗi khi đồng bộ dữ liệu.",
+          "Quên nhập giá vốn dẫn đến việc báo cáo lợi nhuận hiển thị sai lệch bằng 100% doanh thu."
+        ],
+        "real_case": "Menu quán cafe Tinky có 35 món, được chia thành 4 nhóm: Cà phê truyền thống (CF), Trà sữa (TS), Trà trái cây (TC) và Bánh ăn kèm (BK). Thu ngân chỉ mất trung bình 3 giây để tìm và chọn món trên màn hình cảm ứng.",
+        "faqs": [
+          {
+            "q": "Nếu một món có nhiều size thì tạo nhiều sản phẩm hay tạo biến thể?",
+            "a": "Nên tạo theo từng mã SKU riêng biệt (vd: CF-DEN-S, CF-DEN-L) để quản lý giá vốn và định lượng nguyên liệu chính xác nhất."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về niêm yết giá hàng hóa, dịch vụ (Luật Giá 2023)",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Tạo ngành hàng và nhóm sản phẩm mới",
+        "url": "/admin/categories",
+        "required_permission": "CATALOG_MANAGE"
+      }
+    },
+    {
+      "id": "shift-management-cash",
+      "category_id": "pos-operations",
+      "title": "Quy Trình Quản Lý Ca Bán Hàng: Mở Ca, Đếm Tiền & Bàn Giao Ca",
+      "slug": "quy-trinh-quan-ly-ca-ban-hang-mo-chot-ca",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE"
+      ],
+      "keywords": [
+        "quản lý ca",
+        "mở ca",
+        "chốt ca",
+        "đếm tiền",
+        "lệch quỹ",
+        "shift"
+      ],
+      "summary": "Quy trình kiểm soát tiền mặt chặt chẽ: khai báo tiền đầu ca, đối chiếu doanh thu thực thu trong ca và lập biên bản bàn giao ca chống thất thoát.",
+      "content": {
+        "overview": "Quản lý ca (Shift Management) là quy trình bắt buộc tại quầy thu ngân nhằm tách bạch trách nhiệm tiền mặt và doanh thu giữa các nhân viên bán hàng trong ngày.",
+        "why_it_matters": "Nếu không chốt ca riêng biệt, khi cuối ngày kiểm két thấy thiếu tiền, chủ quán không thể biết lỗi do nhân viên ca sáng hay ca chiều làm mất.",
+        "when_to_do": "Nhân viên bắt đầu ca làm việc phải Mở ca (Open Shift) và kết thúc ca phải Chốt ca (Close Shift).",
+        "steps": [
+          "Bước 1: Đầu ca, thu ngân đếm số tiền mặt lẻ trong ngăn kéo (Opening Cash) và nhập vào hệ thống.",
+          "Bước 2: Trong ca, mọi giao dịch thu tiền mặt hoặc chuyển khoản đều phải bấm tạo đơn trên POS.",
+          "Bước 3: Cuối ca, thu ngân bấm 'Close Shift', đếm toàn bộ tiền mặt thực tế trong két nhập vào hệ thống.",
+          "Bước 4: Tinky tự động tính chênh lệch: Tiền thực đếm - (Tiền đầu ca + Doanh thu tiền mặt) = Lệch thừa/thiếu.",
+          "Bước 5: In phiếu tổng kết ca (`/shift/print`), thu ngân ca trước và ca sau cùng ký xác nhận bàn giao."
+        ],
+        "checklist": [
+          "Tiền lẻ đầu ca được chuẩn bị sẵn đủ các mệnh giá 1k, 2k, 5k, 10k, 20k để thối lại cho khách",
+          "Tất cả các khoản chi tiêu vặt trong ca (mua đá, mua khăn giấy) đều phải có phiếu chi ghi rõ lý do",
+          "Chênh lệch tiền mặt cuối ca vượt quá 20.000 VNĐ phải ghi chú giải trình lý do"
+        ],
+        "costs": "Chi phí vận hành: 0 VNĐ.",
+        "common_mistakes": [
+          "Nhân viên lấy tiền trong két đi mua đồ cá nhân mà không ghi chép, cuối ca đếm thiếu tiền hốt hoảng.",
+          "Ca sáng chưa đóng ca đã để nhân viên ca chiều vào bán tiếp trên cùng một phiên làm việc."
+        ],
+        "real_case": "Tại Tinky Coffee, ca sáng (7h-15h) bắt đầu với 500.000 VNĐ tiền lẻ. Trong ca bán được 3.200.000 VNĐ tiền mặt và 1.800.000 VNĐ chuyển khoản. Khi chốt ca két có 3.700.000 VNĐ tiền mặt, khớp chuẩn xác 100%, bàn giao cho ca chiều.",
+        "faqs": [
+          {
+            "q": "Nếu tiền thực tế đếm được nhiều hơn doanh thu trên máy thì xử lý sao?",
+            "a": "Hệ thống ghi nhận là 'Lệch thừa'. Thường do thu ngân thối thiếu tiền cho khách hoặc khách để lại tiền boa. Cần ghi chú rõ ràng vào biên bản ca."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về quản lý tiền mặt và chứng từ quỹ (Thông tư 152/2025/TT-BTC)",
+            "url": "https://congbao.chinhphu.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Mở ca hoặc chốt ca bán hàng của bạn",
+        "url": "/shift",
+        "required_permission": "SHIFT_MANAGE"
+      }
+    },
+    {
+      "id": "vietqr-speaker-payment",
+      "category_id": "pos-operations",
+      "title": "Thanh Toán VietQR Động & Cơ Chế Loa Thông Báo Chống Bill Giả",
+      "slug": "thanh-toan-vietqr-dong-loa-thong-bao-chong-bill-gia",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE"
+      ],
+      "keywords": [
+        "vietqr",
+        "chuyển khoản",
+        "loa thông báo",
+        "bill giả",
+        "payment speaker",
+        "sepay"
+      ],
+      "summary": "Nguyên lý tạo mã VietQR động theo từng đơn hàng, tự động đối soát tiền nổi qua SePay và cơ chế loa phát thanh giọng nói tiếng Việt chống lừa đảo chuyển khoản.",
+      "content": {
+        "overview": "Thanh toán không tiền mặt qua VietQR đang chiếm trên 60% giao dịch bán lẻ tại Việt Nam. Tinky tích hợp mã QR động kèm nội dung đơn hàng `TINKYxxxxx` và loa tự động đọc số tiền ngay khi tiền vào tài khoản.",
+        "why_it_matters": "Kẻ gian thường dùng app làm giả ảnh chụp màn hình chuyển khoản thành công ('fake bill') để lừa thu ngân khi quán đông. Loa thông báo tự động nghe từ ngân hàng giúp thu ngân không cần nhìn điện thoại mà vẫn biết chắc chắn tiền đã về.",
+        "when_to_do": "Áp dụng cho mọi giao dịch khách hàng thanh toán chuyển khoản hoặc thanh toán kết hợp (Tiền mặt + QR).",
+        "steps": [
+          "Bước 1: Thu ngân chọn món xong -> Chọn phương thức 'VietQR' hoặc 'Cash + VietQR' trên màn hình POS.",
+          "Bước 2: Hệ thống tự động tạo mã VietQR chuẩn NAPAS chứa chính xác số tiền cần trả và cú pháp chuyển khoản.",
+          "Bước 3: Khách hàng mở app ngân hàng bất kỳ quét mã; tiền chuyển thẳng vào tài khoản của chủ quán.",
+          "Bước 4: Cổng SePay gửi tín hiệu về Tinky trong vòng 1-3 giây -> Loa máy tính tự phát: 'Đã nhận [Số tiền] đồng' -> Màn hình tự chuyển sang trạng thái COMPLETED và máy in tự nhả bill."
+        ],
+        "checklist": [
+          "Đã cấu hình đúng tài khoản ngân hàng và API key SePay trong file cấu hình bảo mật",
+          "Đã bật tùy chọn 'Tự động in phiếu khi nhận thông báo tiền về' trong Cài đặt",
+          "Quy tắc vàng: Thu ngân chỉ đưa đồ uống/hàng hóa cho khách SAU KHI LOA ĐÃ ĐỌC XÁC NHẬN"
+        ],
+        "costs": "Mã QR ngân hàng: Miễn phí giao dịch ngân hàng; Cổng tích hợp tự động SePay: chi phí gói duy trì theo quy định nhà mạng.",
+        "common_mistakes": [
+          "Dán mã QR in giấy tĩnh tại quầy nhưng không ghi số tiền, khách tự gõ nhầm 50.000 thành 5.000 đồng rồi bỏ đi.",
+          "Thu ngân tin vào màn hình điện thoại của khách mà không kiểm tra xem tài khoản quán đã thực nhận tiền chưa."
+        ],
+        "real_case": "Khách gọi 3 ly trà đào tổng 90.000 VNĐ. Khách quét mã VietQR động trên màn hình Tinky. Đúng 2 giây sau loa quán vang lên: 'Đã nhận chín mươi nghìn đồng đơn TINKY00245', máy in xé giấy 'tách', thu ngân mỉm cười đưa đồ cho khách.",
+        "faqs": [
+          {
+            "q": "Nếu khách chuyển sai số tiền hoặc chuyển thiếu thì sao?",
+            "a": "Tinky sẽ tự động chuyển giao dịch vào màn hình Cảnh báo (`/alerts`) với lỗi AMOUNT_MISMATCH, loa sẽ không thông báo thành công và đơn hàng vẫn ở trạng thái chờ để thu ngân xử lý."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy chuẩn mã phản hồi nhanh VietQR của Ngân hàng Nhà nước Việt Nam",
+            "url": "https://sbv.gov.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Tạo đơn hàng mới trải nghiệm thanh toán QR",
+        "url": "/orders/new",
+        "required_permission": "ORDER_CREATE"
+      }
+    },
+    {
+      "id": "inventory-stock-management",
+      "category_id": "pos-operations",
+      "title": "Kiểm Soát Tồn Kho & Quản Lý Giá Vốn Hàng Bán",
+      "slug": "kiem-soat-ton-kho-quan-ly-gia-von",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "tồn kho",
+        "quản lý kho",
+        "giá vốn",
+        "cogs",
+        "kiểm kê kho"
+      ],
+      "summary": "Nguyên tắc thiết lập số lượng tồn kho, cập nhật giá vốn hàng bán (Cost Price) cho từng mã SKU và quy trình kiểm kê định kỳ phát hiện thất thoát.",
+      "content": {
+        "overview": "Quản lý tồn kho giúp bạn biết chính xác trong kho còn bao nhiêu sản phẩm, khi nào cần nhập thêm hàng và tổng giá trị hàng tồn là bao nhiêu tiền.",
+        "why_it_matters": "Tồn kho quá nhiều làm đọng vốn và dễ hỏng hóc hết hạn sử dụng; tồn kho quá ít dẫn đến việc khách đặt mua nhưng không có hàng để giao, bị sàn phạt hủy đơn.",
+        "when_to_do": "Cập nhật mỗi khi nhập lô hàng mới từ nhà cung ứng và kiểm kê thực tế định kỳ hàng tuần/tháng.",
+        "steps": [
+          "Bước 1: Vào trang Quản lý sản phẩm (`/admin/products`), cập nhật Số lượng tồn kho và Giá vốn cho từng SKU.",
+          "Bước 2: Mỗi khi bán 1 đơn hàng tại quầy hoặc trên sàn, hệ thống ghi nhận sản lượng xuất bán.",
+          "Bước 3: Định kỳ cuối tuần, đếm số lượng thực tế trên kệ đối chiếu với số liệu trên phần mềm.",
+          "Bước 4: Nếu có chênh lệch, tìm nguyên nhân: nhân viên làm vỡ hỏng, nguyên liệu hao hụt hay bị trộm cắp."
+        ],
+        "checklist": [
+          "Mọi sản phẩm bày bán đều có dán nhãn mã SKU rõ ràng trên kệ",
+          "Khu vực kho bảo quản khô ráo, thoáng mát, có kệ cách mặt đất tối thiểu 15cm",
+          "Thiết lập mức cảnh báo tồn kho tối thiểu (vd: còn dưới 5 sản phẩm thì báo nhập hàng)"
+        ],
+        "costs": "Chi phí phần mềm quản lý: Đã có sẵn trong Tinky; Chi phí hao hụt kho cho phép: thông thường dưới 1.5% doanh thu.",
+        "common_mistakes": [
+          "Nhập hàng về để bừa bãi không ghi ngày nhập, dẫn đến hàng cũ còn hạn ngắn nằm ở dưới, hàng mới đè lên trên.",
+          "Không kiểm kho thường xuyên, đến lúc sàn nổ đơn hàng loạt mới phát hiện trong kho đã hết hàng từ tuần trước."
+        ],
+        "real_case": "Cửa hàng phụ kiện Tinky định kỳ tối chủ nhật kiểm kho 50 mã ốp lưng. Nhờ đối chiếu số tồn trên Tinky, chủ shop phát hiện thiếu 2 chiếc do nhân viên quên không bấm thanh toán khi bán cho người quen.",
+        "faqs": [
+          {
+            "q": "Tính giá vốn theo phương pháp nào là chuẩn nhất?",
+            "a": "Hộ kinh doanh nhỏ nên áp dụng phương pháp Giá bình quân gia quyền hoặc Giá thực tế đích danh cho từng đợt nhập hàng."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về kế toán hàng tồn kho (Thông tư 152/2025/TT-BTC)",
+            "url": "https://congbao.chinhphu.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Cập nhật giá vốn và quản lý danh mục sản phẩm",
+        "url": "/admin/products",
+        "required_permission": "CATALOG_MANAGE"
+      }
+    },
+    {
+      "id": "shopee-store-setup",
+      "category_id": "shopee-seller",
+      "title": "Mở Gian Hàng Shopee Chuẩn SEO & Cài Đặt Vận Chuyển",
+      "slug": "mo-gian-hang-shopee-chuan-seo-cai-dat-van-chuyen",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "SHOPEE_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "shopee",
+        "mở gian hàng",
+        "kênh người bán",
+        "vận chuyển shopee",
+        "cài đặt kho"
+      ],
+      "summary": "Quy trình đăng ký tài khoản Shopee Seller Centre, định danh thông tin thuế, thiết lập địa chỉ kho lấy hàng và cài đặt các đơn vị vận chuyển.",
+      "content": {
+        "overview": "Bắt đầu bán hàng trên Shopee đòi hỏi thiết lập gian hàng chuyên nghiệp trên Shopee Seller Centre (`banhang.shopee.vn`) với đầy đủ thông tin pháp lý và kết nối vận chuyển.",
+        "why_it_matters": "Địa chỉ kho sai khiến bưu tá không thể đến lấy hàng, dẫn đến trễ hạn giao hàng và bị Shopee phạt điểm Sao Quả Tạ, giảm hiển thị gian hàng.",
+        "when_to_do": "Thiết lập gian hàng hoàn chỉnh trước khi đăng sản phẩm mở bán.",
+        "steps": [
+          "Bước 1: Truy cập `banhang.shopee.vn`, đăng nhập tài khoản Shopee cá nhân.",
+          "Bước 2: Vào **Hồ sơ Shop**: Cập nhật Tên Shop, Logo vuông, Banner giới thiệu và Mô tả shop chứa từ khóa chính.",
+          "Bước 3: Vào **Địa chỉ**: Thêm địa chỉ lấy hàng chính xác (nơi bưu tá SPX, GHTK sẽ ghé lấy gói hàng).",
+          "Bước 4: Vào **Cài đặt Vận chuyển**: Kích hoạt các kênh giao hàng: Hỏa tốc (nếu có), Nhanh (SPX, GHTK, Viettel Post) và Tiết kiệm.",
+          "Bước 5: Vào **Tài chính** -> **Thiết lập tài khoản ngân hàng**: Nhập số tài khoản ngân hàng kinh doanh để rút tiền sau này."
+        ],
+        "checklist": [
+          "Tên Shop ngắn gọn, có chứa tên thương hiệu và ngành hàng (VD: Tinky Coffee - Cà Phê Mộc)",
+          "Số điện thoại người liên hệ tại kho luôn trong trạng thái nghe máy để bưu tá liên lạc",
+          "Đã bật ít nhất 2 đơn vị vận chuyển phổ biến để đảm bảo có người lấy hàng đều đặn"
+        ],
+        "costs": "Đăng ký mở gian hàng: Hoàn toàn miễn phí.",
+        "common_mistakes": [
+          "Điền địa chỉ kho lấy hàng là địa chỉ cơ quan công sở (nơi không có người trực vào ngày thứ 7/chủ nhật).",
+          "Tên shop đặt chung chung vô nghĩa kiểu 'shop_12345678' khiến khách hàng mất lòng tin."
+        ],
+        "real_case": "Shop Tinky Coffee đăng ký gian hàng trên Shopee, hoàn thiện mô tả cam kết 100% cafe nguyên chất rang mới trong tuần, bật kênh vận chuyển Hỏa tốc nội thành và Nhanh toàn quốc, sẵn sàng tiếp nhận đơn.",
+        "faqs": [
+          {
+            "q": "Cá nhân chưa có giấy phép kinh doanh có bán được trên Shopee không?",
+            "a": "Có thể đăng ký bán bằng CCCD cá nhân, nhưng khi doanh thu lớn bạn bắt buộc phải cập nhật mã số thuế hộ kinh doanh để tuân thủ pháp luật."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Học viện Shopee Uni Việt Nam - Cẩm nang mở gian hàng",
+            "url": "https://banhang.shopee.vn/edu/article/2072",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Chuẩn bị mẫu file import đơn Shopee vào Tinky",
+        "url": "/sales/import",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "shopee-variations-pricing",
+      "category_id": "shopee-seller",
+      "title": "Phân Loại Biến Thể Sản Phẩm & Cấu Hình Giá Bán Shopee",
+      "slug": "phan-loai-bien-the-san-pham-cau-hinh-gia-shopee",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "SHOPEE_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "biến thể",
+        "giá bán shopee",
+        "sku shopee",
+        "định giá",
+        "tối ưu seo"
+      ],
+      "summary": "Cách cấu hình biến thể sản phẩm 2 tầng (Size x Hương vị), đặt mã SKU đồng bộ với Tinky và công thức định giá bán bù đắp trọn vẹn chi phí sàn.",
+      "content": {
+        "overview": "Tạo link sản phẩm chuẩn SEO trên Shopee kết hợp biến thể linh hoạt giúp tăng tỷ lệ chuyển đổi mua hàng và tránh nhầm lẫn khi nhặt hàng đóng gói.",
+        "why_it_matters": "Nếu định giá bán bằng giá bán tại quầy, sau khi Shopee trừ 15% - 20% các loại phí sàn bạn sẽ bị âm lợi nhuận trên mỗi đơn hàng bán ra.",
+        "when_to_do": "Tính toán giá bán cẩn thận trước khi niêm yết công khai trên Shopee.",
+        "steps": [
+          "Bước 1: Soạn tiêu đề theo công thức SEO: [Loại SP] + [Thương hiệu] + [Đặc tính/Model] + [Công dụng].",
+          "Bước 2: Thiết lập Phân loại hàng (Variations): Tầng 1: Quy cách (Gói 250g, Gói 500g); Tầng 2: Mức độ rang (Rang vừa, Rang đậm).",
+          "Bước 3: Nhập Mã SKU cho từng phân loại: Khớp đúng 100% với mã SKU trong phần mềm Tinky.",
+          "Bước 4: Tính giá niêm yết: Lấy giá bán mong muốn chia cho (1 - 0.18) để bù đắp 18% chi phí sàn."
+        ],
+        "checklist": [
+          "Hình ảnh đại diện bìa vuông 1:1, ảnh rõ nét, không dính logo watermark của web khác",
+          "Điền đầy đủ các thông số bắt buộc: Trọng lượng đóng gói, kích thước hộp sau đóng gói (D x R x C)",
+          "Mã SKU Shopee trùng khớp với mã SKU trên Tinky để phục vụ import đơn hàng"
+        ],
+        "costs": "Không mất phí đăng sản phẩm.",
+        "common_mistakes": [
+          "Khai báo sai kích thước hộp đóng gói (ví dụ nặng 200g nhưng khai nhầm 2kg), khiến phí ship khách nhìn thấy quá cao và không ai bấm mua.",
+          "Gộp các sản phẩm có giá trị chênh lệch quá 5 lần vào cùng một link (vi phạm chính sách Shopee spam giá)."
+        ],
+        "real_case": "Gói cafe 500g có giá vốn 45.000 VNĐ. Shop muốn thu về 80.000 VNĐ. Shop niêm yết trên Shopee giá 100.000 VNĐ. Sau khi trừ 18.000 VNĐ phí sàn, shop thực nhận 82.000 VNĐ, đạt đúng mục tiêu lợi nhuận.",
+        "faqs": [
+          {
+            "q": "Có nên để giá thật cao rồi tạo voucher giảm giá 50% không?",
+            "a": "Không nên lạm dụng vì Shopee quét hành vi nâng giá ảo trước khi khuyến mãi. Hãy định giá hợp lý và tạo voucher 5% - 15%."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Chính sách đăng bán sản phẩm của Shopee Việt Nam",
+            "url": "https://banhang.shopee.vn/edu",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Đồng bộ mã SKU và giá vốn sản phẩm",
+        "url": "/admin/products",
+        "required_permission": "CATALOG_MANAGE"
+      }
+    },
+    {
+      "id": "shopee-fee-breakdown",
+      "category_id": "shopee-seller",
+      "title": "Bóc Tách Toàn Bộ Biểu Phí Sàn Shopee (Cố Định, Thanh Toán, Xtra)",
+      "slug": "boc-tach-toan-bo-bieu-phi-san-shopee",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "SHOPEE_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "phí sàn shopee",
+        "phí thanh toán",
+        "phí cố định",
+        "freeship xtra",
+        "voucher xtra",
+        "ams"
+      ],
+      "summary": "Chi tiết cách tính 4 loại phí trên Shopee: Phí thanh toán 4-5%, Phí cố định 4-5%, Gói dịch vụ Xtra và Hoa hồng tiếp thị liên kết AMS.",
+      "content": {
+        "overview": "Biểu phí bán hàng Shopee gồm các khoản phí bắt buộc và các gói dịch vụ tự nguyện đăng ký. Tổng chi phí sàn thường dao động từ 13% đến 20% trên mỗi đơn hàng hoàn thành.",
+        "why_it_matters": "Không nắm rõ các tầng phí khiến người bán ngộ nhận rằng doanh thu cao là có lãi, trong khi tiền thực tế rút về ví Shopee sau khi trừ phí bị hao hụt nặng nề.",
+        "when_to_do": "Kiểm tra kỹ biểu phí định kỳ hàng quý hoặc mỗi khi Shopee có thông báo điều chỉnh chính sách phí.",
+        "steps": [
+          "Bước 1: Tính Phí Thanh Toán (Payment Fee): 4.0% - 5.0% x (Tổng tiền người mua trả).",
+          "Bước 2: Tính Phí Cố Định (Commission Fee): 4.0% - 5.0% x (Tiền hàng sau giảm giá của Shop).",
+          "Bước 3: Tính Phí Gói Dịch Vụ (nếu đăng ký): Gói Freeship Xtra (khoảng 6% - 8%), Gói Voucher Xtra (khoảng 3% - 4%).",
+          "Bước 4: Tính Phí Tiếp Thị Liên Kết (Shopee AMS): Tỷ lệ % hoa hồng bạn cài đặt cho KOL/KOC kéo khách."
+        ],
+        "checklist": [
+          "Đã cộng tổng các tỷ lệ % phí vào bảng tính giá bán sản phẩm",
+          "Định kỳ tải file Báo cáo thu nhập (Income Report) để kiểm tra các khoản phí bị trừ thực tế",
+          "Cân nhắc hủy các gói dịch vụ Xtra nếu tỷ lệ tăng trưởng đơn hàng không bù đắp được chi phí gói"
+        ],
+        "costs": "Tổng chi phí sàn thường chiếm từ 14% đến 19% giá trị đơn hàng.",
+        "common_mistakes": [
+          "Đăng ký tham gia tất cả các gói Freeship Xtra, Voucher Xtra, Flash Sale cùng lúc khiến tổng phí sàn vọt lên trên 25%.",
+          "Tưởng rằng phí ship là người mua trả hết, không biết rằng người bán cũng có thể phải chịu một phần phí nếu chọn gói hỗ trợ ship."
+        ],
+        "real_case": "Một đơn Shopee tiền hàng 200.000 VNĐ. Phí thanh toán (5%): 10.000 VNĐ; Phí cố định (4%): 8.000 VNĐ; Phí gói Freeship Xtra (7%): 14.000 VNĐ. Tổng phí Shopee khấu trừ là 32.000 VNĐ (chiếm 16%). Shop thực nhận 168.000 VNĐ.",
+        "faqs": [
+          {
+            "q": "Đơn hàng bị khách trả hàng/hoàn tiền thì Shopee có trừ phí không?",
+            "a": "Không. Shopee chỉ thu phí sàn trên các đơn hàng giao thành công (COMPLETED). Đơn hủy hoặc hoàn tiền sẽ được hoàn lại các khoản phí sàn."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Chi tiết biểu phí bán hàng trên Shopee Việt Nam (Shopee Uni)",
+            "url": "https://banhang.shopee.vn/edu/article/2072",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Xem biểu đồ phân tích chi phí sàn Fee Waterfall",
+        "url": "/analytics?tab=fees",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "shopee-order-fulfillment",
+      "category_id": "shopee-seller",
+      "title": "Quy Trình Đóng Gói, Giao Vận & Xử Lý Đổi Trả Shopee",
+      "slug": "quy-trinh-dong-goi-giao-van-doi-tra-shopee",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "SHOPEE_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "đóng gói",
+        "bưu tá",
+        "giao hàng shopee",
+        "hoàn hàng",
+        "khiếu nại"
+      ],
+      "summary": "Quy chuẩn đóng gói chống vỡ hỏng, quy tắc quay video bàn giao bưu tá, quản lý chỉ số giao trễ và kỹ năng xử lý khiếu nại trả hàng hoàn tiền.",
+      "content": {
+        "overview": "Giao vận và hoàn tất đơn hàng (Fulfillment) là khâu trực tiếp quyết định trải nghiệm của khách hàng và điểm đánh giá sao của shop trên Shopee.",
+        "why_it_matters": "Giao hàng trễ hạn làm tăng tỷ lệ hủy đơn (NFR), bị phạt Sao Quả Tạ. Đóng gói ẩu làm hàng vỡ hỏng trong quá trình vận chuyển sẽ bị khách trả hàng và mất cả chì lẫn chài.",
+        "when_to_do": "Thực hiện liên tục hàng ngày ngay khi có thông báo đơn hàng mới.",
+        "steps": [
+          "Bước 1: In phiếu gửi hàng (Waybill) có mã vạch vận đơn từ Kênh Người Bán.",
+          "Bước 2: Nhặt đúng sản phẩm theo mã SKU in trên phiếu; kiểm tra hạn sử dụng và tình trạng nguyên vẹn.",
+          "Bước 3: Bọc màng xốp nổ (Bubble wrap) tối thiểu 2-3 lớp quanh sản phẩm; đóng vào hộp carton cứng cáp.",
+          "Bước 4: Dán phiếu gửi hàng chắc chắn lên mặt hộp; quay video ngắn lúc đóng hàng và dán tem niêm phong.",
+          "Bước 5: Bàn giao gói hàng cho bưu tá SPX/GHTK, yêu cầu bưu tá quét mã xác nhận 'Đã lấy hàng' ngay tại chỗ."
+        ],
+        "checklist": [
+          "Đóng hàng và giao bưu tá trong vòng 24 giờ kể từ lúc phát sinh đơn",
+          "Có video/ảnh chụp quá trình đóng hàng rõ mã vận đơn để làm bằng chứng khiếu nại",
+          "Bao bì có dán nhãn 'Hàng dễ vỡ xin nhẹ tay' nếu là chai lọ thủy tinh/đồ ăn"
+        ],
+        "costs": "Hộp carton: 1.500 - 3.500 VNĐ/hộp; Màng bọc xốp nổ: 100.000 VNĐ/cuộn 50m; Băng keo: 15.000 VNĐ/cuộn.",
+        "common_mistakes": [
+          "Giao hàng cho bưu tá nhưng không đứng xem họ quét mã, bưu tá quên quét khiến đơn bị Shopee tự động hủy do quá hạn giao.",
+          "Không quay video lúc đóng hàng, khi khách khiếu nại giao thiếu thì shop không có bằng chứng đối chất."
+        ],
+        "real_case": "Shop Tinky có 1 đơn hàng bị khách bấm khiếu nại 'giao thiếu 1 gói cafe'. Nhờ cung cấp video quay rõ lúc đóng gói cân nặng gói hàng 1.05 kg trên bàn cân, Shopee đã bác bỏ khiếu nại của khách và chuyển tiền đầy đủ cho shop.",
+        "faqs": [
+          {
+            "q": "Khách từ chối nhận hàng (Boom hàng) thì ai chịu tiền ship?",
+            "a": "Đơn giao không thành công do lỗi người mua thì hàng sẽ được hoàn trả lại cho shop và shop không bị trừ tiền ship đơn hàng đó."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định đóng gói và tiêu chuẩn vận chuyển Shopee Việt Nam",
+            "url": "https://banhang.shopee.vn/edu",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Import file đơn Shopee vào sổ bán hàng",
+        "url": "/sales/import",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "tiktok-store-registration",
+      "category_id": "tiktok-seller",
+      "title": "Đăng Ký Cửa Hàng TikTok Shop & Cài Đặt Tài Khoản Tiếp Thị",
+      "slug": "dang-ky-tiktok-shop-cai-dat-tai-khoan-tiep-thi",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "tiktok shop",
+        "đăng ký tiktok shop",
+        "seller center",
+        "tài khoản tiếp thị",
+        "official account"
+      ],
+      "summary": "Các bước đăng ký cửa hàng TikTok Shop Seller Center, liên kết tài khoản TikTok chính thức (Official Account) và 4 tài khoản tiếp thị để livestream gắn giỏ hàng.",
+      "content": {
+        "overview": "TikTok Shop cho phép người dùng xem video, lướt livestream và bấm mua hàng trực tiếp mà không cần rời khỏi ứng dụng TikTok.",
+        "why_it_matters": "Không liên kết tài khoản tiếp thị đúng cách sẽ khiến kênh TikTok của bạn không thể gắn được giỏ hàng sản phẩm vào video hoặc không thể ghim sản phẩm khi livestream.",
+        "when_to_do": "Thiết lập sau khi đã có sản phẩm sẵn sàng mở bán.",
+        "steps": [
+          "Bước 1: Truy cập `seller-vn.tiktok.com`, đăng ký tài khoản bằng số điện thoại hoặc email.",
+          "Bước 2: Xác minh danh tính: Tải ảnh chụp CCCD hoặc Giấy phép đăng ký kinh doanh Hộ kinh doanh.",
+          "Bước 3: Nhập thông tin thuế: Cung cấp Mã số thuế hộ kinh doanh để nhận hóa đơn dịch vụ điện tử của TikTok.",
+          "Bước 4: Liên kết Tài khoản chính thức (Official Account) để đồng bộ tên shop với kênh TikTok cá nhân.",
+          "Bước 5: Vào mục **Tài khoản tiếp thị (Marketing Accounts)**: Liên kết thêm các nick TikTok phụ để livestream gắn giỏ hàng."
+        ],
+        "checklist": [
+          "Ảnh chụp CCCD rõ nét 4 góc, không bị lóa sáng, còn hạn sử dụng",
+          "Kênh TikTok liên kết phải đạt đủ điều kiện trên 18 tuổi",
+          "Đã cài đặt tài khoản ngân hàng trùng khớp tên người đại diện pháp lý"
+        ],
+        "costs": "Đăng ký mở shop: Miễn phí.",
+        "common_mistakes": [
+          "Tên tài khoản ngân hàng rút tiền không trùng với tên trên CCCD/ĐKKD đăng ký shop (bị từ chối rút tiền).",
+          "Liên kết nhầm tài khoản TikTok đang dính gậy vi phạm tiêu chuẩn cộng đồng."
+        ],
+        "real_case": "Bạn Linh đăng ký mở shop TikTok bằng giấy phép Hộ kinh doanh Tinky, liên kết kênh TikTok chính 'Tinky Cafe' và thêm 2 tài khoản tiếp thị của nhân viên để thay phiên livestream bán hàng mỗi trưa.",
+        "faqs": [
+          {
+            "q": "Kênh TikTok có cần đủ 1.000 người theo dõi (follow) mới mở được shop không?",
+            "a": "Khi bạn đăng ký tài khoản người bán TikTok Shop Seller Center thành công và liên kết tài khoản chính thức, kênh của bạn sẽ có giỏ hàng ngay lập tức mà không cần 1.000 follow."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Trung tâm Học viện TikTok Shop Academy Việt Nam",
+            "url": "https://seller-vn.tiktok.com/university",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Chuẩn bị import đơn hàng TikTok Shop",
+        "url": "/sales/import",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "tiktok-content-conversion",
+      "category_id": "tiktok-seller",
+      "title": "Bán Hàng Qua Video Ngắn, Livestream & Giỏ Hàng Sản Phẩm",
+      "slug": "ban-hang-video-ngan-livestream-gio-hang-tiktok",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "video tiktok",
+        "livestream",
+        "giỏ hàng vàng",
+        "chuyển đổi đơn",
+        "short video"
+      ],
+      "summary": "Kỹ thuật sáng tạo video ngắn 3 giây giữ chân người xem, kịch bản livestream chốt đơn và cách tối ưu giỏ hàng sản phẩm trên TikTok Shop.",
+      "content": {
+        "overview": "Trên TikTok Shop, nội dung chính là cửa hàng. Video ngắn mang lại đơn hàng thụ động 24/7, trong khi Livestream mang lại doanh số bùng nổ trong thời gian ngắn.",
+        "why_it_matters": "Đăng video bán hàng nhàm chán hoặc livestream không có kịch bản sẽ khiến người xem lướt qua trong 1 giây đầu, thuật toán TikTok sẽ ngừng phân phối traffic cho bạn.",
+        "when_to_do": "Sản xuất video đều đặn 1-2 video/ngày và duy trì lịch livestream tối thiểu 3-4 buổi/tuần.",
+        "steps": [
+          "Bước 1: Cấu trúc video chuẩn 3 phần: 3 giây đầu (Gây tò mò / Đặt vấn đề) -> 15 giây thân bài (Trải nghiệm thực tế sản phẩm) -> 5 giây kết (Kêu gọi nhấp vào giỏ hàng vàng).",
+          "Bước 2: Gắn link sản phẩm: Bấm 'Thêm liên kết' -> Chọn sản phẩm trong gian hàng của bạn trước khi bấm đăng video.",
+          "Bước 3: Chuẩn bị Livestream: Setup ánh sáng, âm thanh rõ ràng, bảng giá ưu đãi và quà tặng ghim nổi bật.",
+          "Bước 4: Kỹ thuật Ghim Deal: Luôn ghim sản phẩm đang nói trực tiếp lên đầu màn hình live để khách hàng bấm mua tức thì."
+        ],
+        "checklist": [
+          "Video có độ phân giải tối thiểu 1080p, quay dọc tỷ lệ 9:16",
+          "Âm thanh giọng nói rõ ràng, có phụ đề tự động cho người xem không bật loa",
+          "Tuyệt đối không nói các từ ngữ cấm: 'chuyển khoản ngoài', 'zalo', 'face', 'shopee', không để lộ mã QR cá nhân trên live"
+        ],
+        "costs": "Đèn livestream cơ bản: 300.000 - 800.000 VNĐ; Micro cài áo không dây: 300.000 - 1.200.000 VNĐ.",
+        "common_mistakes": [
+          "Bật livestream để màn hình trống không có người nói chuyện (bị TikTok quét vi phạm live tĩnh và khóa tính năng).",
+          "Nói quá công dụng sản phẩm (dùng từ 'trị dứt điểm', 'cam kết 100%', 'tốt nhất Việt Nam') khiến video bị hạn chế."
+        ],
+        "real_case": "Video quay cảnh bóc gói cafe hạt Tinky nghe tiếng giòn rụm và rót nước sôi bốc khói nghi ngút thu hút 180.000 view, đem về 240 đơn hàng chỉ trong vòng 48 giờ mà không tốn tiền chạy quảng cáo.",
+        "faqs": [
+          {
+            "q": "Livestream có cần người xem đông mới bán được hàng không?",
+            "a": "Không nhất thiết. Chỉ cần 20-30 mắt xem đúng tệp khách hàng có nhu cầu, nếu kịch bản tốt bạn vẫn có thể chốt được 10-15 đơn hàng mỗi phiên."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy tắc tiêu chuẩn cộng đồng và chính sách nội dung TikTok Shop",
+            "url": "https://seller-vn.tiktok.com/university",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Xem phân tích doanh thu theo nguồn LIVE và Video",
+        "url": "/analytics?tab=traffic",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "tiktok-affiliate-creators",
+      "category_id": "tiktok-seller",
+      "title": "Hợp Tác Với Creator KOC Qua TikTok Shop Affiliate",
+      "slug": "hop-tac-creator-koc-tiktok-shop-affiliate",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "affiliate tiktok",
+        "koc",
+        "kol",
+        "creator",
+        "hoa hồng tiếp thị",
+        "mẫu miễn phí"
+      ],
+      "summary": "Cách tận dụng hàng nghìn nhà sáng tạo nội dung (KOC/KOL) bán hàng hộ bạn: Cài đặt kế hoạch hoa hồng mở, kế hoạch định hướng và gửi mẫu dùng thử.",
+      "content": {
+        "overview": "TikTok Shop Affiliate cho phép chủ shop tiếp cận mạng lưới hàng chục nghìn Creator sáng tạo nội dung. Bạn chỉ trả hoa hồng khi đơn hàng giao thành công, không rủi ro chi phí quảng cáo trước.",
+        "why_it_matters": "Một mình bạn không thể quay hàng trăm video mỗi tháng. Hợp tác với Creator giúp sản phẩm của bạn xuất hiện liên tục trên hàng trăm kênh khác nhau với chi phí biến đổi tối ưu.",
+        "when_to_do": "Kích hoạt ngay khi sản phẩm đã có mặt trong kho và có biên lợi nhuận đủ tốt để chia sẻ hoa hồng.",
+        "steps": [
+          "Bước 1: Vào Seller Center -> Mục **Tiếp thị liên kết (Affiliate)** -> Tạo **Kế hoạch mở (Open Plan)** với mức hoa hồng từ 8% đến 15%.",
+          "Bước 2: Tìm kiếm Creator phù hợp tại mục **Tìm nhà sáng tạo**: Lọc theo ngành hàng, tỷ lệ hoàn thành đơn và lượng tương tác.",
+          "Bước 3: Tạo **Kế hoạch định hướng (Targeted Plan)**: Mời đích danh các KOC uy tín với mức hoa hồng độc quyền cao hơn.",
+          "Bước 4: Duyệt gửi **Mẫu miễn phí (Free Sample)**: Gửi 1 sản phẩm cho KOC trải nghiệm, kèm điều kiện KOC phải đăng video trong vòng 10 ngày."
+        ],
+        "checklist": [
+          "Biên lợi nhuận gộp của sản phẩm tối thiểu 35% để đủ chi trả hoa hồng 10-15% cho Creator mà vẫn có lãi",
+          "Hợp tác với các Creator có tệp người xem trùng khớp với khách hàng mục tiêu",
+          "Theo dõi tỷ lệ ra đơn của từng KOC để tái hợp tác với người có hiệu quả cao"
+        ],
+        "costs": "Chi phí gửi mẫu sản phẩm dùng thử: Giá vốn sản phẩm + tiền ship (khoảng 30.000 - 60.000 VNĐ/mẫu).",
+        "common_mistakes": [
+          "Gửi mẫu đại trà cho các nick ảo không có tương tác thật, mất tiền hàng mà không nhận được video nào.",
+          "Cài hoa hồng quá thấp (dưới 5%) khiến Creator không có động lực nhận lời gắn giỏ hàng."
+        ],
+        "real_case": "Shop Tinky gửi tặng 10 gói cafe cho 10 bạn sinh viên hay review ẩm thực. 7 bạn đăng video, trong đó có 1 video viral 300.000 view giúp shop nổ hơn 500 đơn hàng trong 3 ngày, chi trả hoa hồng 10% rất vui vẻ.",
+        "faqs": [
+          {
+            "q": "Nếu khách hủy đơn hoặc trả hàng thì KOC có được nhận hoa hồng không?",
+            "a": "Không. Hoa hồng affiliate chỉ được TikTok tự động trích trả khi đơn hàng chuyển sang trạng thái Hoàn thành (COMPLETED)."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Chính sách tiếp thị liên kết TikTok Shop Affiliate",
+            "url": "https://seller-vn.tiktok.com/university",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Quản lý và đối soát hoa hồng tiếp thị liên kết",
+        "url": "/admin/channel-commissions",
+        "required_permission": "AFFILIATE_FINANCE_READ"
+      }
+    },
+    {
+      "id": "tiktok-fee-tax-settlement",
+      "category_id": "tiktok-seller",
+      "title": "Bóc Tách Biểu Phí Sàn TikTok Shop & Đối Soát Doanh Thu Chịu Thuế",
+      "slug": "boc-tach-bieu-phi-tiktok-shop-doi-soat-thue",
+      "difficulty": "ADVANCED",
+      "reading_time_minutes": 7,
+      "target_models": [
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "phí tiktok shop",
+        "doanh thu chịu thuế",
+        "settlement report",
+        "đối soát ví",
+        "thuế tiktok shop"
+      ],
+      "summary": "Hiểu bản chất kế toán của sheet Reports trong file quyết toán TikTok Shop: Phân biệt rõ Subtotal after seller discounts (Doanh thu tính thuế) với Total settlement amount (Tiền rút về ví).",
+      "content": {
+        "overview": "File quyết toán tài chính từ TikTok Shop Seller Center chia làm 3 tầng tiền riêng biệt: Doanh thu chịu thuế, Tổng phí sàn và Tiền thực tế chuyển về tài khoản ngân hàng.",
+        "why_it_matters": "Khai thuế sai con số có thể bị phạt nặng. Cơ quan thuế quy định Doanh thu tính thuế là tiền hàng sau voucher shop, KHÔNG ĐƯỢC trừ chi phí sàn. Nếu lấy số tiền thực rút về ví để khai thuế, bạn sẽ bị coi là trốn thuế.",
+        "when_to_do": "Đối soát định kỳ mỗi khi có sao kê quyết toán hoặc vào ngày cuối cùng của tháng/quý.",
+        "steps": [
+          "Bước 1: Tải file quyết toán: Vào Seller Center -> **Tài chính** -> **Quyết toán** -> Xuất file Excel.",
+          "Bước 2: Mở sheet `Reports`: Tìm dòng `Total revenue` hoặc `Subtotal after seller discounts` (Đây là DOANH THU CHỊU THUẾ).",
+          "Bước 3: Đọc dòng `Total fees`: Gồm Phí hoa hồng sàn (`TikTok Shop commission fee`) và Phí giao dịch (`Transaction fee`).",
+          "Bước 4: Kiểm tra dòng `Total settlement amount`: Đây là số tiền thực nhận chuyển về tài khoản ngân hàng.",
+          "Bước 5: Upload file CSV vào phân hệ `/sales/import` trên Tinky để tự động đối chiếu dòng tiền."
+        ],
+        "checklist": [
+          "Doanh thu tính thuế khai báo = Subtotal after seller discounts (đã trừ hoàn tiền)",
+          "Tuyệt đối không lấy con số Total settlement amount (tiền về ví) để làm doanh thu kê khai thuế",
+          "Lưu trữ file Excel quyết toán gốc của sàn tối thiểu 05 năm phục vụ thanh tra thuế"
+        ],
+        "costs": "Tổng biểu phí sàn TikTok Shop dao động từ 12% đến 18% giá trị đơn hàng.",
+        "common_mistakes": [
+          "Tưởng rằng phí sàn là khoản được khấu trừ khỏi doanh thu tính thuế của hộ kinh doanh (Thực tế hộ kinh doanh nộp thuế khoán % doanh thu không được trừ chi phí này).",
+          "Quên trừ các khoản hoàn tiền (Refund subtotal) dẫn đến việc khai thừa doanh thu bị đánh thuế oan."
+        ],
+        "real_case": "Trong tháng 10, Shop có Subtotal after seller discounts là 183.369.775 VNĐ, hoàn hàng 295.000 VNĐ -> Doanh thu chịu thuế là 183.074.775 VNĐ. Phí sàn trừ 24.569.797 VNĐ. Tiền rút về ví là 158.644.978 VNĐ. Khi nộp thuế, shop kê khai con số 183.074.775 VNĐ hoàn toàn khớp với số liệu TikTok báo cáo cho Cục Thuế.",
+        "faqs": [
+          {
+            "q": "Voucher trợ giá do TikTok Shop tài trợ có tính vào doanh thu chịu thuế không?",
+            "a": "Có. Vì khoản tiền trợ giá này được TikTok Shop hoàn trả lại cho người bán trong kỳ quyết toán ví, nên nó thuộc tổng doanh thu thực nhận của người bán."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Nghị định 91/2022/NĐ-CP về trách nhiệm cung cấp thông tin của sàn TMĐT",
+            "url": "https://congbao.chinhphu.vn",
+            "verified": true
+          },
+          {
+            "title": "Thông tư 40/2021/TT-BTC hướng dẫn thuế đối với hộ kinh doanh bán hàng TMĐT",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Xem biểu đồ đối soát tài chính Fee Waterfall TikTok Shop",
+        "url": "/analytics?tab=fees",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "cogs-taxable-net-profit",
+      "category_id": "finance-omnichannel",
+      "title": "Phân Biệt Giá Vốn (COGS), Doanh Thu Chịu Thuế & Lãi Ròng",
+      "slug": "phan-biet-gia-von-doanh-thu-chiu-thue-lai-rong",
+      "difficulty": "BEGINNER",
+      "reading_time_minutes": 5,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "giá vốn",
+        "cogs",
+        "doanh thu chịu thuế",
+        "lãi ròng",
+        "lợi nhuận gộp",
+        "tài chính"
+      ],
+      "summary": "Hiểu chuẩn mực 5 chỉ số tài chính sống còn: Giá vốn hàng bán, GMV, Doanh thu chịu thuế, Lợi nhuận gộp và Lợi nhuận ròng để không bao giờ bị ảo tưởng tài chính.",
+      "content": {
+        "overview": "Nhiều người kinh doanh nhầm lẫn giữa doanh thu và lợi nhuận. Tiền bán hàng chảy qua tài khoản không đồng nghĩa với việc bạn đang có lãi.",
+        "why_it_matters": "Nếu không phân biệt rạch ròi, bạn sẽ lấy tiền giá vốn hoặc tiền thuế phải nộp đi chi tiêu cá nhân, đến hạn nhập hàng hoặc hạn đóng thuế thì mất khả năng thanh toán.",
+        "when_to_do": "Kiểm tra báo cáo tài chính hàng ngày trên Sổ bán hàng Tinky.",
+        "steps": [
+          "Bước 1: Xác định Giá Vốn (COGS): Chi phí nguyên vật liệu trực tiếp để tạo ra sản phẩm.",
+          "Bước 2: Xác định Doanh Thu Chịu Thuế: Tiền bán hàng thực tế sau khi trừ giảm giá của shop.",
+          "Bước 3: Tính Lợi Nhuận Gộp = Doanh thu chịu thuế - Giá vốn hàng bán (COGS).",
+          "Bước 4: Tính Lợi Nhuận Ròng = Lợi nhuận gộp - Chi phí sàn - Chi phí vận hành cửa hàng - Thuế."
+        ],
+        "checklist": [
+          "Biên lợi nhuận gộp tối thiểu đạt từ 40% - 60% (với ngành F&B) hoặc 30% - 40% (với ngành bán lẻ)",
+          "Lợi nhuận ròng cuối cùng thực nhận sau khi trừ toàn bộ chi phí đạt tối thiểu từ 15% - 25%",
+          "Tiền vốn và tiền lãi được tách biệt rõ ràng trên sổ sách kế toán"
+        ],
+        "costs": "Theo dõi tài chính: Đã tích hợp sẵn trong hệ thống Tinky.",
+        "common_mistakes": [
+          "Cầm 10 triệu tiền khách trả trong ngày tưởng mình lãi 10 triệu và đem đi tiêu xài, trong khi giá vốn mất 6 triệu và tiền nhà mất 2 triệu.",
+          "Không tính chi phí khấu hao máy móc và tiền công tự làm của chính bản thân mình."
+        ],
+        "real_case": "Ly trà sữa bán giá 30.000 VNĐ. Giá vốn nguyên liệu (trà, sữa, trân châu, ly, ống hút) là 9.000 VNĐ. Lãi gộp là 21.000 VNĐ (70%). Sau khi trừ tiền mặt bằng, điện nước, nhân viên và thuế, quán lãi ròng 7.500 VNĐ/ly (25%).",
+        "faqs": [
+          {
+            "q": "Tiền công của chủ quán có được tính vào chi phí không?",
+            "a": "Về mặt quản trị kinh doanh, bạn bắt buộc phải tính lương cho chính mình. Nếu kinh doanh mà không đủ trả lương cho bản thân thì mô hình đó chưa thực sự hiệu quả."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Nguyên tắc xác định doanh thu và chi phí theo Luật Kế toán 2015",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Xem sổ bán hàng và báo cáo lợi nhuận chi tiết",
+        "url": "/sales",
+        "required_permission": "SALES_MANAGE"
+      }
+    },
+    {
+      "id": "break-even-calculation",
+      "category_id": "finance-omnichannel",
+      "title": "Cách Tính Điểm Hòa Vốn (Break-Even) Cho Cửa Hàng",
+      "slug": "cach-tinh-diem-hoa-von-cho-cua-hang",
+      "difficulty": "INTERMEDIATE",
+      "reading_time_minutes": 6,
+      "target_models": [
+        "OFFLINE_STORE",
+        "SHOPEE_SELLER",
+        "TIKTOK_SELLER",
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "điểm hòa vốn",
+        "break-even",
+        "chi phí cố định",
+        "chi phí biến đổi",
+        "bài toán kinh doanh"
+      ],
+      "summary": "Công thức tính điểm hòa vốn chuẩn xác: Mỗi ngày phải bán được bao nhiêu ly cafe, bao nhiêu đơn hàng thì cửa hàng mới bắt đầu có lãi.",
+      "content": {
+        "overview": "Điểm hòa vốn (Break-Even Point) là cột mốc mà tại đó Tổng Doanh Thu vừa đủ bù đắp Tổng Chi Phí (Lợi nhuận bằng 0). Vượt qua điểm này, mỗi đơn hàng bán thêm đều mang lại lợi nhuận ròng cho bạn.",
+        "why_it_matters": "Biết điểm hòa vốn giúp bạn đặt chỉ tiêu bán hàng (KPI) thực tế cho nhân viên: Mỗi ngày phải bán tối thiểu bao nhiêu đơn để không bị lỗ tiền nhà.",
+        "when_to_do": "Tính toán trước khi quyết định mở quán hoặc mỗi khi thay đổi mặt bằng/nhân sự.",
+        "steps": [
+          "Bước 1: Tính Tổng Chi Phí Cố Định (FC) trong 1 tháng: Tiền thuê nhà (10 triệu) + Lương nhân viên (8 triệu) + Điện nước internet (2 triệu) = 20 triệu VNĐ.",
+          "Bước 2: Tính Lãi Gộp trên 1 sản phẩm: Giá bán (25.000 VNĐ) - Giá vốn biến đổi (10.000 VNĐ) = 15.000 VNĐ/ly.",
+          "Bước 3: Áp dụng công thức hòa vốn: Sản lượng hòa vốn = Tổng chi phí cố định / Lãi gộp 1 sản phẩm.",
+          "Bước 4: Tính số lượng mỗi ngày: 20.000.000 / 15.000 = 1.333 ly/tháng -> Khoảng 45 ly/ngày."
+        ],
+        "checklist": [
+          "Đã tính đủ toàn bộ các khoản chi phí cố định không bỏ sót khoản nào",
+          "Con số sản lượng hòa vốn mỗi ngày nằm trong khả năng phục vụ thực tế của mặt bằng",
+          "Có kế hoạch marketing để đạt sản lượng hòa vốn ngay trong tháng thứ 2 mở quán"
+        ],
+        "costs": "Áp dụng công thức tính toán: 0 VNĐ.",
+        "common_mistakes": [
+          "Thuê mặt bằng quá đắt (30 triệu/tháng) trong khi quán chỉ có 5 bàn, dẫn đến điểm hòa vốn lên tới 150 ly/ngày vượt quá sức chứa tối đa của quán.",
+          "Quên tính chi phí hao hụt và chi phí khuyến mãi vào chi phí biến đổi."
+        ],
+        "real_case": "Quán cafe Tinky có chi phí cố định 18 triệu/tháng. Lãi gộp trung bình mỗi ly nước là 16.000 VNĐ. Điểm hòa vốn là 1.125 ly/tháng, tương đương 38 ly/ngày. Mỗi ngày từ ly thứ 39 trở đi quán bắt đầu bỏ túi lợi nhuận ròng.",
+        "faqs": [
+          {
+            "q": "Nếu những ngày đầu chưa đạt điểm hòa vốn thì làm sao?",
+            "a": "Đây là lý do bạn cần Quỹ dự phòng sinh tồn 3-6 tháng để bù lỗ chi phí cố định trong giai đoạn quán đang tích lũy khách quen."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Phương pháp quản trị tài chính doanh nghiệp nhỏ và vừa (Bộ Kế hoạch và Đầu tư)",
+            "url": "https://business.gov.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Thử nghiệm tính toán ước tính tài chính trên Tinky",
+        "url": "/tax/calculator",
+        "required_permission": "TAX_READ"
+      }
+    },
+    {
+      "id": "omnichannel-reconciliation",
+      "category_id": "finance-omnichannel",
+      "title": "Quản Lý Bán Hàng Đa Kênh Hợp Nhất & Đối Soát Quyết Toán Ví Sàn",
+      "slug": "quan-ly-ban-hang-da-kenh-doi-soat-quyet-toan-vi",
+      "difficulty": "ADVANCED",
+      "reading_time_minutes": 7,
+      "target_models": [
+        "OMNICHANNEL"
+      ],
+      "keywords": [
+        "đa kênh",
+        "omnichannel",
+        "đối soát ví",
+        "hợp nhất doanh thu",
+        "tinky analytics"
+      ],
+      "summary": "Cách vận hành trơn tru mô hình vừa bán tại quầy POS vừa bán trên Shopee và TikTok Shop: Hợp nhất sổ bán hàng, theo dõi tiền ký quỹ Escrow và tránh thất thoát.",
+      "content": {
+        "overview": "Bán hàng đa kênh (Omnichannel) là xu hướng tất yếu: Khách biết đến quán qua video TikTok, mua trải nghiệm tại cửa hàng offline và đặt mua lại gói cafe đóng gói trên Shopee.",
+        "why_it_matters": "Bán nhiều kênh mà không hợp nhất quản lý sẽ dẫn đến tình trạng: Không biết kênh nào thực sự mang lại lãi ròng, tiền kẹt trong ví sàn không kiểm soát được và tồn kho lệch lạc.",
+        "when_to_do": "Thực hiện đối soát hợp nhất định kỳ hàng tuần hoặc cuối mỗi tháng trên Tinky.",
+        "steps": [
+          "Bước 1: Sử dụng chung một bảng mã SKU cho toàn bộ sản phẩm trên POS, Shopee và TikTok Shop.",
+          "Bước 2: Bán tại quầy ghi nhận qua màn hình POS (`/orders/new`).",
+          "Bước 3: Định kỳ tải file CSV xuất từ Shopee và TikTok Shop tải lên phân hệ `/sales/import`.",
+          "Bước 4: Mở trang Phân tích kênh (`/analytics`): So sánh doanh thu GMV, doanh thu chịu thuế, tỷ lệ chi phí sàn và lãi ròng giữa các kênh.",
+          "Bước 5: Kiểm tra mục Fee Waterfall để biết chính xác có bao nhiêu tiền đã về ví ngân hàng và bao nhiêu tiền còn đang chờ thanh toán (Pending in Escrow)."
+        ],
+        "checklist": [
+          "Mọi đơn hàng từ tất cả các kênh đều được tập hợp vào Sổ bán hàng duy nhất",
+          "Đã đối chiếu số dư tiền rút về tài khoản ngân hàng khớp với báo cáo quyết toán sàn",
+          "Doanh thu tổng cộng các kênh được theo dõi chặt chẽ so với ngưỡng thuế 1 tỷ đồng"
+        ],
+        "costs": "Tích hợp đa kênh hợp nhất: Đã tích hợp sẵn 100% trong Tinky, không cần mua thêm phần mềm ngoài.",
+        "common_mistakes": [
+          "Dùng 3 phần mềm khác nhau cho 3 kênh khiến số liệu bị phân mảnh, cuối tháng cộng tay trên Excel dễ nhầm lẫn.",
+          "Không theo dõi tiền ký quỹ (Escrow), sàn giam tiền quyết toán do shop chưa cập nhật thông tin định danh mà không biết."
+        ],
+        "real_case": "Thương hiệu Tinky vận hành 1 cửa hàng tại quận 1 và 2 gian hàng online trên Shopee, TikTok Shop. Nhờ phân hệ Channel Analytics trên Tinky, chủ quán phát hiện TikTok Shop mang lại doanh thu cao nhất nhưng Shopee lại có tỷ lệ hoàn đơn thấp nhất và lãi ròng ổn định nhất.",
+        "faqs": [
+          {
+            "q": "Tinky có hỗ trợ đồng bộ tồn kho tự động qua API với sàn không?",
+            "a": "Hiện tại Tinky quản lý dữ liệu qua cơ chế Import CSV chuẩn hóa cực kỳ an toàn, bảo mật và tương thích hoàn toàn với file xuất của Shopee và TikTok Shop mà không lo lộ API key."
+          }
+        ],
+        "legal_sources": [
+          {
+            "title": "Quy định về quản lý hoạt động thương mại điện tử (Nghị định 52/2013/NĐ-CP và NĐ 85/2021/NĐ-CP)",
+            "url": "https://vbpl.vn",
+            "verified": true
+          }
+        ]
+      },
+      "tinky_action": {
+        "label": "Mở phân hệ phân tích đa kênh Channel Analytics",
+        "url": "/analytics",
+        "required_permission": "SALES_MANAGE"
+      }
+    }
+  ]
+}
