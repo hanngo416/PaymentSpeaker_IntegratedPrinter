@@ -2,6 +2,8 @@ package controller.admin;
 
 import controller.auth.LoginServlet;
 import dao.CatalogDAO;
+import dao.SettingDAO;
+import dao.StockDAO;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -36,9 +38,14 @@ public class ProductServlet extends HttpServlet {
         MESSAGES.put("deleted", "Product deleted.");
         MESSAGES.put("used", "A product that is on an order cannot be deleted. Hide it instead.");
         MESSAGES.put("bad", "Invalid request.");
+        MESSAGES.put("restocked", "Stock added.");
+        MESSAGES.put("adjusted", "Stock count saved.");
+        MESSAGES.put("stockbad", "Check the quantity and the note, then try again.");
     }
 
     private final CatalogDAO catalogDAO = new CatalogDAO();
+    private final StockDAO stockDAO = new StockDAO();
+    private final SettingDAO settingDAO = new SettingDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -69,6 +76,10 @@ public class ProductServlet extends HttpServlet {
         try {
             if ("save".equals(action)) {
                 save(request, response, actor);
+                return;
+            }
+            if ("restock".equals(action) || "adjust".equals(action)) {
+                changeStock(request, response, actor, action);
                 return;
             }
             String msg = "bad";
@@ -147,14 +158,16 @@ public class ProductServlet extends HttpServlet {
             p.setCostPrice(new BigDecimal(rawCost));
         }
 
-        String rawStock = trim(request.getParameter("stockQuantity")).replaceAll("[.,\\s]", "");
-        if (rawStock.isEmpty()) {
-            rawStock = "0";
-        }
-        if (rawStock.matches("\\d{1,7}")) {
-            p.setStockQuantity(Integer.parseInt(rawStock));
-        } else {
-            errors.put("stockQuantity", "A whole number from 0 to 9999999.");
+        if (!editing) {
+            String rawStock = trim(request.getParameter("stockQuantity")).replaceAll("[.,\\s]", "");
+            if (rawStock.isEmpty()) {
+                rawStock = "0";
+            }
+            if (rawStock.matches("\\d{1,7}")) {
+                p.setStockQuantity(Integer.parseInt(rawStock));
+            } else {
+                errors.put("stockQuantity", "A whole number from 0 to 9999999.");
+            }
         }
 
         String rawOrder = trim(request.getParameter("displayOrder"));
@@ -195,6 +208,32 @@ public class ProductServlet extends HttpServlet {
         show(request, response);
     }
 
+    private void changeStock(HttpServletRequest request, HttpServletResponse response, User actor, String action)
+            throws SQLException, IOException {
+        boolean restock = "restock".equals(action);
+        String rawId = trim(request.getParameter("productId"));
+        String rawQty = trim(request.getParameter(restock ? "quantity" : "newQuantity")).replaceAll("[.,\\s]", "");
+        String note = trim(request.getParameter("note"));
+        boolean valid = rawId.matches("\\d{1,9}")
+                && (restock ? rawQty.matches("[1-9]\\d{0,5}") : rawQty.matches("-?\\d{1,7}"))
+                && note.length() <= 200 && (restock || note.length() >= 3);
+        String msg = "stockbad";
+        if (valid) {
+            int productId = Integer.parseInt(rawId);
+            int qty = Integer.parseInt(rawQty);
+            String noteValue = note.isEmpty() ? null : note;
+            boolean done = restock
+                    ? stockDAO.restock(productId, qty, actor.getUserId(), noteValue)
+                    : stockDAO.adjust(productId, qty, actor.getUserId(), noteValue);
+            if (done) {
+                AuditService.log(actor, restock ? "STOCK_RESTOCK" : "STOCK_ADJUST", "PRODUCT", String.valueOf(productId),
+                        restock ? "added" : "counted", String.valueOf(qty));
+                msg = restock ? "restocked" : "adjusted";
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/admin/products?msg=" + msg);
+    }
+
     private boolean groupExists(int groupId) throws SQLException {
         for (Group g : catalogDAO.findAllGroups()) {
             if (g.getGroupId() == groupId) {
@@ -202,6 +241,14 @@ public class ProductServlet extends HttpServlet {
             }
         }
         return false;
+    }
+
+    private int lowStockThreshold() throws SQLException {
+        try {
+            return Integer.parseInt(settingDAO.get("stock_low_threshold", "5").trim());
+        } catch (NumberFormatException e) {
+            return 5;
+        }
     }
 
     private void show(HttpServletRequest request, HttpServletResponse response)
@@ -222,6 +269,9 @@ public class ProductServlet extends HttpServlet {
             request.setAttribute("result", result);
             request.setAttribute("categories", catalogDAO.findAllCategories());
             request.setAttribute("groups", catalogDAO.findAllGroups());
+            int threshold = lowStockThreshold();
+            request.setAttribute("lowStockThreshold", threshold);
+            request.setAttribute("lowStockCount", stockDAO.countLowStock(threshold));
         } catch (SQLException e) {
             throw new ServletException("Cannot load products", e);
         }

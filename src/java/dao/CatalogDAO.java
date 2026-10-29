@@ -170,22 +170,33 @@ public class CatalogDAO {
 
     public void insertProduct(Product p) throws SQLException {
         String sql = "INSERT INTO Products (group_id, product_code, product_name, price, cost_price, stock_quantity, active, display_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, p.getGroupId());
-            ps.setString(2, p.getProductCode());
-            ps.setString(3, p.getProductName());
-            ps.setBigDecimal(4, p.getPrice());
-            ps.setBigDecimal(5, p.getCostPrice());
-            ps.setInt(6, p.getStockQuantity());
-            ps.setBoolean(7, p.isActive());
-            ps.setInt(8, p.getDisplayOrder());
-            ps.executeUpdate();
+        try (Connection con = DBUtil.getConnection()) {
+            con.setAutoCommit(false);
+            try (PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, p.getGroupId());
+                ps.setString(2, p.getProductCode());
+                ps.setString(3, p.getProductName());
+                ps.setBigDecimal(4, p.getPrice());
+                ps.setBigDecimal(5, p.getCostPrice());
+                ps.setInt(6, p.getStockQuantity());
+                ps.setBoolean(7, p.isActive());
+                ps.setInt(8, p.getDisplayOrder());
+                ps.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        StockDAO.recordInitial(con, keys.getInt(1), p.getStockQuantity());
+                    }
+                }
+                con.commit();
+            } catch (SQLException | RuntimeException e) {
+                con.rollback();
+                throw e;
+            }
         }
     }
 
     public void updateProduct(Product p) throws SQLException {
-        String sql = "UPDATE Products SET group_id = ?, product_code = ?, product_name = ?, price = ?, cost_price = ?, stock_quantity = ?, active = ?, display_order = ? WHERE product_id = ?";
+        String sql = "UPDATE Products SET group_id = ?, product_code = ?, product_name = ?, price = ?, cost_price = ?, active = ?, display_order = ? WHERE product_id = ?";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, p.getGroupId());
@@ -193,10 +204,9 @@ public class CatalogDAO {
             ps.setString(3, p.getProductName());
             ps.setBigDecimal(4, p.getPrice());
             ps.setBigDecimal(5, p.getCostPrice());
-            ps.setInt(6, p.getStockQuantity());
-            ps.setBoolean(7, p.isActive());
-            ps.setInt(8, p.getDisplayOrder());
-            ps.setInt(9, p.getProductId());
+            ps.setBoolean(6, p.isActive());
+            ps.setInt(7, p.getDisplayOrder());
+            ps.setInt(8, p.getProductId());
             ps.executeUpdate();
         }
     }

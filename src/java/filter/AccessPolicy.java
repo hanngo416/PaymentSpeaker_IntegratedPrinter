@@ -37,6 +37,7 @@ public final class AccessPolicy {
             new Rule("/admin/products", PRODUCT_MANAGE, PRODUCT_MANAGE),
             new Rule("/admin/categories", PRODUCT_MANAGE, PRODUCT_MANAGE),
             new Rule("/admin/groups", PRODUCT_MANAGE, PRODUCT_MANAGE),
+            new Rule("/admin/stock-history", PRODUCT_MANAGE, PRODUCT_MANAGE),
             new Rule("/admin/audit", AUDIT_READ, AUDIT_READ),
             new Rule("/admin/taxes", TAX_READ, TAX_MANAGE),
             new Rule("/admin/affiliates", SALES_MANAGE, SALES_MANAGE),

@@ -38,6 +38,8 @@ public class SettingsServlet extends HttpServlet {
         MESSAGES.put("printerbad", "Choose one of the printers installed on this PC.");
         MESSAGES.put("vat", "VAT rate saved. New orders use it; old receipts keep their rate.");
         MESSAGES.put("vatbad", "VAT rate must be a number from 0 to 20 with at most 2 decimals.");
+        MESSAGES.put("stock", "Low stock level saved.");
+        MESSAGES.put("stockbad", "The low stock level must be a whole number from 0 to 9999.");
         MESSAGES.put("bad", "Invalid request.");
     }
 
@@ -57,6 +59,7 @@ public class SettingsServlet extends HttpServlet {
             request.setAttribute("installedPrinters", PrinterStatusService.installedPrinters());
             request.setAttribute("vatRate", settingDAO.getVatRate().stripTrailingZeros().toPlainString());
             request.setAttribute("vatIncluded", settingDAO.getVatIncluded());
+            request.setAttribute("stockLowThreshold", settingDAO.get("stock_low_threshold", "5"));
         } catch (SQLException e) {
             throw new ServletException("Cannot load devices", e);
         }
@@ -70,6 +73,10 @@ public class SettingsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User actor = (User) request.getSession().getAttribute(LoginServlet.SESSION_USER);
+        if ("stock".equals(request.getParameter("action"))) {
+            saveStockLevel(request, response, actor);
+            return;
+        }
         if ("vat".equals(request.getParameter("action"))) {
             saveVat(request, response, actor);
             return;
@@ -133,6 +140,28 @@ public class SettingsServlet extends HttpServlet {
                 msg = "printer";
             } catch (SQLException e) {
                 throw new ServletException("Cannot save the printer", e);
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/settings?msg=" + msg);
+    }
+
+    private void saveStockLevel(HttpServletRequest request, HttpServletResponse response, User actor)
+            throws ServletException, IOException {
+        if (!RolePermissions.has(actor.getRole(), Permission.PRODUCT_MANAGE)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        String raw = request.getParameter("stockLowThreshold");
+        String msg = "stockbad";
+        if (raw != null && raw.trim().matches("\\d{1,4}")) {
+            try {
+                String old = settingDAO.get("stock_low_threshold", "5");
+                settingDAO.set("stock_low_threshold", String.valueOf(Integer.parseInt(raw.trim())));
+                AuditService.log(actor, "STOCK_THRESHOLD", "SETTING", "stock_low_threshold",
+                        "from", old, "to", raw.trim());
+                msg = "stock";
+            } catch (SQLException e) {
+                throw new ServletException("Cannot save the low stock level", e);
             }
         }
         response.sendRedirect(request.getContextPath() + "/settings?msg=" + msg);
