@@ -760,3 +760,15 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChCommissions_Affiliat
 CREATE INDEX IX_ChCommissions_Affiliate ON ChannelCommissions(affiliate_id, status);
 GO
 
+IF OBJECT_ID('GuideProgress', 'U') IS NULL
+CREATE TABLE GuideProgress (
+    progress_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    article_id NVARCHAR(100) NOT NULL,
+    kind NVARCHAR(20) NOT NULL,
+    state NVARCHAR(50) NOT NULL,
+    updated_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT FK_GuideProgress_Users FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    CONSTRAINT UQ_GuideProgress UNIQUE (user_id, article_id, kind)
+);
+GO
