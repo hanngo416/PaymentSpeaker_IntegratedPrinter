@@ -13,6 +13,7 @@ public class TxRow {
     private String status;
     private Timestamp transTime;
     private Integer createdBy;
+    private boolean needsReview;
 
     public int getTransId() {
         return transId;
@@ -77,5 +78,13 @@ public class TxRow {
 
     public void setCreatedBy(Integer createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public boolean isNeedsReview() {
+        return needsReview;
+    }
+
+    public void setNeedsReview(boolean needsReview) {
+        this.needsReview = needsReview;
     }
 }

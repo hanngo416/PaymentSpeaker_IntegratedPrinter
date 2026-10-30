@@ -246,7 +246,8 @@ public class TransactionDAO {
                 }
             }
             String sql = "SELECT t.trans_id, t.bank_trans_id, o.order_code, t.amount, "
-                    + "t.content, t.status, t.trans_time, o.created_by" + FROM + where
+                    + "t.content, t.status, t.trans_time, o.created_by, "
+                    + "CASE WHEN t.status = N'COMPLETED' AND EXISTS (SELECT 1 FROM FraudAlerts a WHERE a.trans_id = t.trans_id AND a.rule_code IN (N'HIGH_AMOUNT', N'BURST_RATE') AND a.status IN (N'NEW', N'IN_PROGRESS')) THEN 1 ELSE 0 END AS needs_review" + FROM + where
                     + " ORDER BY t.trans_time DESC, t.trans_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 bind(ps, params);
@@ -264,6 +265,7 @@ public class TransactionDAO {
                         r.setTransTime(rs.getTimestamp("trans_time"));
                         Object cb = rs.getObject("created_by");
                         r.setCreatedBy(cb != null ? ((Number) cb).intValue() : null);
+                        r.setNeedsReview(rs.getBoolean("needs_review"));
                         items.add(r);
                     }
                 }
