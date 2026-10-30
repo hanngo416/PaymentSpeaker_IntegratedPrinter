@@ -107,6 +107,9 @@ public class TaxService {
     }
 
     public void notifyIfLevelRose(int year) {
+        if (!Features.isOn(Features.TAX)) {
+            return;
+        }
         try {
             TaxView v = view(year);
             if (v.estimate == null) {

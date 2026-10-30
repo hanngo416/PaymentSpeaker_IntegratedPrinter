@@ -60,6 +60,9 @@ public class ProfitService {
     private final TaxRuleDAO taxRuleDAO = new TaxRuleDAO();
 
     private TaxParams params() throws SQLException {
+        if (!Features.isOn(Features.TAX)) {
+            return null;
+        }
         String sector = settingDAO.get("tax_sector", "GOODS");
         return taxRuleDAO.loadParams(sector, Date.valueOf(LocalDate.now()));
     }

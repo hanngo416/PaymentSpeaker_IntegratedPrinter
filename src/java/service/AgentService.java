@@ -141,7 +141,7 @@ public class AgentService {
             JsonObject system = new JsonObject();
             JsonArray sysParts = new JsonArray();
             sysParts.add(textPart(SYSTEM + "\n\n" + WEB_PAGES + "\nToday is " + LocalDate.now() + " (" + LocalDate.now().getDayOfWeek()
-                    + "). The user is " + user.getFullName() + ", role " + user.getRole() + "." + pageContext
+                    + "). The user is " + user.getFullName() + ", role " + user.getRole() + "." + pageContext + Features.promptNote()
                     + " Use the earlier turns of the conversation to understand follow-up questions."));
             system.add("parts", sysParts);
             body.add("systemInstruction", system);

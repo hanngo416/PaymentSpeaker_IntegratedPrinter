@@ -41,6 +41,9 @@ public class AgentTools {
         }
 
         boolean allowedFor(Role role) {
+            if (TAX_TOOLS.contains(name) && !Features.isOn(Features.TAX)) {
+                return false;
+            }
             for (Permission p : anyOf) {
                 if (RolePermissions.has(role, p)) {
                     return true;
@@ -101,6 +104,9 @@ public class AgentTools {
                     new String[0], Permission.TAX_READ),
             new Tool("tax_rules", "Tax rules in force with their legal source reference.",
                     new String[0], Permission.TAX_READ));
+
+    private static final java.util.Set<String> TAX_TOOLS
+            = new java.util.HashSet<>(java.util.Arrays.asList("tax_estimate", "tax_rules", "search_tax_docs"));
 
     private final AgentDAO dao = new AgentDAO();
     private final SummaryDAO summaryDAO = new SummaryDAO();

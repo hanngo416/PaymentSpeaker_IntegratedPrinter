@@ -22,6 +22,7 @@ import model.enums.Role;
 import service.PrinterStatusService;
 import service.ReceiptPrinter;
 import service.AuditService;
+import service.Features;
 
 @WebServlet(name = "SettingsServlet", urlPatterns = {"/settings"})
 public class SettingsServlet extends HttpServlet {
@@ -40,6 +41,7 @@ public class SettingsServlet extends HttpServlet {
         MESSAGES.put("vatbad", "VAT rate must be a number from 0 to 20 with at most 2 decimals.");
         MESSAGES.put("stock", "Low stock level saved.");
         MESSAGES.put("stockbad", "The low stock level must be a whole number from 0 to 9999.");
+        MESSAGES.put("features", "Modules saved.");
         MESSAGES.put("bad", "Invalid request.");
     }
 
@@ -73,6 +75,10 @@ public class SettingsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User actor = (User) request.getSession().getAttribute(LoginServlet.SESSION_USER);
+        if ("features".equals(request.getParameter("action"))) {
+            saveFeatures(request, response, actor);
+            return;
+        }
         if ("stock".equals(request.getParameter("action"))) {
             saveStockLevel(request, response, actor);
             return;
@@ -143,6 +149,33 @@ public class SettingsServlet extends HttpServlet {
             }
         }
         response.sendRedirect(request.getContextPath() + "/settings?msg=" + msg);
+    }
+
+    private void saveFeatures(HttpServletRequest request, HttpServletResponse response, User actor)
+            throws ServletException, IOException {
+        if (actor.getRole() != Role.ADMIN) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        Map<String, String> wanted = new HashMap<>();
+        wanted.put(Features.TAX, request.getParameter("featureTax"));
+        wanted.put(Features.ONLINE, request.getParameter("featureOnline"));
+        wanted.put(Features.AFFILIATE, request.getParameter("featureAffiliate"));
+        wanted.put(Features.AI, request.getParameter("featureAi"));
+        try {
+            for (String module : Features.MODULES) {
+                String value = wanted.get(module) != null ? "1" : "0";
+                String old = settingDAO.get(Features.settingKey(module), "1");
+                if (!old.equals(value)) {
+                    settingDAO.set(Features.settingKey(module), value);
+                    AuditService.log(actor, "FEATURE_TOGGLE", "SETTING", Features.settingKey(module), "from", old, "to", value);
+                }
+            }
+            Features.invalidateCache();
+        } catch (SQLException e) {
+            throw new ServletException("Cannot save the modules", e);
+        }
+        response.sendRedirect(request.getContextPath() + "/settings?msg=features");
     }
 
     private void saveStockLevel(HttpServletRequest request, HttpServletResponse response, User actor)

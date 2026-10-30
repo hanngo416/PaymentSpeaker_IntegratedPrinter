@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.User;
 import model.enums.Permission;
 import model.view.TaxEstimate;
+import service.Features;
 import service.TaxService;
 
 @WebServlet(name = "BotFeedServlet", urlPatterns = {"/bot/feed"})
@@ -32,8 +33,12 @@ public class BotFeedServlet extends HttpServlet {
         TaxService.TaxView view;
         int newAlerts = 0;
         try {
-            taxService.notifyIfLevelRose(year);
-            view = taxService.view(year);
+            if (Features.isOn(Features.TAX)) {
+                taxService.notifyIfLevelRose(year);
+                view = taxService.view(year);
+            } else {
+                view = null;
+            }
             if (RolePermissions.has(user.getRole(), Permission.ALERT_READ)) {
                 newAlerts = alertDAO.countNew();
             }
@@ -41,7 +46,7 @@ public class BotFeedServlet extends HttpServlet {
             throw new ServletException("Cannot build the bot feed", e);
         }
 
-        TaxEstimate e = view.getEstimate();
+        TaxEstimate e = view == null ? null : view.getEstimate();
         int level = e == null ? 0 : e.getLevel();
         String percent = e == null ? "0.00" : e.getPercent().toPlainString();
         String remaining = e == null ? "0" : e.getRemaining().toBigInteger().toString();

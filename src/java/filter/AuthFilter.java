@@ -24,6 +24,7 @@ import model.User;
 import model.enums.Role;
 import model.enums.UserStatus;
 import service.AuthService;
+import service.Features;
 import model.enums.Permission;
 
 /**
@@ -98,6 +99,24 @@ public class AuthFilter implements Filter {
             }
             request.setAttribute("denyReason", "You do not have the " + needed.getCode() + " permission to access this page.");
             request.getRequestDispatcher("/WEB-INF/views/common/error403.jsp").forward(request, response);
+            return;
+        }
+
+        request.setAttribute("features", Features.snapshot());
+        String disabled = Features.disabledModule(path);
+        if (disabled != null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            if (AccessPolicy.isAjax(path)) {
+                return;
+            }
+            request.setAttribute("disabledFeature", disabled);
+            request.setAttribute("javax.servlet.error.status_code", HttpServletResponse.SC_NOT_FOUND);
+            request.getRequestDispatcher("/WEB-INF/views/common/error.jsp").forward(request, response);
+            return;
+        }
+        if (user.getRole() == Role.ADMIN && "GET".equals(request.getMethod()) && !AccessPolicy.isAjax(path)
+                && !path.equals("/setup") && !path.equals("/logout") && Features.setupPending()) {
+            response.sendRedirect(request.getContextPath() + "/setup");
             return;
         }
 

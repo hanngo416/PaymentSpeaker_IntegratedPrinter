@@ -30,6 +30,9 @@ public class AffiliateService {
     private final SettingDAO settingDAO = new SettingDAO();
 
     public Attribution attribute(String rawCode, User seller, long eligibleAmount) throws SQLException {
+        if (!Features.isOn(Features.AFFILIATE)) {
+            return null;
+        }
         String code = rawCode == null ? "" : rawCode.trim().toUpperCase();
         if (code.isEmpty()) {
             return null;
