@@ -95,7 +95,7 @@ public final class AccessPolicy {
     }
 
     public static boolean isAjax(String path) {
-        return path.startsWith("/speaker/poll") || path.startsWith("/orders/status") || path.startsWith("/bot/feed") || path.startsWith("/bot/chat");
+        return path.startsWith("/speaker/poll") || path.startsWith("/orders/status") || path.startsWith("/bot/feed") || path.startsWith("/bot/chat") || path.startsWith("/guide/progress");
     }
 
     public static Permission requiredFor(String path, String method) {
@@ -109,6 +109,6 @@ public final class AccessPolicy {
     }
 
     private static boolean isOpenToSignedIn(String path) {
-        return path.equals("/") || path.equals("/index.html") || path.equals("/profile") || path.equals("/logout");
+        return path.equals("/") || path.equals("/index.html") || path.equals("/profile") || path.equals("/guide") || path.startsWith("/guide/") || path.equals("/logout");
     }
 }
