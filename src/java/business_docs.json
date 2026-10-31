@@ -51,7 +51,7 @@
       "category_id": "preparation",
       "title": "Tìm Kiếm & Đánh Giá Ý Tưởng Sản Phẩm Khả Thi",
       "slug": "tim-kiem-danh-gia-y-tuong-san-pham",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE",
@@ -113,7 +113,7 @@
       "category_id": "preparation",
       "title": "Lập Dự Toán Vốn Ban Đầu & Quỹ Dự Phòng Sinh Tồn",
       "slug": "lap-du-toan-von-quy-du-phong-sinh-ton",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE",
@@ -175,7 +175,7 @@
       "category_id": "preparation",
       "title": "Khảo Sát Mặt Bằng & Tìm Kiếm Nguồn Hàng Uy Tín",
       "slug": "khao-sat-mat-bang-nguon-hang-uy-tin",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE",
@@ -235,7 +235,7 @@
       "category_id": "preparation",
       "title": "Đặt Tên Thương Hiệu & Thiết Kế Bộ Nhận Diện Cơ Bản",
       "slug": "dat-ten-thuong-hieu-thiet-ke-nhan-dien",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 4,
       "target_models": [
         "OFFLINE_STORE",
@@ -297,7 +297,7 @@
       "category_id": "legal-tax",
       "title": "Phân Biệt Cá Nhân Kinh Doanh, Hộ Kinh Doanh Và Doanh Nghiệp",
       "slug": "phan-biet-ca-nhan-ho-kinh-doanh-doanh-nghiep",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE",
@@ -358,7 +358,7 @@
       "category_id": "legal-tax",
       "title": "Thủ Tục Đăng Ký Hộ Kinh Doanh Tại Cấp Xã (Nghị Định 168/2025/NĐ-CP)",
       "slug": "thu-tuc-dang-ky-ho-kinh-doanh-cap-xa-2026",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE",
@@ -421,7 +421,7 @@
       "category_id": "legal-tax",
       "title": "Giấy Phép An Toàn Thực Phẩm & Hồ Sơ PCCC Cho Quán Cafe, Ăn Uống",
       "slug": "giay-phep-attp-pccc-quan-cafe-an-uong",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE"
@@ -486,7 +486,7 @@
       "category_id": "legal-tax",
       "title": "Chính Sách Thuế Hộ KD 2026: Ngưỡng 1 Tỷ Đồng & Tỷ Lệ Thuế",
       "slug": "chinh-sach-thue-nguong-1-ty-dong-2026",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE",
@@ -554,7 +554,7 @@
       "category_id": "legal-tax",
       "title": "Đăng Ký Tài Khoản Ngân Hàng / Ví Điện Tử Kinh Doanh (Mẫu 01/BK-STK)",
       "slug": "dang-ky-tai-khoan-ngan-hang-kinh-doanh-01-bk-stk",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE",
@@ -616,7 +616,7 @@
       "category_id": "legal-tax",
       "title": "Chế Độ Sổ Sách Kế Toán Thông Tư 152/2025/TT-BTC (Mẫu S1a-HKD & S2a-HKD)",
       "slug": "che-do-so-sach-ke-toan-thong-tu-152-2025",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE",
@@ -679,7 +679,7 @@
       "category_id": "pos-operations",
       "title": "Trang Bị Phần Cứng: Máy POS, Máy In Nhiệt & Loa Thông Báo",
       "slug": "trang-bi-phan-cung-may-pos-in-nhiet-loa-thong-bao",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE"
@@ -738,7 +738,7 @@
       "category_id": "pos-operations",
       "title": "Chuẩn Hóa Danh Mục Sản Phẩm: Ngành Hàng - Nhóm Hàng - Mã SKU",
       "slug": "chuan-hoa-danh-muc-nganh-hang-nhom-hang-sku",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE",
@@ -800,7 +800,7 @@
       "category_id": "pos-operations",
       "title": "Quy Trình Quản Lý Ca Bán Hàng: Mở Ca, Đếm Tiền & Bàn Giao Ca",
       "slug": "quy-trinh-quan-ly-ca-ban-hang-mo-chot-ca",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE"
@@ -861,7 +861,7 @@
       "category_id": "pos-operations",
       "title": "Thanh Toán VietQR Động & Cơ Chế Loa Thông Báo Chống Bill Giả",
       "slug": "thanh-toan-vietqr-dong-loa-thong-bao-chong-bill-gia",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE"
@@ -921,7 +921,7 @@
       "category_id": "pos-operations",
       "title": "Kiểm Soát Tồn Kho & Quản Lý Giá Vốn Hàng Bán",
       "slug": "kiem-soat-ton-kho-quan-ly-gia-von",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE",
@@ -983,7 +983,7 @@
       "category_id": "shopee-seller",
       "title": "Mở Gian Hàng Shopee Chuẩn SEO & Cài Đặt Vận Chuyển",
       "slug": "mo-gian-hang-shopee-chuan-seo-cai-dat-van-chuyen",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "SHOPEE_SELLER",
@@ -1044,7 +1044,7 @@
       "category_id": "shopee-seller",
       "title": "Phân Loại Biến Thể Sản Phẩm & Cấu Hình Giá Bán Shopee",
       "slug": "phan-loai-bien-the-san-pham-cau-hinh-gia-shopee",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "SHOPEE_SELLER",
@@ -1104,7 +1104,7 @@
       "category_id": "shopee-seller",
       "title": "Bóc Tách Toàn Bộ Biểu Phí Sàn Shopee (Cố Định, Thanh Toán, Xtra)",
       "slug": "boc-tach-toan-bo-bieu-phi-san-shopee",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "SHOPEE_SELLER",
@@ -1165,7 +1165,7 @@
       "category_id": "shopee-seller",
       "title": "Quy Trình Đóng Gói, Giao Vận & Xử Lý Đổi Trả Shopee",
       "slug": "quy-trinh-dong-goi-giao-van-doi-tra-shopee",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "SHOPEE_SELLER",
@@ -1226,7 +1226,7 @@
       "category_id": "tiktok-seller",
       "title": "Đăng Ký Cửa Hàng TikTok Shop & Cài Đặt Tài Khoản Tiếp Thị",
       "slug": "dang-ky-tiktok-shop-cai-dat-tai-khoan-tiep-thi",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "TIKTOK_SELLER",
@@ -1287,7 +1287,7 @@
       "category_id": "tiktok-seller",
       "title": "Bán Hàng Qua Video Ngắn, Livestream & Giỏ Hàng Sản Phẩm",
       "slug": "ban-hang-video-ngan-livestream-gio-hang-tiktok",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "TIKTOK_SELLER",
@@ -1347,7 +1347,7 @@
       "category_id": "tiktok-seller",
       "title": "Hợp Tác Với Creator KOC Qua TikTok Shop Affiliate",
       "slug": "hop-tac-creator-koc-tiktok-shop-affiliate",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "TIKTOK_SELLER",
@@ -1408,7 +1408,7 @@
       "category_id": "tiktok-seller",
       "title": "Bóc Tách Biểu Phí Sàn TikTok Shop & Đối Soát Doanh Thu Chịu Thuế",
       "slug": "boc-tach-bieu-phi-tiktok-shop-doi-soat-thue",
-      "difficulty": "ADVANCED",
+      "difficulty": "Nâng cao",
       "reading_time_minutes": 7,
       "target_models": [
         "TIKTOK_SELLER",
@@ -1474,7 +1474,7 @@
       "category_id": "finance-omnichannel",
       "title": "Phân Biệt Giá Vốn (COGS), Doanh Thu Chịu Thuế & Lãi Ròng",
       "slug": "phan-biet-gia-von-doanh-thu-chiu-thue-lai-rong",
-      "difficulty": "BEGINNER",
+      "difficulty": "Cơ bản",
       "reading_time_minutes": 5,
       "target_models": [
         "OFFLINE_STORE",
@@ -1537,7 +1537,7 @@
       "category_id": "finance-omnichannel",
       "title": "Cách Tính Điểm Hòa Vốn (Break-Even) Cho Cửa Hàng",
       "slug": "cach-tinh-diem-hoa-von-cho-cua-hang",
-      "difficulty": "INTERMEDIATE",
+      "difficulty": "Trung cấp",
       "reading_time_minutes": 6,
       "target_models": [
         "OFFLINE_STORE",
@@ -1599,7 +1599,7 @@
       "category_id": "finance-omnichannel",
       "title": "Quản Lý Bán Hàng Đa Kênh Hợp Nhất & Đối Soát Quyết Toán Ví Sàn",
       "slug": "quan-ly-ban-hang-da-kenh-doi-soat-quyet-toan-vi",
-      "difficulty": "ADVANCED",
+      "difficulty": "Nâng cao",
       "reading_time_minutes": 7,
       "target_models": [
         "OMNICHANNEL"

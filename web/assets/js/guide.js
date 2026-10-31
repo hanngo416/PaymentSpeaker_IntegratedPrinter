@@ -24,9 +24,12 @@
     Array.prototype.forEach.call(boxes, function (box) {
         box.addEventListener('change', function () {
             var wanted = box.checked;
+            var parent = box.closest ? box.closest('.guide-check-row') : box.parentNode;
+            if (parent) { parent.classList.toggle('is-done', wanted); }
             post('CHECKLIST', wanted ? 'CHECKED' : 'UNCHECKED', box.getAttribute('data-item'), function (data) {
                 if (!data) {
                     box.checked = !wanted;
+                    if (parent) { parent.classList.toggle('is-done', !wanted); }
                     return;
                 }
                 if (count) { count.textContent = data.checked + '/' + data.total; }
@@ -42,12 +45,17 @@
             post(kind, on ? 'UNCHECKED' : onState, null, function (data) {
                 if (!data) { return; }
                 btn.setAttribute('data-on', on ? '0' : '1');
-                btn.textContent = on ? offLabel : onLabel;
+                var span = btn.querySelector('span');
+                if (span) {
+                    span.textContent = on ? offLabel : onLabel;
+                } else {
+                    btn.textContent = on ? offLabel : onLabel;
+                }
                 btn.classList.toggle('primary', !on);
             });
         });
     }
 
-    toggle('btnBookmark', 'BOOKMARK', 'SAVED', 'Saved', 'Save for later');
-    toggle('btnRead', 'READ', 'CHECKED', 'Marked as read', 'Mark as read');
+    toggle('btnBookmark', 'BOOKMARK', 'SAVED', 'Đã lưu trong thư viện', 'Lưu lại để tra cứu');
+    toggle('btnRead', 'READ', 'CHECKED', 'Đã hoàn thành bài học', 'Đánh dấu đã đọc');
 })();

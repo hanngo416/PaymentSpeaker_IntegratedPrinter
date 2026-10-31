@@ -150,7 +150,7 @@
                         <div>
                             <h2 class="guide-section-heading" style="margin: 0 0 4px;">
                                 <span class="guide-heading-num">03</span>
-                                Checklist Hành Động Cần Hoàn Thành
+                                Danh Sách Việc Cần Hoàn Thành
                             </h2>
                             <p class="hint">Đánh dấu những việc bạn đã thực hiện để theo dõi tiến độ công việc</p>
                         </div>
@@ -205,7 +205,7 @@
                         Tình Huống Ví Dụ Thực Tế
                     </h2>
                     <div class="guide-case-box">
-                        <div class="guide-case-badge">Case Study Thực Tế</div>
+                        <div class="guide-case-badge">Tình Huống Điển Hình</div>
                         <p><c:out value="${article.realCase}"/></p>
                     </div>
                 </section>
@@ -298,7 +298,7 @@
                     <c:if test="${not empty article.whyItMatters}"><a href="#context">Bối cảnh & Thời điểm</a></c:if>
                     <c:if test="${not empty article.overview}"><a href="#overview">Tổng quan kiến thức</a></c:if>
                     <c:if test="${not empty article.steps}"><a href="#steps">Quy trình từng bước</a></c:if>
-                    <c:if test="${not empty article.checklist}"><a href="#checklist">Checklist công việc</a></c:if>
+                    <c:if test="${not empty article.checklist}"><a href="#checklist">Danh sách việc cần làm</a></c:if>
                     <c:if test="${not empty article.costs || not empty article.commonMistakes}"><a href="#costs-pitfalls">Chi phí & Cạm bẫy</a></c:if>
                     <c:if test="${not empty article.realCase}"><a href="#case-study">Ví dụ thực tế</a></c:if>
                     <c:if test="${not empty article.faqs}"><a href="#faqs">Hỏi đáp thường gặp</a></c:if>

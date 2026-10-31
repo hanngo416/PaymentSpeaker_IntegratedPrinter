@@ -181,8 +181,16 @@ public class KnowledgeServlet extends HttpServlet {
             }
         }
         int total = docs.getArticles().size();
+        Map<String, List<GuideArticle>> catArticles = new HashMap<>();
+        Map<String, GuideCategory> categoryMap = new HashMap<>();
+        for (GuideCategory c : docs.getCategories()) {
+            categoryMap.put(c.getId(), c);
+            catArticles.put(c.getId(), docs.getArticlesByCategory(c.getId()));
+        }
         request.setAttribute("available", docs.isAvailable());
         request.setAttribute("categories", docs.getCategories());
+        request.setAttribute("catArticles", catArticles);
+        request.setAttribute("categoryMap", categoryMap);
         request.setAttribute("articles", shown);
         request.setAttribute("catTotal", catTotal);
         request.setAttribute("catRead", catRead);
