@@ -534,3 +534,236 @@ progress.bar::-moz-progress-bar { background: var(--primary-2); border-radius: 9
 .tpill.bad { background: var(--bad-bg, rgba(225, 69, 95, 0.12)); color: var(--bad, #b4233c); }
 .tpill.info { background: rgba(109, 40, 217, 0.1); color: #6d28d9; }
 .tpill.muted { background: var(--surface-soft, #f3e8ee); color: var(--muted, #8f7a86); }
+
+/* Visual Data & Analytics Visualization Styles */
+.visual-card {
+    background: var(--glass, rgba(255, 255, 255, 0.52));
+    border: 1px solid var(--glass-edge, rgba(255, 255, 255, 0.75));
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: var(--glass-shine, inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 8px 32px rgba(190, 24, 93, 0.08));
+    backdrop-filter: blur(20px) saturate(180%);
+}
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.chart-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy, #191c1e);
+    margin: 0;
+}
+.chart-legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--gray, #5b4150);
+}
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Stacked Horizontal Distribution Bars */
+.stacked-dist-bar {
+    display: flex;
+    height: 22px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.04);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    margin: 10px 0;
+}
+.dist-seg {
+    height: 100%;
+    transition: opacity 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 4px;
+}
+.dist-seg:hover {
+    filter: brightness(1.1);
+    cursor: default;
+}
+
+/* Daily Bar Trend Component */
+.daily-trend-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 160px;
+    padding: 20px 4px 6px 4px;
+    border-bottom: 2px solid var(--line, rgba(190, 24, 93, 0.14));
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.daily-col-item {
+    flex: 1;
+    min-width: 28px;
+    max-width: 52px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    border-radius: 6px 6px 0 0;
+    transition: background 0.15s ease;
+    padding: 0 2px;
+}
+.daily-col-item:hover {
+    background: rgba(190, 24, 93, 0.06);
+}
+.daily-col-item.active {
+    background: rgba(190, 24, 93, 0.12);
+    border: 1px solid var(--primary, #be185d);
+    border-bottom: 0;
+}
+.daily-bars-group {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+}
+.daily-bar-rev {
+    width: 12px;
+    background: linear-gradient(180deg, var(--primary-2, #ec4899) 0%, var(--primary, #be185d) 100%);
+    border-radius: 3px 3px 0 0;
+    min-height: 3px;
+    transition: height 0.2s ease;
+}
+.daily-bar-profit {
+    width: 10px;
+    background: #10b981;
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+    transition: height 0.2s ease;
+}
+.daily-bar-loss {
+    width: 10px;
+    background: #ef4444;
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+}
+.daily-col-label {
+    font-size: 10px;
+    color: var(--gray, #5b4150);
+    margin-top: 4px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Financial Waterfall Component */
+.waterfall-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+.waterfall-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.waterfall-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--gray, #5b4150);
+}
+.waterfall-bar-track {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+}
+.waterfall-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+/* Wallet Escrow Split Meter */
+.wallet-meter-box {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--line, rgba(190, 24, 93, 0.14));
+}
+.meter-track {
+    display: flex;
+    height: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 8px 0;
+    background: #e2e8f0;
+}
+.meter-settled {
+    background: linear-gradient(90deg, #10b981, #059669);
+    height: 100%;
+}
+.meter-escrow {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+    height: 100%;
+}
+
+/* SKU Progress & Margin Badges */
+.sku-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 100px;
+}
+.sku-progress-bar {
+    height: 6px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.sku-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    border-radius: 3px;
+}
+.margin-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.margin-high { background: rgba(16, 185, 129, 0.15); color: #047857; }
+.margin-mid { background: rgba(245, 158, 11, 0.18); color: #b45309; }
+.margin-low { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+

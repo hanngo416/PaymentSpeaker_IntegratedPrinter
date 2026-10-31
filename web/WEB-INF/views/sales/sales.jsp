@@ -41,8 +41,85 @@
     </c:forEach>
 </div>
 
+<c:set var="totalCardRev" value="0"/>
+<c:set var="totalCardOrders" value="0"/>
+<c:forEach var="c" items="${cards}">
+    <c:set var="totalCardRev" value="${totalCardRev + c.revenue}"/>
+    <c:set var="totalCardOrders" value="${totalCardOrders + c.orders}"/>
+</c:forEach>
+
+<c:if test="${totalCardRev > 0}">
+    <div class="card" style="margin-top: 14px;">
+        <div class="chart-header">
+            <div>
+                <span class="kpi-label">Channel Revenue Share</span>
+                <strong style="font-size: 14px; margin-left: 8px;"><fmt:formatNumber value="${totalCardRev}" pattern="#,##0"/> VND (${totalCardOrders} sales)</strong>
+            </div>
+            <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#be185d;"></span> Store POS</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#ea580c;"></span> Shopee</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#0f172a;"></span> TikTok Shop</span>
+            </div>
+        </div>
+        <div class="stacked-dist-bar">
+            <c:forEach var="c" items="${cards}">
+                <c:if test="${c.revenue > 0}">
+                    <c:set var="sharePct" value="${c.revenue * 100 / totalCardRev}"/>
+                    <div class="dist-seg" style="width: ${sharePct}%; background: ${c.channel == 'STORE' ? 'linear-gradient(135deg, #be185d, #ec4899)' : (c.channel == 'SHOPEE' ? '#ea580c' : '#0f172a')};"
+                         title="${channelNames[c.channel]}: <fmt:formatNumber value='${c.revenue}' pattern='#,##0'/> VND (<fmt:formatNumber value='${sharePct}' pattern='0.0'/>%), Profit: <fmt:formatNumber value='${c.profit}' pattern='#,##0'/> VND">
+                        <c:if test="${sharePct >= 10}">
+                            ${channelNames[c.channel]} <fmt:formatNumber value="${sharePct}" pattern="0.0"/>%
+                        </c:if>
+                    </div>
+                </c:if>
+            </c:forEach>
+        </div>
+    </div>
+</c:if>
+
 <div class="card">
     <h2>Days</h2>
+    <c:set var="maxDailyRev" value="1"/>
+    <c:forEach var="d" items="${days}">
+        <c:if test="${d.revenue > maxDailyRev}">
+            <c:set var="maxDailyRev" value="${d.revenue}"/>
+        </c:if>
+    </c:forEach>
+
+    <c:if test="${not empty days}">
+        <div style="margin-bottom: 20px;">
+            <div class="chart-header">
+                <span class="chart-title">Daily Sales & Profit Chart</span>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-dot" style="background:var(--primary);"></span> Revenue</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Profit</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> Loss</span>
+                </div>
+            </div>
+            <div class="daily-trend-chart">
+                <c:forEach var="d" items="${days}">
+                    <c:set var="hRev" value="${d.revenue * 100 / maxDailyRev}"/>
+                    <c:set var="hProfit" value="${d.profit > 0 ? (d.profit * 100 / maxDailyRev) : (d.profit < 0 ? (-d.profit * 100 / maxDailyRev) : 0)}"/>
+                    <a href="${base}&amp;day=${d.day}" class="daily-col-item ${selected != null && selected.day == d.day ? 'active' : ''}"
+                       title="Day ${d.day}: Revenue <fmt:formatNumber value='${d.revenue}' pattern='#,##0'/> VND, Profit <fmt:formatNumber value='${d.profit}' pattern='#,##0'/> VND (Click to view breakdown)">
+                        <div class="daily-bars-group">
+                            <div class="daily-bar-rev" style="height: ${hRev < 4 ? 4 : hRev}%;"></div>
+                            <c:choose>
+                                <c:when test="${d.profit < 0}">
+                                    <div class="daily-bar-loss" style="height: ${hProfit < 3 ? 3 : hProfit}%;"></div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="daily-bar-profit" style="height: ${hProfit < 3 ? 3 : hProfit}%;"></div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                        <div class="daily-col-label">${d.day.substring(5)}</div>
+                    </a>
+                </c:forEach>
+            </div>
+            <p class="hint" style="margin-top: 6px;">Click on any day bar to drill down into costs, margins, and sales.</p>
+        </div>
+    </c:if>
     <table>
         <thead>
         <tr>
@@ -95,6 +172,68 @@
             </tr>
             </tbody>
         </table>
+
+        <c:if test="${selected.revenue > 0}">
+            <div style="margin: 16px 0 20px 0; padding: 14px; border-radius: 10px; background: rgba(255, 255, 255, 0.65); border: 1px solid var(--line);">
+                <div class="chart-header">
+                    <span style="font-size: 13px; font-weight: 700; color: var(--navy);">Cost & Profit Breakdown (<c:out value="${selected.day}"/>)</span>
+                    <span style="font-size: 12px; color: var(--gray);">Gross Revenue: <strong><fmt:formatNumber value="${selected.revenue}" pattern="#,##0"/> VND</strong> (100%)</span>
+                </div>
+                <c:set var="cogsPct" value="${selected.cost * 100 / selected.revenue}"/>
+                <c:set var="feePct" value="${selected.platformFee * 100 / selected.revenue}"/>
+                <c:set var="shipPct" value="${selected.shippingFee * 100 / selected.revenue}"/>
+                <c:set var="commPct" value="${selected.commission * 100 / selected.revenue}"/>
+                <c:set var="taxPct" value="${selected.taxReserve * 100 / selected.revenue}"/>
+                <c:set var="profitPct" value="${selected.profit * 100 / selected.revenue}"/>
+                <div class="stacked-dist-bar" style="height: 22px;">
+                    <c:if test="${cogsPct > 0}">
+                        <div class="dist-seg" style="width: ${cogsPct}%; background: #64748b;" title="Cost of Goods (COGS): <fmt:formatNumber value='${selected.cost}' pattern='#,##0'/> VND (<fmt:formatNumber value='${cogsPct}' pattern='0.0'/>%)">
+                            <c:if test="${cogsPct >= 8}">COGS <fmt:formatNumber value='${cogsPct}' pattern='0'/>%</c:if>
+                        </div>
+                    </c:if>
+                    <c:if test="${feePct > 0}">
+                        <div class="dist-seg" style="width: ${feePct}%; background: #f59e0b;" title="Platform Fee: <fmt:formatNumber value='${selected.platformFee}' pattern='#,##0'/> VND (<fmt:formatNumber value='${feePct}' pattern='0.0'/>%)">
+                            <c:if test="${feePct >= 8}">Fee <fmt:formatNumber value='${feePct}' pattern='0'/>%</c:if>
+                        </div>
+                    </c:if>
+                    <c:if test="${shipPct > 0}">
+                        <div class="dist-seg" style="width: ${shipPct}%; background: #ea580c;" title="Shipping: <fmt:formatNumber value='${selected.shippingFee}' pattern='#,##0'/> VND (<fmt:formatNumber value='${shipPct}' pattern='0.0'/>%)">
+                            <c:if test="${shipPct >= 8}">Ship <fmt:formatNumber value='${shipPct}' pattern='0'/>%</c:if>
+                        </div>
+                    </c:if>
+                    <c:if test="${commPct > 0}">
+                        <div class="dist-seg" style="width: ${commPct}%; background: #8b5cf6;" title="Commission: <fmt:formatNumber value='${selected.commission}' pattern='#,##0'/> VND (<fmt:formatNumber value='${commPct}' pattern='0.0'/>%)">
+                            <c:if test="${commPct >= 8}">Comm <fmt:formatNumber value='${commPct}' pattern='0'/>%</c:if>
+                        </div>
+                    </c:if>
+                    <c:if test="${taxPct > 0}">
+                        <div class="dist-seg" style="width: ${taxPct}%; background: #f87171;" title="Tax Reserve: <fmt:formatNumber value='${selected.taxReserve}' pattern='#,##0'/> VND (<fmt:formatNumber value='${taxPct}' pattern='0.0'/>%)">
+                            <c:if test="${taxPct >= 8}">Tax <fmt:formatNumber value='${taxPct}' pattern='0'/>%</c:if>
+                        </div>
+                    </c:if>
+                    <c:choose>
+                        <c:when test="${selected.profit > 0}">
+                            <div class="dist-seg" style="width: ${profitPct}%; background: #10b981;" title="Net Profit: <fmt:formatNumber value='${selected.profit}' pattern='#,##0'/> VND (<fmt:formatNumber value='${profitPct}' pattern='0.0'/>%)">
+                                <c:if test="${profitPct >= 8}">Profit <fmt:formatNumber value='${profitPct}' pattern='0'/>%</c:if>
+                            </div>
+                        </c:when>
+                        <c:when test="${selected.profit < 0}">
+                            <div class="dist-seg" style="width: 100%; background: #ef4444;" title="Loss: <fmt:formatNumber value='${selected.profit}' pattern='#,##0'/> VND">
+                                Net Loss (<fmt:formatNumber value="${selected.profit}" pattern="#,##0"/> VND)
+                            </div>
+                        </c:when>
+                    </c:choose>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--gray); margin-top: 6px;">
+                    <span><span class="legend-dot" style="background:#64748b;"></span> COGS: <fmt:formatNumber value="${cogsPct}" pattern="0.0"/>%</span>
+                    <span><span class="legend-dot" style="background:#f59e0b;"></span> Platform Fee: <fmt:formatNumber value="${feePct}" pattern="0.0"/>%</span>
+                    <span><span class="legend-dot" style="background:#ea580c;"></span> Shipping: <fmt:formatNumber value="${shipPct}" pattern="0.0"/>%</span>
+                    <span><span class="legend-dot" style="background:#8b5cf6;"></span> Commission: <fmt:formatNumber value="${commPct}" pattern="0.0"/>%</span>
+                    <span><span class="legend-dot" style="background:#f87171;"></span> Tax: <fmt:formatNumber value="${taxPct}" pattern="0.0"/>%</span>
+                    <span><span class="legend-dot" style="background:#10b981;"></span> Net Profit: <fmt:formatNumber value="${profitPct}" pattern="0.0"/>%</span>
+                </div>
+            </div>
+        </c:if>
         <c:choose>
             <c:when test="${channel == 'STORE'}">
                 <p class="hint">Store sales are in the Transactions page.</p>
