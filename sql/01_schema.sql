@@ -898,7 +898,7 @@ DECLARE @tables TABLE (seq INT IDENTITY(1,1), name SYSNAME);
 INSERT INTO @tables (name) VALUES
 (N'Users'), (N'Devices'), (N'Categories'), (N'DiscountCodes'), (N'Orders'), (N'Transactions'), (N'Affiliates'),
 (N'Campaigns'), (N'ChannelSales'), (N'Invoices'), (N'Expenses'), (N'TaxObligations'), (N'TaxDocuments'),
-(N'TaxAssessments'), (N'TaxCalculations'), (N'ChannelPayouts'), (N'Payouts'), (N'AuditLogs');
+(N'TaxAssessments'), (N'TaxCalculations'), (N'ChannelPayouts'), (N'Payouts'), (N'AuditLogs'), (N'Groups'), (N'Products');
 DECLARE @i INT = 1;
 DECLARE @n INT = (SELECT COUNT(*) FROM @tables);
 DECLARE @t SYSNAME;
@@ -925,4 +925,83 @@ BEGIN
     EXEC (N'ALTER TABLE Settings DROP CONSTRAINT ' + @pk);
     EXEC (N'ALTER TABLE Settings ADD CONSTRAINT PK_Settings PRIMARY KEY (store_id, setting_key)');
 END
+GO
+
+DECLARE @dtables TABLE (seq INT IDENTITY(1,1), name SYSNAME);
+INSERT INTO @dtables (name) VALUES
+(N'Users'), (N'Devices'), (N'Categories'), (N'DiscountCodes'), (N'Orders'), (N'Transactions'), (N'Affiliates'),
+(N'Campaigns'), (N'ChannelSales'), (N'Invoices'), (N'Expenses'), (N'TaxObligations'), (N'TaxDocuments'),
+(N'TaxAssessments'), (N'TaxCalculations'), (N'ChannelPayouts'), (N'Payouts'), (N'AuditLogs'), (N'Groups'), (N'Products');
+DECLARE @di INT = 1;
+DECLARE @dn INT = (SELECT COUNT(*) FROM @dtables);
+DECLARE @dt SYSNAME;
+DECLARE @dsql NVARCHAR(MAX);
+WHILE @di <= @dn
+BEGIN
+    SELECT @dt = name FROM @dtables WHERE seq = @di;
+    IF NOT EXISTS (SELECT 1 FROM sys.default_constraints dc
+                   WHERE dc.parent_object_id = OBJECT_ID(@dt) AND dc.parent_column_id = COLUMNPROPERTY(OBJECT_ID(@dt), 'store_id', 'ColumnId'))
+    BEGIN
+        SET @dsql = N'ALTER TABLE ' + QUOTENAME(@dt) + N' ADD CONSTRAINT ' + QUOTENAME(N'DF_' + @dt + N'_StoreCtx')
+                  + N' DEFAULT (NULLIF(TRY_CAST(SESSION_CONTEXT(N''store_id'') AS INT), -1)) FOR store_id';
+        EXEC (@dsql);
+    END
+    SET @di = @di + 1;
+END
+GO
+
+IF EXISTS (SELECT 1 FROM sys.default_constraints WHERE name = N'DF_Settings_Store'
+           AND definition NOT LIKE N'%SESSION_CONTEXT%')
+BEGIN
+    ALTER TABLE Settings DROP CONSTRAINT DF_Settings_Store;
+    ALTER TABLE Settings ADD CONSTRAINT DF_Settings_Store
+        DEFAULT (ISNULL(NULLIF(TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT), -1), 0)) FOR store_id;
+END
+GO
+
+IF EXISTS (SELECT 1 FROM sys.security_policies WHERE name = N'StoreIsolation')
+    DROP SECURITY POLICY dbo.StoreIsolation;
+GO
+
+CREATE OR ALTER FUNCTION dbo.fn_store_filter(@store_id INT)
+RETURNS TABLE WITH SCHEMABINDING AS
+RETURN SELECT 1 AS allowed
+WHERE SESSION_CONTEXT(N'store_id') IS NULL OR @store_id = TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT);
+GO
+
+CREATE OR ALTER FUNCTION dbo.fn_user_filter(@store_id INT)
+RETURNS TABLE WITH SCHEMABINDING AS
+RETURN SELECT 1 AS allowed
+WHERE SESSION_CONTEXT(N'store_id') IS NULL
+   OR TRY_CAST(SESSION_CONTEXT(N'is_admin') AS INT) = 1
+   OR @store_id = TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT);
+GO
+
+CREATE OR ALTER FUNCTION dbo.fn_setting_filter(@store_id INT)
+RETURNS TABLE WITH SCHEMABINDING AS
+RETURN SELECT 1 AS allowed
+WHERE SESSION_CONTEXT(N'store_id') IS NULL OR @store_id = 0 OR @store_id = TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT);
+GO
+
+DECLARE @pol NVARCHAR(MAX) = N'CREATE SECURITY POLICY dbo.StoreIsolation ';
+DECLARE @store_tables TABLE (name SYSNAME);
+INSERT INTO @store_tables VALUES
+(N'Devices'), (N'Categories'), (N'Groups'), (N'Products'), (N'DiscountCodes'), (N'Orders'), (N'Transactions'), (N'Affiliates'),
+(N'Campaigns'), (N'ChannelSales'), (N'Invoices'), (N'Expenses'), (N'TaxObligations'), (N'TaxDocuments'),
+(N'TaxAssessments'), (N'TaxCalculations'), (N'ChannelPayouts'), (N'Payouts');
+SELECT @pol = @pol + N'ADD FILTER PREDICATE dbo.fn_store_filter(store_id) ON dbo.' + QUOTENAME(name)
+            + N', ADD BLOCK PREDICATE dbo.fn_store_filter(store_id) ON dbo.' + QUOTENAME(name) + N' AFTER INSERT'
+            + N', ADD BLOCK PREDICATE dbo.fn_store_filter(store_id) ON dbo.' + QUOTENAME(name) + N' AFTER UPDATE, '
+FROM @store_tables;
+SET @pol = @pol
+    + N'ADD FILTER PREDICATE dbo.fn_user_filter(store_id) ON dbo.Users, '
+    + N'ADD BLOCK PREDICATE dbo.fn_user_filter(store_id) ON dbo.Users AFTER INSERT, '
+    + N'ADD BLOCK PREDICATE dbo.fn_user_filter(store_id) ON dbo.Users AFTER UPDATE, '
+    + N'ADD FILTER PREDICATE dbo.fn_user_filter(store_id) ON dbo.AuditLogs, '
+    + N'ADD BLOCK PREDICATE dbo.fn_user_filter(store_id) ON dbo.AuditLogs AFTER INSERT, '
+    + N'ADD FILTER PREDICATE dbo.fn_setting_filter(store_id) ON dbo.Settings, '
+    + N'ADD BLOCK PREDICATE dbo.fn_setting_filter(store_id) ON dbo.Settings AFTER INSERT, '
+    + N'ADD BLOCK PREDICATE dbo.fn_setting_filter(store_id) ON dbo.Settings AFTER UPDATE '
+    + N'WITH (STATE = ON)';
+EXEC (@pol);
 GO

@@ -23,8 +23,17 @@ public class User implements Serializable {
     private String googleId;
     private Role role;
     private UserStatus status;
+    private Integer storeId;
 
     public User() {
+    }
+
+    public Integer getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
     }
 
     

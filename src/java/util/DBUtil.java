@@ -25,7 +25,9 @@ public class DBUtil {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASS);
+        Connection con = DriverManager.getConnection(URL, USER, PASS);
+        StoreContext.apply(con);
+        return con;
     }
 
     public static void close(ResultSet rs, Statement st, Connection cn) {

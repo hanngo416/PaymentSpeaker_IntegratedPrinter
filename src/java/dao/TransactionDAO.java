@@ -26,8 +26,9 @@ public class TransactionDAO {
 
     private static final String INSERT_TRANSACTION
             = "INSERT INTO Transactions "
-            + "(bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ISNULL(?, SYSDATETIME()))";
+            + "(bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time, store_id) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ISNULL(?, SYSDATETIME()), "
+            + "COALESCE((SELECT store_id FROM Orders WHERE order_id = ?), (SELECT TOP 1 store_id FROM Stores ORDER BY store_id)))";
 
     private static final String CREDIT_ORDER
             = "UPDATE Orders SET status = N'COMPLETED' WHERE order_id = ? AND status IN (N'PENDING', N'EXPIRED')";
@@ -324,6 +325,7 @@ public class TransactionDAO {
             } else {
                 ps.setTimestamp(8, t.getTransTime());
             }
+            setInteger(ps, 9, t.getOrderId());
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 keys.next();

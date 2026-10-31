@@ -25,6 +25,7 @@ import model.enums.Role;
 import model.enums.UserStatus;
 import service.AuthService;
 import service.Features;
+import util.StoreContext;
 import model.enums.Permission;
 
 /**
@@ -86,6 +87,16 @@ public class AuthFilter implements Filter {
         user = authService.forSession(fresh);
         session.setAttribute(LoginServlet.SESSION_USER, user);
 
+        StoreContext.set(user.getStoreId(), user.getRole() == Role.ADMIN);
+        try {
+            serve(request, response, chain, user, path);
+        } finally {
+            StoreContext.clear();
+        }
+    }
+
+    private void serve(HttpServletRequest request, HttpServletResponse response, FilterChain chain, User user, String path)
+            throws IOException, ServletException {
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
         response.setHeader("Pragma", "no-cache");
 

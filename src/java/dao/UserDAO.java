@@ -21,13 +21,13 @@ public class UserDAO {
 
     private static final String SELECT_BY_ID
             = "SELECT u.user_id, u.user_code, u.full_name, "
-            + "       u.status, u.email, u.google_id, r.role_name "
+            + "       u.status, u.email, u.google_id, u.store_id, r.role_name "
             + "FROM Users u JOIN Roles r ON r.role_id = u.role_id "
             + "WHERE u.user_id = ?";
 
     private static final String SELECT_BY_EMAIL
             = "SELECT u.user_id, u.user_code, u.full_name, "
-            + "       u.status, u.email, u.google_id, r.role_name "
+            + "       u.status, u.email, u.google_id, u.store_id, r.role_name "
             + "FROM Users u JOIN Roles r ON r.role_id = u.role_id "
             + "WHERE u.email = ?";
 
@@ -94,7 +94,7 @@ public class UserDAO {
 
     private static final String LIST_COLUMNS
             = "SELECT u.user_id, u.user_code, u.full_name, "
-            + "       u.status, u.email, u.google_id, r.role_name";
+            + "       u.status, u.email, u.google_id, u.store_id, r.role_name";
 
     public Page<User> search(UserFilter f) throws SQLException {
         StringBuilder where = new StringBuilder(" WHERE 1 = 1");
@@ -294,6 +294,8 @@ public class UserDAO {
         u.setFullName(rs.getString("full_name"));
         u.setEmail(rs.getString("email"));
         u.setGoogleId(rs.getString("google_id"));
+        int storeId = rs.getInt("store_id");
+        u.setStoreId(rs.wasNull() ? null : storeId);
         u.setStatus(UserStatus.valueOf(rs.getString("status")));
         u.setRole(Role.valueOf(rs.getString("role_name")));
         return u;

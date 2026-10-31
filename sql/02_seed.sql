@@ -837,6 +837,8 @@ UPDATE TaxAssessments SET store_id = @sid WHERE store_id IS NULL;
 UPDATE TaxCalculations SET store_id = @sid WHERE store_id IS NULL;
 UPDATE ChannelPayouts SET store_id = @sid WHERE store_id IS NULL;
 UPDATE Payouts SET store_id = @sid WHERE store_id IS NULL;
+UPDATE [Groups] SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Products SET store_id = @sid WHERE store_id IS NULL;
 UPDATE AuditLogs SET store_id = @sid
 WHERE store_id IS NULL
   AND actor_username NOT IN (SELECT user_code FROM Users WHERE role_id = @admin_role);
