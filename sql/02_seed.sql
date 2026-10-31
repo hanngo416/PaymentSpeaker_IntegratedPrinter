@@ -820,7 +820,7 @@ GO
 
 DECLARE @sid INT = (SELECT TOP 1 store_id FROM Stores ORDER BY store_id);
 DECLARE @admin_role INT = (SELECT role_id FROM Roles WHERE role_name = N'ADMIN');
-UPDATE Users SET store_id = @sid WHERE store_id IS NULL AND role_id <> @admin_role;
+UPDATE Users SET store_id = @sid WHERE store_id IS NULL;
 UPDATE Devices SET store_id = @sid WHERE store_id IS NULL;
 UPDATE Categories SET store_id = @sid WHERE store_id IS NULL;
 UPDATE DiscountCodes SET store_id = @sid WHERE store_id IS NULL;
