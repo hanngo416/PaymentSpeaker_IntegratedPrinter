@@ -13,31 +13,35 @@ UNION ALL SELECT 'Devices', COUNT(*), 1 FROM Devices
 UNION ALL SELECT 'Categories', COUNT(*), 5 FROM Categories
 UNION ALL SELECT 'Groups', COUNT(*), 15 FROM [Groups]
 UNION ALL SELECT 'Products', COUNT(*), 51 FROM Products
-UNION ALL SELECT 'Orders', COUNT(*), 39 FROM Orders
-UNION ALL SELECT 'OrderItems', COUNT(*), 7 FROM OrderItems
-UNION ALL SELECT 'Transactions', COUNT(*), 40 FROM Transactions
-UNION ALL SELECT 'FraudAlerts', COUNT(*), 8 FROM FraudAlerts
+UNION ALL SELECT 'Orders', COUNT(*), 40 FROM Orders
+UNION ALL SELECT 'OrderItems', COUNT(*), 8 FROM OrderItems
+UNION ALL SELECT 'Transactions', COUNT(*), 43 FROM Transactions
+UNION ALL SELECT 'FraudAlerts', COUNT(*), 11 FROM FraudAlerts
 UNION ALL SELECT 'AuditLogs', COUNT(*), 14 FROM AuditLogs
 UNION ALL SELECT 'DiscountCodes', COUNT(*), 3 FROM DiscountCodes
-UNION ALL SELECT 'Settings', COUNT(*), 6 FROM Settings
+UNION ALL SELECT 'Settings', COUNT(*), 21 FROM Settings
 UNION ALL SELECT 'TaxRules', COUNT(*), 14 FROM TaxRules
 UNION ALL SELECT 'Affiliates', COUNT(*), 5 FROM Affiliates
 UNION ALL SELECT 'Campaigns', COUNT(*), 3 FROM Campaigns
 UNION ALL SELECT 'Commissions', COUNT(*), 15 FROM Commissions
 UNION ALL SELECT 'Payouts', COUNT(*), 1 FROM Payouts
-UNION ALL SELECT 'CommissionAdjustments', COUNT(*), 0 FROM CommissionAdjustments
+UNION ALL SELECT 'CommissionAdjustments', COUNT(*), 1 FROM CommissionAdjustments
 UNION ALL SELECT 'TaxObligations', COUNT(*), 5 FROM TaxObligations
 UNION ALL SELECT 'TaxObligationHistory', COUNT(*), 1 FROM TaxObligationHistory
 UNION ALL SELECT 'TaxPayments', COUNT(*), 1 FROM TaxPayments
-UNION ALL SELECT 'TaxCalculations', COUNT(*), 0 FROM TaxCalculations
-UNION ALL SELECT 'TaxAssessments', COUNT(*), 0 FROM TaxAssessments
+UNION ALL SELECT 'TaxCalculations', COUNT(*), 1 FROM TaxCalculations
+UNION ALL SELECT 'TaxAssessments', COUNT(*), 1 FROM TaxAssessments
 UNION ALL SELECT 'Expenses', COUNT(*), 8 FROM Expenses
-UNION ALL SELECT 'TaxReconNotes', COUNT(*), 0 FROM TaxReconNotes
+UNION ALL SELECT 'TaxReconNotes', COUNT(*), 1 FROM TaxReconNotes
 UNION ALL SELECT 'TaxDocuments', COUNT(*), 4 FROM TaxDocuments
 UNION ALL SELECT 'ChannelSales', COUNT(*), 56 FROM ChannelSales
 UNION ALL SELECT 'ChannelCommissions', COUNT(*), 6 FROM ChannelCommissions
 UNION ALL SELECT 'ChannelPayouts', COUNT(*), 1 FROM ChannelPayouts
-UNION ALL SELECT 'ChannelPayoutItems', COUNT(*), 1 FROM ChannelPayoutItems;
+UNION ALL SELECT 'ChannelPayoutItems', COUNT(*), 1 FROM ChannelPayoutItems
+UNION ALL SELECT 'ChannelSaleItems', COUNT(*), 56 FROM ChannelSaleItems
+UNION ALL SELECT 'Invoices', COUNT(*), 5 FROM Invoices
+UNION ALL SELECT 'InvoiceLines', COUNT(*), 5 FROM InvoiceLines
+UNION ALL SELECT 'GuideProgress', COUNT(*), 5 FROM GuideProgress;
 GO
 
 -- CHECK 1b: every foreign key in the database, child table first

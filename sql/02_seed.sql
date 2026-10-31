@@ -629,6 +629,12 @@ GO
 SET NOEXEC OFF;
 GO
 
+IF NOT EXISTS (SELECT 1 FROM StockMovements WHERE reason IN (N'RESTOCK', N'ADJUST', N'SALE'))
+    UPDATE Products SET stock_quantity = CASE product_id % 10 WHEN 0 THEN 0 WHEN 1 THEN 3 WHEN 2 THEN 5 ELSE 15 + (product_id * 7) % 40 END
+    WHERE stock_quantity = 0
+      AND NOT EXISTS (SELECT 1 FROM StockMovements m WHERE m.product_id = Products.product_id);
+GO
+
 INSERT INTO Settings (setting_key, setting_value)
 SELECT N'stock_low_threshold', N'5'
 WHERE NOT EXISTS (SELECT 1 FROM Settings WHERE setting_key = N'stock_low_threshold');
@@ -639,4 +645,170 @@ SELECT p.product_id, p.stock_quantity, p.stock_quantity, N'INITIAL', N'Opening b
 FROM Products p
 WHERE p.stock_quantity <> 0
   AND NOT EXISTS (SELECT 1 FROM StockMovements m WHERE m.product_id = p.product_id);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM StockMovements WHERE reason IN (N'RESTOCK', N'ADJUST', N'SALE'))
+BEGIN
+    DECLARE @mgr_id INT = (SELECT user_id FROM Users WHERE user_code = N'mai_manager');
+    DECLARE @sale_order INT = (SELECT TOP 1 order_id FROM Orders WHERE status = N'COMPLETED' ORDER BY order_id);
+    DECLARE @pick TABLE (rn INT, product_id INT);
+    INSERT INTO @pick (rn, product_id)
+    SELECT ROW_NUMBER() OVER (ORDER BY product_id), product_id
+    FROM Products WHERE product_code NOT LIKE N'DEMO%';
+    DECLARE @mv TABLE (seq INT IDENTITY(1,1), rn INT, reason NVARCHAR(10), change INT, note NVARCHAR(200), days_ago INT);
+    INSERT INTO @mv (rn, reason, change, note, days_ago) VALUES
+    (1, N'RESTOCK', 24, N'Weekly delivery from supplier', 6),
+    (1, N'SALE', -3, N'Sold at the counter', 4),
+    (2, N'RESTOCK', 12, N'Restocked after a sell-out', 5),
+    (2, N'ADJUST', -2, N'Damaged items found during the count', 3),
+    (3, N'ADJUST', 4, N'Counted more than the system showed', 2),
+    (4, N'RESTOCK', 30, N'Monthly bulk order', 1),
+    (4, N'SALE', -6, N'Sold at the counter', 1);
+    DECLARE @s INT = 1;
+    DECLARE @max INT = (SELECT MAX(seq) FROM @mv);
+    DECLARE @pid INT, @chg INT, @after INT, @why NVARCHAR(10), @memo NVARCHAR(200), @ago INT;
+    WHILE @s <= @max
+    BEGIN
+        SET @pid = NULL;
+        SELECT @pid = p.product_id, @chg = m.change, @why = m.reason, @memo = m.note, @ago = m.days_ago
+        FROM @mv m JOIN @pick p ON p.rn = m.rn WHERE m.seq = @s;
+        IF @pid IS NOT NULL
+        BEGIN
+            UPDATE Products SET stock_quantity = stock_quantity + @chg WHERE product_id = @pid;
+            SET @after = (SELECT stock_quantity FROM Products WHERE product_id = @pid);
+            INSERT INTO StockMovements (product_id, quantity_change, quantity_after, reason, order_id, note, created_by, created_at)
+            VALUES (@pid, @chg, @after, @why, CASE WHEN @why = N'SALE' THEN @sale_order ELSE NULL END, @memo,
+                    CASE WHEN @why = N'SALE' THEN NULL ELSE @mgr_id END, DATEADD(DAY, -@ago, SYSDATETIME()));
+        END
+        SET @s = @s + 1;
+    END
+END
+GO
+
+INSERT INTO Settings (setting_key, setting_value)
+SELECT v.k, v.v FROM (VALUES
+    (N'feature_tax', N'1'), (N'feature_online', N'1'), (N'feature_affiliate', N'1'), (N'feature_ai', N'1'),
+    (N'setup_done', N'1'),
+    (N'taxp_name', N'Tinky Cafe'), (N'taxp_type', N'HOUSEHOLD'), (N'taxp_address', N'District 1, Ho Chi Minh City'),
+    (N'taxp_branches', N'1'), (N'taxp_channels', N'BOTH'), (N'taxp_registration', N'REGISTERED'),
+    (N'taxp_tin', N'0312345678'), (N'taxp_method', N'QUARTERLY'), (N'taxp_einvoice', N'NO')
+) AS v(k, v)
+WHERE NOT EXISTS (SELECT 1 FROM Settings s WHERE s.setting_key = v.k);
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Transactions WHERE bank_trans_id = N'FT26RV0001')
+BEGIN
+    DECLARE @cash_id INT = (SELECT user_id FROM Users WHERE user_code = N'nam_cashier');
+    DECLARE @boss_id INT = (SELECT user_id FROM Users WHERE user_code = N'mai_manager');
+    INSERT INTO Orders (order_code, created_by, created_by_code, amount, status, qr_content, expires_at, created_at)
+    VALUES (N'TINKY30001', @cash_id, N'nam_cashier', 45000.00, N'COMPLETED',
+            N'https://img.vietqr.io/image/TPBank-77884268888-compact2.png?amount=45000&addInfo=TINKY30001&accountName=LAM%20HOANG%20AN',
+            DATEADD(HOUR, -2, SYSDATETIME()), DATEADD(HOUR, -3, SYSDATETIME()));
+    DECLARE @linked INT = SCOPE_IDENTITY();
+    INSERT INTO Transactions (bank_trans_id, order_id, amount, content, bank_account, gateway, status, trans_time, received_at, announced, printed,
+                              resolution, close_category, resolution_note, resolved_by, resolved_at, linked_order_id)
+    VALUES
+    (N'FT26RV0001', NULL, 120000.00, N'Customer forgot the order code', N'77884268888', N'TPBank', N'CANCELLED',
+     DATEADD(MINUTE, -40, SYSDATETIME()), DATEADD(MINUTE, -40, SYSDATETIME()), 1, 0, NULL, NULL, NULL, NULL, NULL, NULL),
+    (N'FT26RV0002', NULL, 30000.00, N'Wrong account transfer', N'77884268888', N'TPBank', N'CANCELLED',
+     DATEADD(HOUR, -5, SYSDATETIME()), DATEADD(HOUR, -5, SYSDATETIME()), 1, 0, N'CLOSED', N'WRONG_ACCOUNT_OR_SPAM',
+     N'Sender confirmed the transfer was meant for another shop', @boss_id, DATEADD(HOUR, -4, SYSDATETIME()), NULL),
+    (N'FT26RV0003', @linked, 45000.00, N'Coffee payment without code', N'77884268888', N'TPBank', N'COMPLETED',
+     DATEADD(HOUR, -3, SYSDATETIME()), DATEADD(HOUR, -3, SYSDATETIME()), 1, 1, N'LINKED', NULL,
+     N'Matched to the order by phone call with the customer', @boss_id, DATEADD(HOUR, -2, SYSDATETIME()), @linked);
+    INSERT INTO FraudAlerts (trans_id, rule_code, reason, severity, status, resolved_by, resolved_notes, created_at)
+    SELECT trans_id, N'NO_ORDER', N'No order matches the code in the transfer content.', N'MEDIUM',
+           CASE bank_trans_id WHEN N'FT26RV0001' THEN N'NEW' ELSE N'RESOLVED' END,
+           CASE bank_trans_id WHEN N'FT26RV0001' THEN NULL ELSE @boss_id END,
+           CASE bank_trans_id WHEN N'FT26RV0001' THEN NULL ELSE resolution_note END,
+           received_at
+    FROM Transactions WHERE bank_trans_id IN (N'FT26RV0001', N'FT26RV0002', N'FT26RV0003');
+    INSERT INTO OrderItems (order_id, product_id, product_name, unit_price, quantity, subtotal)
+    VALUES (@linked, NULL, N'Quick Custom Sale', 45000.00, 1, 45000.00);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Invoices)
+BEGIN
+    DECLARE @inv_user INT = (SELECT user_id FROM Users WHERE user_code = N'han_admin');
+    DECLARE @inv_orders TABLE (rn INT, order_id INT, order_code NVARCHAR(20), amount DECIMAL(18,2));
+    INSERT INTO @inv_orders (rn, order_id, order_code, amount)
+    SELECT ROW_NUMBER() OVER (ORDER BY order_id), order_id, order_code, amount
+    FROM Orders WHERE order_code LIKE N'TINKY201__' AND status = N'COMPLETED';
+    INSERT INTO Invoices (invoice_no, source_type, source_id, buyer_name, buyer_tax_code, buyer_address, total_amount, vat_amount, status,
+                          provider_invoice_no, provider_lookup_code, created_by, created_at)
+    SELECT N'TMP' + CAST(o.rn AS NVARCHAR(5)), N'ORDER', o.order_id,
+           CASE o.rn WHEN 1 THEN N'Walk-in customer' WHEN 2 THEN N'Sunrise Trading Co' WHEN 3 THEN N'Walk-in customer' ELSE N'Green Leaf Ltd' END,
+           CASE WHEN o.rn IN (2, 4) THEN N'0312345001' ELSE NULL END, NULL,
+           CASE WHEN o.rn = 4 THEN o.amount + 5000 ELSE o.amount END,
+           ROUND(o.amount * 8 / 108, 0),
+           CASE o.rn WHEN 3 THEN N'SENT_TO_PROVIDER' ELSE N'ISSUED' END,
+           CASE WHEN o.rn IN (1, 2, 4) THEN N'C26TAA' + CAST(1000 + o.rn AS NVARCHAR(6)) ELSE NULL END,
+           CASE WHEN o.rn IN (1, 2, 4) THEN N'LK26' + CAST(5000 + o.rn AS NVARCHAR(6)) ELSE NULL END,
+           @inv_user, DATEADD(DAY, -o.rn, SYSDATETIME())
+    FROM @inv_orders o WHERE o.rn <= 4;
+    UPDATE Invoices SET invoice_no = N'INV' + RIGHT(N'000000' + CAST(invoice_id AS NVARCHAR(10)), 6) WHERE invoice_no LIKE N'TMP%';
+    INSERT INTO InvoiceLines (invoice_id, name, quantity, unit_price, subtotal)
+    SELECT i.invoice_id, N'Order ' + o.order_code, 1, i.total_amount, i.total_amount
+    FROM Invoices i JOIN Orders o ON o.order_id = i.source_id WHERE i.source_type = N'ORDER';
+    INSERT INTO Invoices (invoice_no, source_type, source_id, buyer_name, total_amount, vat_amount, status, created_by)
+    SELECT TOP 1 N'TMPCH', N'CHANNEL_SALE', sale_id, N'Online buyer', goods_amount, ROUND(goods_amount * 8 / 108, 0), N'DRAFT', @inv_user
+    FROM ChannelSales WHERE status = N'COMPLETED' ORDER BY sale_id;
+    UPDATE Invoices SET invoice_no = N'INV' + RIGHT(N'000000' + CAST(invoice_id AS NVARCHAR(10)), 6) WHERE invoice_no = N'TMPCH';
+    INSERT INTO InvoiceLines (invoice_id, name, quantity, unit_price, subtotal)
+    SELECT i.invoice_id, N'Online order ' + s.external_ref, 1, i.total_amount, i.total_amount
+    FROM Invoices i JOIN ChannelSales s ON s.sale_id = i.source_id WHERE i.source_type = N'CHANNEL_SALE';
+END
+GO
+
+INSERT INTO TaxReconNotes (ref_key, note, resolved, updated_by)
+SELECT N'ORDER:' + CAST(o.order_id AS NVARCHAR(10)), N'Customer did not ask for an invoice; keep the receipt only.', 1,
+       (SELECT user_id FROM Users WHERE user_code = N'han_admin')
+FROM (SELECT TOP 1 order_id FROM Orders
+      WHERE status = N'COMPLETED' AND order_id NOT IN (SELECT source_id FROM Invoices WHERE source_type = N'ORDER')
+      ORDER BY order_id DESC) o
+WHERE NOT EXISTS (SELECT 1 FROM TaxReconNotes);
+GO
+
+INSERT INTO TaxAssessments (assessed_on, period_label, summary, verification, created_by)
+SELECT CAST(GETDATE() AS DATE), N'Year to date',
+       N'VAT: needs verification. PIT: needs verification. E-invoice: needs verification. Bookkeeping: applicable.',
+       N'NEEDS_VERIFICATION', (SELECT user_id FROM Users WHERE user_code = N'han_admin')
+WHERE NOT EXISTS (SELECT 1 FROM TaxAssessments);
+GO
+
+INSERT INTO TaxCalculations (calc_date, period_label, period_from, period_to, sector, revenue, adjustment, vat_amount, pit_amount, total_amount,
+                             rule_stamp, verified_rules, note, created_by)
+SELECT CAST(GETDATE() AS DATE), N'Demo period', DATEFROMPARTS(YEAR(GETDATE()), 1, 1), CAST(GETDATE() AS DATE), N'GOODS',
+       100000000, 0, 1000000, 0, 1000000, N'Demo rules from the seed data', 0, N'Demo calculation, not the amount to pay',
+       (SELECT user_id FROM Users WHERE user_code = N'han_admin')
+WHERE NOT EXISTS (SELECT 1 FROM TaxCalculations);
+GO
+
+INSERT INTO ChannelSaleItems (sale_id, sku_code, product_name, variation_name, quantity, unit_price, subtotal, cost_price)
+SELECT s.sale_id, N'SKU-' + RIGHT(N'0000' + CAST(s.sale_id AS NVARCHAR(10)), 4),
+       CASE s.sale_id % 3 WHEN 0 THEN N'Cold brew bottle' WHEN 1 THEN N'Drip coffee bag' ELSE N'Coffee beans 250g' END,
+       NULL, 1, s.goods_amount, s.goods_amount, s.cost_amount
+FROM ChannelSales s
+WHERE NOT EXISTS (SELECT 1 FROM ChannelSaleItems);
+GO
+
+INSERT INTO CommissionAdjustments (commission_id, affiliate_id, amount, reason, payout_id, created_by)
+SELECT TOP 1 c.commission_id, c.affiliate_id, -5000, N'Customer returned part of the order', NULL,
+       (SELECT user_id FROM Users WHERE user_code = N'mai_manager')
+FROM Commissions c
+WHERE c.status = N'PAID' AND NOT EXISTS (SELECT 1 FROM CommissionAdjustments);
+GO
+
+INSERT INTO GuideProgress (user_id, article_id, kind, state)
+SELECT u.user_id, v.article_id, v.kind, v.state
+FROM (VALUES
+    (N'han_admin', N'preparation', N'READ', N'CHECKED'),
+    (N'han_admin', N'legal-tax', N'BOOKMARK', N'SAVED'),
+    (N'han_admin', N'register-hkd-2026', N'READ', N'CHECKED'),
+    (N'nam_cashier', N'pos-operations', N'READ', N'CHECKED'),
+    (N'nam_cashier', N'pos-operations', N'BOOKMARK', N'SAVED')
+) AS v(user_code, article_id, kind, state)
+JOIN Users u ON u.user_code = v.user_code
+WHERE NOT EXISTS (SELECT 1 FROM GuideProgress g WHERE g.user_id = u.user_id AND g.article_id = v.article_id AND g.kind = v.kind);
 GO
