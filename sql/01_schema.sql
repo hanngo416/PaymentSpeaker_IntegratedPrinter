@@ -881,3 +881,48 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_Transactions_LinkedOrder' AND object_id = OBJECT_ID(N'Transactions'))
 CREATE UNIQUE INDEX UX_Transactions_LinkedOrder ON Transactions(linked_order_id) WHERE linked_order_id IS NOT NULL;
 GO
+
+IF OBJECT_ID('Stores', 'U') IS NULL
+CREATE TABLE Stores (
+    store_id INT IDENTITY(1,1) PRIMARY KEY,
+    store_code NVARCHAR(30) NOT NULL UNIQUE,
+    store_name NVARCHAR(100) NOT NULL,
+    address NVARCHAR(200) NULL,
+    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT CHK_Stores_Status CHECK (status IN ('ACTIVE', 'SUSPENDED'))
+);
+GO
+
+DECLARE @tables TABLE (seq INT IDENTITY(1,1), name SYSNAME);
+INSERT INTO @tables (name) VALUES
+(N'Users'), (N'Devices'), (N'Categories'), (N'DiscountCodes'), (N'Orders'), (N'Transactions'), (N'Affiliates'),
+(N'Campaigns'), (N'ChannelSales'), (N'Invoices'), (N'Expenses'), (N'TaxObligations'), (N'TaxDocuments'),
+(N'TaxAssessments'), (N'TaxCalculations'), (N'ChannelPayouts'), (N'Payouts'), (N'AuditLogs');
+DECLARE @i INT = 1;
+DECLARE @n INT = (SELECT COUNT(*) FROM @tables);
+DECLARE @t SYSNAME;
+DECLARE @sql NVARCHAR(MAX);
+WHILE @i <= @n
+BEGIN
+    SELECT @t = name FROM @tables WHERE seq = @i;
+    IF OBJECT_ID(@t, 'U') IS NOT NULL AND COL_LENGTH(@t, 'store_id') IS NULL
+    BEGIN
+        SET @sql = N'ALTER TABLE ' + QUOTENAME(@t) + N' ADD store_id INT NULL CONSTRAINT ' + QUOTENAME(N'FK_' + @t + N'_Stores')
+                 + N' FOREIGN KEY REFERENCES Stores(store_id)';
+        EXEC (@sql);
+        SET @sql = N'CREATE INDEX ' + QUOTENAME(N'IX_' + @t + N'_Store') + N' ON ' + QUOTENAME(@t) + N'(store_id)';
+        EXEC (@sql);
+    END
+    SET @i = @i + 1;
+END
+GO
+
+IF COL_LENGTH('Settings', 'store_id') IS NULL
+BEGIN
+    DECLARE @pk SYSNAME = (SELECT name FROM sys.key_constraints WHERE parent_object_id = OBJECT_ID('Settings') AND type = 'PK');
+    EXEC (N'ALTER TABLE Settings ADD store_id INT NOT NULL CONSTRAINT DF_Settings_Store DEFAULT 0');
+    EXEC (N'ALTER TABLE Settings DROP CONSTRAINT ' + @pk);
+    EXEC (N'ALTER TABLE Settings ADD CONSTRAINT PK_Settings PRIMARY KEY (store_id, setting_key)');
+END
+GO

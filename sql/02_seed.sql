@@ -812,3 +812,34 @@ FROM (VALUES
 JOIN Users u ON u.user_code = v.user_code
 WHERE NOT EXISTS (SELECT 1 FROM GuideProgress g WHERE g.user_id = u.user_id AND g.article_id = v.article_id AND g.kind = v.kind);
 GO
+
+INSERT INTO Stores (store_code, store_name, address)
+SELECT N'TINKY-HCM', N'Tinky Cafe', N'District 1, Ho Chi Minh City'
+WHERE NOT EXISTS (SELECT 1 FROM Stores);
+GO
+
+DECLARE @sid INT = (SELECT TOP 1 store_id FROM Stores ORDER BY store_id);
+DECLARE @admin_role INT = (SELECT role_id FROM Roles WHERE role_name = N'ADMIN');
+UPDATE Users SET store_id = @sid WHERE store_id IS NULL AND role_id <> @admin_role;
+UPDATE Devices SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Categories SET store_id = @sid WHERE store_id IS NULL;
+UPDATE DiscountCodes SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Orders SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Transactions SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Affiliates SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Campaigns SET store_id = @sid WHERE store_id IS NULL;
+UPDATE ChannelSales SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Invoices SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Expenses SET store_id = @sid WHERE store_id IS NULL;
+UPDATE TaxObligations SET store_id = @sid WHERE store_id IS NULL;
+UPDATE TaxDocuments SET store_id = @sid WHERE store_id IS NULL;
+UPDATE TaxAssessments SET store_id = @sid WHERE store_id IS NULL;
+UPDATE TaxCalculations SET store_id = @sid WHERE store_id IS NULL;
+UPDATE ChannelPayouts SET store_id = @sid WHERE store_id IS NULL;
+UPDATE Payouts SET store_id = @sid WHERE store_id IS NULL;
+UPDATE AuditLogs SET store_id = @sid
+WHERE store_id IS NULL
+  AND actor_username NOT IN (SELECT user_code FROM Users WHERE role_id = @admin_role);
+UPDATE Settings SET store_id = @sid
+WHERE store_id = 0 AND setting_key NOT LIKE N'sepay_last_%' AND setting_key <> N'setup_done';
+GO

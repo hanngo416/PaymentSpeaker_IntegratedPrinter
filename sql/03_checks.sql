@@ -41,7 +41,8 @@ UNION ALL SELECT 'ChannelPayoutItems', COUNT(*), 1 FROM ChannelPayoutItems
 UNION ALL SELECT 'ChannelSaleItems', COUNT(*), 56 FROM ChannelSaleItems
 UNION ALL SELECT 'Invoices', COUNT(*), 5 FROM Invoices
 UNION ALL SELECT 'InvoiceLines', COUNT(*), 5 FROM InvoiceLines
-UNION ALL SELECT 'GuideProgress', COUNT(*), 5 FROM GuideProgress;
+UNION ALL SELECT 'GuideProgress', COUNT(*), 5 FROM GuideProgress
+UNION ALL SELECT 'Stores', COUNT(*), 1 FROM Stores;
 GO
 
 -- CHECK 1b: every foreign key in the database, child table first
