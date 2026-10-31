@@ -95,6 +95,8 @@ public class AgentTools {
                     new String[0], Permission.DEVICE_READ),
             new Tool("search_tax_docs", "Guide for opening and running a shop in Vietnam: business registration, permits for cafe or convenience store, tax rules for household businesses, invoices, bookkeeping, bank statements, filing and paying tax. Required: query (keywords, Vietnamese or English). Returns up to 3 documents with a source and sometimes a note.",
                     new String[]{"query"}, Permission.DASHBOARD_READ),
+            new Tool("search_starter_guide", "Starter guide for people who start a business from zero: business models, registration, products and pricing, selling in store or on Shopee and TikTok Shop, tax basics, invoices, how to use Tinky for each step. Required: query (keywords, Vietnamese or English). Returns up to 3 articles with a summary, steps, a page name to open in Tinky and sources; some carry a note to verify locally or on the marketplace.",
+                    new String[]{"query"}, Permission.DASHBOARD_READ),
             new Tool("tax_estimate", "This year's revenue against the tax-free threshold, with VAT and personal income tax estimates.",
                     new String[0], Permission.TAX_READ),
             new Tool("tax_rules", "Tax rules in force with their legal source reference.",
@@ -207,6 +209,8 @@ public class AgentTools {
                 o.addProperty("note", "Estimate only, not the amount to pay");
                 return o;
             }
+            case "search_starter_guide":
+                return new BusinessDocService().searchForAgent(text(args, "query"), 3);
             case "search_tax_docs":
                 return new TaxDocService().search(text(args, "query"));
             default: {
