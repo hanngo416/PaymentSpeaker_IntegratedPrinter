@@ -13,7 +13,7 @@
             <form method="get" action="${ctx}/guide/search" class="guide-search-box">
                 <div class="guide-search-input-wrap">
                     <svg class="guide-search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" name="q" maxlength="100" value="<c:out value='${q}'/>" placeholder="Tìm kiếm nhanh: ngưỡng thuế 1 tỷ, phí sàn Shopee, TikTok Shop, hóa đơn điện tử...">
+                    <input type="text" class="guide-search-input" name="q" maxlength="100" value="<c:out value='${q}'/>" placeholder="Tìm kiếm nhanh: ngưỡng thuế 1 tỷ, phí sàn Shopee, TikTok Shop, hóa đơn điện tử...">
                     <input type="hidden" name="model" value="<c:out value='${model}'/>">
                     <input type="hidden" name="category" value="<c:out value='${category}'/>">
                 </div>

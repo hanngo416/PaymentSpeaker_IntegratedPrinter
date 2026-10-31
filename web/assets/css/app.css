@@ -729,6 +729,7 @@ tbody tr:hover { background: rgba(241, 243, 246, 0.6); }
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    align-items: center;
     margin-bottom: 16px;
 }
 .guide-search-input-wrap {
@@ -737,34 +738,43 @@ tbody tr:hover { background: rgba(241, 243, 246, 0.6); }
 }
 .guide-search-ico {
     position: absolute;
-    left: 14px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
     color: var(--muted);
     pointer-events: none;
+    z-index: 2;
 }
+.guide-search-input-wrap input.guide-search-input,
 .guide-search-input-wrap input[type="text"] {
     width: 100%;
-    min-height: 44px;
-    padding: 10px 14px 10px 42px;
+    min-height: 46px;
+    margin: 0 !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    padding-right: 16px !important;
+    padding-left: 44px !important;
     font-size: var(--fs-md);
     border-radius: 12px;
-    border: 1.5px solid rgba(190, 24, 93, 0.16);
+    border: 1.5px solid rgba(190, 24, 93, 0.2);
     background: #ffffff;
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
+.guide-search-input-wrap input.guide-search-input:focus,
 .guide-search-input-wrap input[type="text"]:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(190, 24, 93, 0.14);
 }
 .guide-search-btn {
-    min-height: 44px;
+    min-height: 46px;
     padding: 0 22px;
     border-radius: 12px;
     font-size: var(--fs-md);
 }
 .guide-reset-btn {
-    min-height: 44px;
+    min-height: 46px;
     padding: 0 16px;
     border-radius: 12px;
     font-size: var(--fs-sm);
