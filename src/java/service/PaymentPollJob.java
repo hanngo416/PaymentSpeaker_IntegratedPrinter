@@ -88,7 +88,7 @@ public class PaymentPollJob implements Runnable {
             nextAllowedTime = 0L;
             saveSyncState(timeStr, "SUCCESS", created, "");
             LOG.log(Level.INFO, "POLL_OK fetched={0} new={1} bad={2} failed={3}", new Object[]{items.size(), created, bad, failed});
-        } catch (Exception e) {
+        } catch (Throwable e) {
             consecutiveFailures++;
             int backoffSec = consecutiveFailures == 1 ? BACKOFF_STEP_1_SECONDS
                     : consecutiveFailures == 2 ? BACKOFF_STEP_2_SECONDS : BACKOFF_MAX_SECONDS;
