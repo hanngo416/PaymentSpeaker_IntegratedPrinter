@@ -11,6 +11,7 @@
         <a class="btn primary" href="${ctx}/admin/products">Products</a>
         <a class="btn" href="${ctx}/admin/categories">Categories</a>
         <a class="btn" href="${ctx}/admin/groups">Groups</a>
+        <a class="btn" href="${ctx}/admin/stock-history">Stock history</a>
     </div>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
     <p class="hint">Products appear on the cashier's order screen under their group. A hidden product is not shown to the cashier; a product that is on an order cannot be deleted.</p>
@@ -53,11 +54,21 @@
             <span class="hint">What the product costs you. Leave empty for 0. Cannot be more than the price.</span>
             <c:if test="${not empty errors.costPrice}"><div class="field-error"><c:out value="${errors.costPrice}"/></div></c:if>
         </label>
-        <label>Stock quantity
-            <input type="text" name="stockQuantity" inputmode="numeric" maxlength="9" value="<c:out value='${formStock}'/>">
-            <span class="hint">Units on hand, counted by hand. It does not drop when an order is paid. Leave empty for 0.</span>
-            <c:if test="${not empty errors.stockQuantity}"><div class="field-error"><c:out value="${errors.stockQuantity}"/></div></c:if>
-        </label>
+        <c:choose>
+            <c:when test="${editing}">
+                <label>Stock quantity
+                    <input type="text" disabled value="<c:out value='${formStock}'/>">
+                    <span class="hint">Current stock count. To add or adjust stock, use the Restock or Adjust button in the table below.</span>
+                </label>
+            </c:when>
+            <c:otherwise>
+                <label>Opening stock quantity
+                    <input type="text" name="stockQuantity" inputmode="numeric" maxlength="9" value="<c:out value='${formStock}'/>">
+                    <span class="hint">Initial units on hand. Automatically creates an opening balance stock movement.</span>
+                    <c:if test="${not empty errors.stockQuantity}"><div class="field-error"><c:out value="${errors.stockQuantity}"/></div></c:if>
+                </label>
+            </c:otherwise>
+        </c:choose>
         <label>Display order
             <input type="text" name="displayOrder" inputmode="numeric" maxlength="4" value="<c:out value='${empty formOrder ? (editing ? form.displayOrder : "") : formOrder}'/>">
             <span class="hint">Smaller numbers show first. Leave empty for 0.</span>
@@ -99,10 +110,17 @@
                 <td><c:out value="${p.categoryName}"/> / <c:out value="${p.groupName}"/></td>
                 <td><fmt:formatNumber value="${p.price}" pattern="#,##0"/> VND</td>
                 <td><fmt:formatNumber value="${p.costPrice}" pattern="#,##0"/> VND</td>
-                <td><fmt:formatNumber value="${p.stockQuantity}" pattern="#,##0"/></td>
+                <td>
+                    <strong><fmt:formatNumber value="${p.stockQuantity}" pattern="#,##0"/></strong>
+                    <c:if test="${p.stockQuantity <= lowStockThreshold}">
+                        <span class="pill LOCKED" style="margin-left:4px;" title="At or below threshold (${lowStockThreshold})">Low stock</span>
+                    </c:if>
+                </td>
                 <td><span class="pill ${p.active ? 'ACTIVE' : 'CANCELLED'}">${p.active ? 'ON SALE' : 'HIDDEN'}</span></td>
                 <td>
                     <a class="btn" href="${ctx}/admin/products?edit=${p.productId}">Edit</a>
+                    <button type="button" class="btn" onclick="openRestockModal(${p.productId}, '<c:out value="${p.productCode}"/>', '<c:out value="${p.productName}"/>', ${p.stockQuantity})">Restock</button>
+                    <button type="button" class="btn" onclick="openAdjustModal(${p.productId}, '<c:out value="${p.productCode}"/>', '<c:out value="${p.productName}"/>', ${p.stockQuantity})">Adjust</button>
                     <form method="post" action="${ctx}/admin/products" class="inline">
                         <input type="hidden" name="id" value="${p.productId}">
                         <button type="submit" name="action" value="${p.active ? 'disable' : 'enable'}">${p.active ? 'Hide' : 'Show'}</button>
@@ -137,6 +155,74 @@
         </c:if>
     </div>
 </div>
+
+<div id="restockModalBackdrop" class="modal-backdrop" hidden>
+    <div class="modal">
+        <button type="button" class="btn modal-close" onclick="closeRestockModal()">&times;</button>
+        <p class="modal-kicker">Restock Inventory</p>
+        <h3 id="restockProductTitle">Product</h3>
+        <p class="hint">Current stock: <strong id="restockCurrentStock">0</strong> units</p>
+        <form method="post" action="${ctx}/admin/products">
+            <input type="hidden" name="action" value="restock">
+            <input type="hidden" id="restockProductId" name="productId" value="">
+            <label>Quantity to add
+                <input type="number" name="quantity" min="1" max="999999" required placeholder="e.g. 50">
+            </label>
+            <label>Note (optional)
+                <input type="text" name="note" maxlength="200" placeholder="e.g. Batch delivery">
+            </label>
+            <div style="display:flex; gap:8px; margin-top:16px;">
+                <button type="submit" class="btn primary">Confirm Restock</button>
+                <button type="button" class="btn" onclick="closeRestockModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="adjustModalBackdrop" class="modal-backdrop" hidden>
+    <div class="modal">
+        <button type="button" class="btn modal-close" onclick="closeAdjustModal()">&times;</button>
+        <p class="modal-kicker">Adjust Counted Inventory</p>
+        <h3 id="adjustProductTitle">Product</h3>
+        <p class="hint">Current system count: <strong id="adjustCurrentStock">0</strong> units</p>
+        <form method="post" action="${ctx}/admin/products">
+            <input type="hidden" name="action" value="adjust">
+            <input type="hidden" id="adjustProductId" name="productId" value="">
+            <label>New counted stock quantity
+                <input type="number" name="newQuantity" required placeholder="e.g. 45">
+                <span class="hint">Enter physical count found in stock.</span>
+            </label>
+            <label>Reason / Note (required, 3-200 characters)
+                <input type="text" name="note" minlength="3" maxlength="200" required placeholder="e.g. Monthly inventory physical audit count">
+            </label>
+            <div style="display:flex; gap:8px; margin-top:16px;">
+                <button type="submit" class="btn primary">Confirm Adjustment</button>
+                <button type="button" class="btn" onclick="closeAdjustModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRestockModal(id, code, name, stock) {
+    document.getElementById('restockProductId').value = id;
+    document.getElementById('restockProductTitle').textContent = code + ' - ' + name;
+    document.getElementById('restockCurrentStock').textContent = stock;
+    document.getElementById('restockModalBackdrop').hidden = false;
+}
+function closeRestockModal() {
+    document.getElementById('restockModalBackdrop').hidden = true;
+}
+function openAdjustModal(id, code, name, stock) {
+    document.getElementById('adjustProductId').value = id;
+    document.getElementById('adjustProductTitle').textContent = code + ' - ' + name;
+    document.getElementById('adjustCurrentStock').textContent = stock;
+    document.getElementById('adjustModalBackdrop').hidden = false;
+}
+function closeAdjustModal() {
+    document.getElementById('adjustModalBackdrop').hidden = true;
+}
+</script>
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
 </body>
 </html>
