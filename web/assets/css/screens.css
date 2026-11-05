@@ -1677,6 +1677,12 @@
 .pos-prod-stock.out-of-stock {
     color: var(--bad);
 }
+.pos-product-card.sold-out {
+    opacity: 0.55;
+}
+.pos-product-card.sold-out:hover {
+    opacity: 0.85;
+}
 .pos-prod-bottom {
     display: flex;
     align-items: center;

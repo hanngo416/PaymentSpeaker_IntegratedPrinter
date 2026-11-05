@@ -119,7 +119,7 @@
 
         <div class="pos-product-grid" id="posProductGrid">
             <c:forEach var="p" items="${products}">
-                <div class="pos-product-card"
+                <div class="pos-product-card${p.stockQuantity > 0 ? '' : ' sold-out'}"
                      data-id="${p.productId}"
                      data-code="<c:out value='${p.productCode}'/>"
                      data-name="<c:out value='${p.productName}'/>"
@@ -247,6 +247,7 @@
                                    value="<c:out value='${discountAmount}'/>">
                         </div>
 
+                        <c:if test="${features.affiliate}">
                         <div class="pos-compact-label-row">
                             <label for="affiliateCode" class="pos-compact-label">Affiliate referral code</label>
                         </div>
@@ -256,6 +257,7 @@
                             <button type="button" id="affiliateCheck" class="pos-btn-affiliate-check">Check</button>
                         </div>
                         <div id="affiliateResult" class="hint"></div>
+                        </c:if>
                     </div>
                 </details>
 
