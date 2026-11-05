@@ -9,6 +9,7 @@
         <a class="btn" href="${ctx}/admin/products">Products</a>
         <a class="btn primary" href="${ctx}/admin/categories">Categories</a>
         <a class="btn" href="${ctx}/admin/groups">Groups</a>
+        <a class="btn" href="${ctx}/admin/stock-history">Stock history</a>
     </div>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
     <p class="hint">A category holds groups and a group holds products, as the cashier sees them on the order screen. A smaller order number shows first.</p>

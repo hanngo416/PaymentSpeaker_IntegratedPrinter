@@ -9,6 +9,7 @@
         <a class="btn" href="${ctx}/admin/products">Products</a>
         <a class="btn" href="${ctx}/admin/categories">Categories</a>
         <a class="btn primary" href="${ctx}/admin/groups">Groups</a>
+        <a class="btn" href="${ctx}/admin/stock-history">Stock history</a>
     </div>
     <c:if test="${not empty message}"><div class="msg"><c:out value="${message}"/></div></c:if>
     <p class="hint">A group sits inside one category and holds products. You can move a group to another category by changing its category and saving.</p>
