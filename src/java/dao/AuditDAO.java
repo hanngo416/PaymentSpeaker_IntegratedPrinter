@@ -20,14 +20,16 @@ public class AuditDAO {
     public void append(String actor, String action, String entity, String entityId, String detail) throws SQLException {
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at) "
-                     + "VALUES (?, ?, ?, ?, ?, ?)")) {
+                     "INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at, store_id) "
+                     + "VALUES (?, ?, ?, ?, ?, ?, COALESCE(NULLIF(TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT), -1), "
+                     + "(SELECT TOP 1 store_id FROM Users WHERE user_code = ?), (SELECT TOP 1 store_id FROM Stores ORDER BY store_id)))")) {
             ps.setString(1, actor);
             ps.setString(2, action);
             ps.setString(3, entity);
             ps.setString(4, entityId);
             ps.setString(5, detail);
             ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            ps.setString(7, actor);
             ps.executeUpdate();
         }
     }
