@@ -13,7 +13,7 @@ public class SettingDAO {
 
     public String get(String key, String fallback) throws SQLException {
         try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT setting_value FROM Settings WHERE setting_key = ?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT TOP 1 setting_value FROM Settings WHERE setting_key = ? ORDER BY store_id DESC")) {
             ps.setString(1, key);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getString(1) : fallback;
@@ -22,7 +22,8 @@ public class SettingDAO {
     }
 
     public void set(String key, String value) throws SQLException {
-        String sql = "UPDATE Settings SET setting_value = ? WHERE setting_key = ?; "
+        String sql = "UPDATE Settings SET setting_value = ? WHERE setting_key = ? "
+                + "AND store_id = ISNULL(NULLIF(TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT), -1), 0); "
                 + "IF @@ROWCOUNT = 0 INSERT INTO Settings (setting_key, setting_value) VALUES (?, ?)";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
