@@ -196,11 +196,15 @@ public class OrderService {
 
     public List<Order> recent(User user) throws SQLException {
         orderDAO.expireOverdue();
-        return orderDAO.findRecent(10, user.getRole() == Role.ADMIN ? null : user.getUserId());
+        return orderDAO.findRecent(10, seesAllOrders(user) ? null : user.getUserId());
     }
 
     private static boolean isOwnerOrAdmin(User user, Order order) {
-        return user.getRole() == Role.ADMIN || order.getCreatedBy() == user.getUserId();
+        return seesAllOrders(user) || order.getCreatedBy() == user.getUserId();
+    }
+
+    private static boolean seesAllOrders(User user) {
+        return user.getRole() == Role.ADMIN || user.getRole() == Role.STORE_MANAGER;
     }
 
     static long parseAmount(String raw) {
