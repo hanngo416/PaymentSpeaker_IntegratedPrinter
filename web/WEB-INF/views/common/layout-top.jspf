@@ -87,10 +87,10 @@
                     </a>
                 </c:if>
 
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR' || not empty myAffiliate}">
+                <c:if test="${(features.online || features.affiliate) && (role == 'ADMIN' || role == 'STORE_MANAGER' || role == 'AUDITOR' || not empty myAffiliate)}">
                     <div class="nav-section-title">Sales &amp; Marketing</div>
                 </c:if>
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                <c:if test="${features.online && (role == 'ADMIN' || role == 'STORE_MANAGER')}">
                     <a href="${ctx}/sales" class="${nav == 'sales' ? 'active' : ''}" title="Sales book">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         <span class="nav-text">Sales Book</span>
@@ -101,19 +101,19 @@
                     </a>
                 </c:if>
 
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                <c:if test="${(features.affiliate || features.online) && (role == 'ADMIN' || role == 'STORE_MANAGER')}">
                     <a href="${ctx}/admin/affiliate-overview" class="${nav == 'affiliates' ? 'active' : ''}" title="Affiliate program">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         <span class="nav-text">Affiliates</span>
                     </a>
                 </c:if>
-                <c:if test="${role == 'AUDITOR'}">
+                <c:if test="${features.online && role == 'AUDITOR'}">
                     <a href="${ctx}/admin/channel-reports" class="${nav == 'affiliates' ? 'active' : ''}" title="Affiliate reports">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                         <span class="nav-text">Affiliate reports</span>
                     </a>
                 </c:if>
-                <c:if test="${not empty myAffiliate}">
+                <c:if test="${features.affiliate && not empty myAffiliate}">
                     <a href="${ctx}/affiliate/portal" class="${nav == 'portal' ? 'active' : ''}" title="My affiliate page">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         <span class="nav-text">My Affiliate</span>
@@ -121,7 +121,7 @@
                 </c:if>
 
                 <c:if test="${role != 'TECHNICIAN' && role != 'AFFILIATE'}">
-                    <div class="nav-section-title">Finance & Tax</div>
+                    <div class="nav-section-title">Finance &amp; Tax</div>
                     <a href="${ctx}/transactions" class="${nav == 'transactions' ? 'active' : ''}" title="Bank Ledger">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span class="nav-text">Bank Ledger</span>
@@ -133,7 +133,7 @@
                         <span class="nav-text">Alert Center</span>
                     </a>
                 </c:if>
-                <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                <c:if test="${features.tax && (role == 'ADMIN' || role == 'STORE_MANAGER')}">
                     <a href="${ctx}/tax" class="${nav == 'tax' ? 'active' : ''}" title="Tax 2026">
                         <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>
                         <span class="nav-text">Tax 2026</span>
