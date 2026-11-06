@@ -23,7 +23,12 @@
 </div>
 
 <div class="card">
-    <h1>Transactions</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h1 style="margin: 0;">Transactions</h1>
+        <c:if test="${sessionScope.loginUser.role == 'ADMIN' || sessionScope.loginUser.role == 'STORE_MANAGER'}">
+            <a class="btn primary" href="${ctx}/transactions/review">Smart Reconciliation Queue &rarr;</a>
+        </c:if>
+    </div>
     <form method="get" action="${ctx}/transactions" class="filters">
         <label>From
             <input type="date" name="from" value="${fromText}">
@@ -111,7 +116,12 @@
                 <td><c:out value="${empty t.orderCode ? '-' : t.orderCode}"/></td>
                 <td class="amount-cell"><c:out value="${amt}"/></td>
                 <td><c:out value="${t.content}"/></td>
-                <td><span class="pill ${displayStatus}"><c:out value="${displayStatus}"/></span></td>
+                <td>
+                    <span class="pill ${displayStatus}"><c:out value="${displayStatus}"/></span>
+                    <c:if test="${t.needsReview}">
+                        <span class="pill PENDING" style="margin-left:4px;" title="Completed transfer with open fraud alert">Needs review</span>
+                    </c:if>
+                </td>
                 <td><c:out value="${t.bankTransId}"/></td>
                 <td style="text-align: center; white-space: nowrap;" onclick="event.stopPropagation()">
                     <c:if test="${canPrintRow}">
