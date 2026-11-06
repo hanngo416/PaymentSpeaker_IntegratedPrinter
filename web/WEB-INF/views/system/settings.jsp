@@ -118,6 +118,125 @@
 </div>
 
 <div class="card">
+    <h2>Inventory &amp; Low Stock Alert</h2>
+    <div class="setting-item">
+        <div class="setting-info">
+            <strong>Low stock alert threshold</strong>
+            <p class="hint">When a product's on-hand quantity falls at or below this number, it shows a Low stock warning badge on products and order screens.</p>
+        </div>
+        <div class="setting-control">
+            <c:choose>
+                <c:when test="${isAdmin}">
+                    <form method="post" action="${ctx}/settings" class="filters">
+                        <input type="hidden" name="action" value="stock">
+                        <input type="number" name="stockLowThreshold" min="0" max="9999" value="${stockLowThreshold}" aria-label="Low stock threshold" style="width:80px">
+                        <span>units</span>
+                        <button type="submit" class="btn">Save</button>
+                    </form>
+                </c:when>
+                <c:otherwise><strong><c:out value="${stockLowThreshold}"/> units</strong></c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</div>
+
+<c:if test="${isAdmin}">
+<div class="card">
+    <h2>Store Modules (Feature Toggles)</h2>
+    <p class="hint">Enable or disable advanced system modules. Core functions (POS, automated bank polling, inventory, shifts, audit logs) remain permanently active. <a href="${ctx}/setup" style="margin-left: 8px;">Run setup wizard again &rarr;</a></p>
+    
+    <form id="featuresForm" method="post" action="${ctx}/settings">
+        <input type="hidden" name="action" value="features">
+        
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title-row">
+                    <strong>Tax Governance &amp; E-Invoices</strong>
+                    <span class="pill ${features.tax ? 'ACTIVE' : 'LOCKED'}">${features.tax ? 'ENABLED' : 'DISABLED'}</span>
+                </div>
+                <p class="hint">1 Billion VND revenue threshold tracker, deterministic tax estimation, e-invoice staging, and statutory tax alerts.</p>
+            </div>
+            <div class="setting-control">
+                <label class="toggle-switch" title="Toggle Tax module">
+                    <input type="checkbox" id="featureTaxInput" name="featureTax" value="1" ${features.tax ? 'checked' : ''} onchange="handleTaxToggle(this)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title-row">
+                    <strong>Omnichannel Retail &amp; Marketplace Sync</strong>
+                    <span class="pill ${features.online ? 'ACTIVE' : 'LOCKED'}">${features.online ? 'ENABLED' : 'DISABLED'}</span>
+                </div>
+                <p class="hint">Shopee and TikTok Shop CSV sales book import, platform commissions, shipping fees, and waterfall net margin calculation.</p>
+            </div>
+            <div class="setting-control">
+                <label class="toggle-switch" title="Toggle Omnichannel module">
+                    <input type="checkbox" name="featureOnline" value="1" ${features.online ? 'checked' : ''}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title-row">
+                    <strong>Affiliate Referral Program</strong>
+                    <span class="pill ${features.affiliate ? 'ACTIVE' : 'LOCKED'}">${features.affiliate ? 'ENABLED' : 'DISABLED'}</span>
+                </div>
+                <p class="hint">Collaborator referral campaigns, cashier attribution at POS, receipt fraud shield, and self-service affiliate portal (/affiliate/portal).</p>
+            </div>
+            <div class="setting-control">
+                <label class="toggle-switch" title="Toggle Affiliate module">
+                    <input type="checkbox" name="featureAffiliate" value="1" ${features.affiliate ? 'checked' : ''}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-title-row">
+                    <strong>Gemini Agentic AI Copilot</strong>
+                    <span class="pill ${features.ai ? 'ACTIVE' : 'LOCKED'}">${features.ai ? 'ENABLED' : 'DISABLED'}</span>
+                </div>
+                <p class="hint">Interactive natural language assistant chat with 14 role-gated business tools and 18-document official legal tax knowledge RAG.</p>
+            </div>
+            <div class="setting-control">
+                <label class="toggle-switch" title="Toggle AI Copilot module">
+                    <input type="checkbox" name="featureAi" value="1" ${features.ai ? 'checked' : ''}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <button type="submit" class="btn primary">Save Module Settings</button>
+        </div>
+    </form>
+</div>
+
+<div id="taxDisableModal" class="modal-backdrop" hidden>
+    <div class="modal">
+        <p class="modal-kicker" style="color:var(--danger);">Legal Compliance Notice</p>
+        <h3>Disabling Tax Governance Module?</h3>
+        <p style="font-size:13.5px; line-height:1.5; color:var(--text-secondary); margin:12px 0;">
+            Turning off this module will stop Tinky from tracking your <strong>1 Billion VND statutory threshold</strong> and will disable proactive threshold warning notifications.
+        </p>
+        <p style="font-size:12.5px; line-height:1.45; background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.25); padding:10px 14px; border-radius:8px; color:var(--danger);">
+            <strong>Important:</strong> Disabling this module inside Tinky does <em>not</em> relieve your business of its statutory tax declaration and payment obligations under Decree 141/2026/ND-CP and Circular 40/2021/TT-BTC.
+        </p>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+            <button type="button" class="btn" onclick="cancelTaxDisable()">Cancel</button>
+            <button type="button" class="btn" style="background:var(--danger); border-color:var(--danger); color:#fff;" onclick="confirmTaxDisable()">I understand, disable Tax</button>
+        </div>
+    </div>
+</div>
+</c:if>
+
+<div class="card">
     <h2>Hardware Devices</h2>
     <c:forEach var="d" items="${devices}">
         <div class="setting-item">
@@ -201,6 +320,21 @@
 </div>
 
 <%@ include file="/WEB-INF/views/common/layout-bottom.jspf" %>
+<script>
+function handleTaxToggle(checkbox) {
+    if (!checkbox.checked) {
+        document.getElementById('taxDisableModal').hidden = false;
+    }
+}
+function cancelTaxDisable() {
+    var cb = document.getElementById('featureTaxInput');
+    if (cb) cb.checked = true;
+    document.getElementById('taxDisableModal').hidden = true;
+}
+function confirmTaxDisable() {
+    document.getElementById('taxDisableModal').hidden = true;
+}
+</script>
 <script src="${ctx}/assets/js/settings.js?v=5" charset="UTF-8"></script>
 </body>
 </html>
