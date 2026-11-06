@@ -115,6 +115,22 @@
                 </a>
             </c:if>
 
+            <c:if test="${role == 'ADMIN' || role == 'STORE_MANAGER'}">
+                <a href="${ctx}/transactions/review" class="quick-nav-item">
+                    <span class="quick-nav-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                    </span>
+                    <span class="quick-nav-content">
+                        <strong>Reconcile</strong>
+                        <small>Flagged queue</small>
+                    </span>
+                </a>
+            </c:if>
+
             <c:if test="${role == 'ADMIN' || role == 'AUDITOR'}">
                 <a href="${ctx}/admin/audit" class="quick-nav-item">
                     <span class="quick-nav-icon">
@@ -237,7 +253,12 @@
                     <td><c:out value="${empty t.orderCode ? '-' : t.orderCode}"/></td>
                     <td class="amount-cell"><fmt:formatNumber value="${t.amount}" pattern="#,##0"/></td>
                     <td><c:out value="${t.content}"/></td>
-                    <td><span class="pill ${displayStatus}"><c:out value="${displayStatus}"/></span></td>
+                    <td>
+                        <span class="pill ${displayStatus}"><c:out value="${displayStatus}"/></span>
+                        <c:if test="${t.needsReview}">
+                            <span class="pill PENDING" style="margin-left:4px;" title="Completed transfer with open fraud alert">Needs review</span>
+                        </c:if>
+                    </td>
                     <td style="text-align: center; white-space: nowrap;">
                         <c:if test="${canPrintRecent}">
                             <form method="post" action="${ctx}/printer/print" target="_blank" class="inline">
