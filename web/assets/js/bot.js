@@ -89,7 +89,7 @@
             renderLog();
             renderChat();
             showDot(false);
-            input.focus();
+            if (input) { input.focus(); }
         }
     });
 
@@ -127,6 +127,11 @@
     }
 
     function renderChat() {
+        if (!chat) { return; }
+        if (box.dataset.aiEnabled === '0') {
+            chat.innerHTML = '';
+            return;
+        }
         chat.innerHTML = '';
         var items = readChat();
         if (items.length === 0 && list.children.length === 0) {
@@ -203,55 +208,60 @@
         renderChat();
     }
 
-    form.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        var text = input.value.trim();
-        if (!text) { return; }
-        addChat('me', text);
-        input.value = '';
-        sendBtn.disabled = true;
-        var wait = document.createElement('div');
-        wait.className = 'bot-line bot';
-        wait.innerHTML = '<p>Thinking...</p>';
-        chat.appendChild(wait);
-        var scroller = body || panel;
-        scroller.scrollTop = scroller.scrollHeight;
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', chatUrl, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        xhr.timeout = 60000;
-        xhr.onload = function () {
-            sendBtn.disabled = false;
-            try {
-                var data = JSON.parse(xhr.responseText);
-                addChat('bot', data.answer, data.steps, data.links);
-            } catch (e) {
-                addChat('bot', 'The assistant could not answer. Please try again.');
+    if (form) {
+        form.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            var text = input.value.trim();
+            if (!text) { return; }
+            addChat('me', text);
+            input.value = '';
+            sendBtn.disabled = true;
+            var wait = document.createElement('div');
+            wait.className = 'bot-line bot';
+            wait.innerHTML = '<p>Thinking...</p>';
+            chat.appendChild(wait);
+            var scroller = body || panel;
+            scroller.scrollTop = scroller.scrollHeight;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', chatUrl, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xhr.timeout = 60000;
+            xhr.onload = function () {
+                sendBtn.disabled = false;
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    addChat('bot', data.answer, data.steps, data.links);
+                } catch (e) {
+                    addChat('bot', 'The assistant could not answer. Please try again.');
+                }
+            };
+            xhr.onerror = xhr.ontimeout = function () {
+                sendBtn.disabled = false;
+                addChat('bot', 'The assistant could not be reached. Please try again.');
+            };
+            var past = readChat().slice(0, -1).filter(function (m) { return m.text; }).map(function (m) { return { who: m.who, text: m.text }; });
+            var path = window.location.pathname;
+            if (ctx && path.indexOf(ctx) === 0) {
+                path = path.substring(ctx.length);
             }
-        };
-        xhr.onerror = xhr.ontimeout = function () {
-            sendBtn.disabled = false;
-            addChat('bot', 'The assistant could not be reached. Please try again.');
-        };
-        var past = readChat().slice(0, -1).filter(function (m) { return m.text; }).map(function (m) { return { who: m.who, text: m.text }; });
-        var path = window.location.pathname;
-        if (ctx && path.indexOf(ctx) === 0) {
-            path = path.substring(ctx.length);
-        }
-        if (!path || path === '') {
-            path = '/home';
-        }
-        var payload = 'message=' + encodeURIComponent(text)
-            + '&page=' + encodeURIComponent(path)
-            + '&pageTitle=' + encodeURIComponent(document.title || '')
-            + '&history=' + encodeURIComponent(JSON.stringify(past.slice(-8)));
-        xhr.send(payload);
-    });
+            if (!path || path === '') {
+                path = '/home';
+            }
+            var payload = 'message=' + encodeURIComponent(text)
+                + '&page=' + encodeURIComponent(path)
+                + '&pageTitle=' + encodeURIComponent(document.title || '')
+                + '&history=' + encodeURIComponent(JSON.stringify(past.slice(-8)));
+            xhr.send(payload);
+        });
+    }
 
-    document.getElementById('botClear').addEventListener('click', function () {
-        saveChat([]);
-        renderChat();
-    });
+    var clearBtn = document.getElementById('botClear');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            saveChat([]);
+            renderChat();
+        });
+    }
 
     dot.hidden = load(UNREAD_KEY) !== '1';
     renderChat();
