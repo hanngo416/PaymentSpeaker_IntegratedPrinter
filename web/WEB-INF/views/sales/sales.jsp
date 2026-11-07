@@ -113,7 +113,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
-                        <div class="daily-col-label">${d.day.substring(5)}</div>
+                        <div class="daily-col-label">${d.day.dayOfMonth}/${d.day.monthValue}</div>
                     </a>
                 </c:forEach>
             </div>
