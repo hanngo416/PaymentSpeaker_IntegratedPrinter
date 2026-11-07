@@ -50,7 +50,6 @@ The seed creates one user per role (see `sql/02_seed.sql`) and demo orders, tran
 | `sql` | Schema, seed data, checks and reset |
 | `test-tools` | Stand-alone test programs |
 | `tools` | Test data generator |
-| `docs` | Overview, functional description and test cases |
 
 ## Tests
 
