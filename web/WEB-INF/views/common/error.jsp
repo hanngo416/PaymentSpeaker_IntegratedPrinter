@@ -24,6 +24,21 @@
 <body class="auth">
 <div class="auth-card wide">
     <c:choose>
+        <c:when test="${not empty disabledFeature}">
+            <span class="pill LOCKED" style="margin-bottom: 12px; display: inline-block;">Module Disabled</span>
+            <h1>Module Disabled</h1>
+            <h2><c:out value="${disabledFeature.toUpperCase()}"/> module is switched off</h2>
+            <p>This feature has been turned off in store settings. An administrator can enable it anytime in Settings &gt; Modules.</p>
+            <c:if test="${sessionScope.loginUser.role == 'ADMIN'}">
+                <p style="margin-top: 16px;"><a class="btn primary" href="${pageContext.request.contextPath}/settings">Open Settings</a></p>
+            </c:if>
+            <p style="margin-top: 16px;">
+                <a class="btn" href="${pageContext.request.contextPath}/home">Back to home</a>
+                <c:if test="${not empty sessionScope.loginUser}">
+                    <a class="btn" href="${pageContext.request.contextPath}/logout" style="margin-left: 8px;">Log out</a>
+                </c:if>
+            </p>
+        </c:when>
         <c:when test="${pageContext.errorData.statusCode == 404}">
             <h1>404</h1>
             <h2>Page not found</h2>
