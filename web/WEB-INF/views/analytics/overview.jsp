@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:set var="pageTitle" value="Channel Analytics"/>
 <c:set var="nav" value="analytics"/>
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
@@ -36,7 +37,7 @@
                         <span class="pill ${m.channel == 'STORE' ? 'ACTIVE' : (m.channel == 'SHOPEE' ? 'PENDING' : 'OFFLINE')}">${m.channel}</span>
                         <small class="hint">${m.completedOrders} completed / ${m.totalOrders} total</small>
                     </div>
-                    <div class="kpi-label">Gross Revenue (Tiền hàng)</div>
+                    <div class="kpi-label">Gross Revenue</div>
                     <div class="kpi-value"><fmt:formatNumber value="${m.grossRevenue}" pattern="#,##0"/> <span class="kpi-unit">VND</span></div>
 
                     <div style="margin: 10px 0 6px 0;">
@@ -59,7 +60,7 @@
                             <span style="color: #dc2626;">-<fmt:formatNumber value="${m.totalDeductions}" pattern="#,##0"/> VND</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
-                            <span class="hint">Net Revenue (Thực thu):</span>
+                            <span class="hint">Net Revenue:</span>
                             <strong><fmt:formatNumber value="${m.netRevenue}" pattern="#,##0"/> VND</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
@@ -110,7 +111,7 @@
                                 <div style="width: 10px; background: #0f172a; border-radius: 3px 3px 0 0; height: ${hTiktok < 3 ? 3 : hTiktok}%;"></div>
                                 <div style="width: 8px; background: ${t.totalProfit >= 0 ? '#10b981' : '#ef4444'}; border-radius: 3px 3px 0 0; height: ${hProfit < 2 ? 2 : hProfit}%;"></div>
                             </div>
-                            <div class="daily-col-label">${t.date.length() > 5 ? t.date.substring(5) : t.date}</div>
+                            <div class="daily-col-label"><c:out value="${fn:length(t.date) > 5 ? fn:substring(t.date, 5, 10) : t.date}"/></div>
                         </div>
                     </c:forEach>
                 </div>
@@ -146,9 +147,7 @@
 
     <c:when test="${activeTab == 'fees'}">
         <div class="alert-banner" style="margin-bottom: 16px; background: #eff6ff; border-color: #3b82f6; color: #1e40af;">
-            <strong>Tax Accounting Principle:</strong> 
-            <strong>Doanh thu chịu thuế (Total Revenue)</strong> = <em>Subtotal after seller discounts</em> (Tiền hàng sau khi trừ voucher shop). 
-            Các khoản chi phí sàn (Phí giao dịch, Phí hoa hồng sàn, Phí vận chuyển, Phí tiếp thị) được khấu trừ vào tiền quyết toán về ví (<strong>Total settlement amount</strong>), nhưng theo quy định thuế <u>không được giảm trừ</u> khỏi doanh thu tính thuế GTGT/TNCN.
+            <strong>Tax Accounting Principle:</strong> Taxable Revenue (Total Revenue) = Subtotal after seller discounts. Platform deductions (Transaction fees, Commission, Shipping subsidies, Marketing fees) are withheld from wallet payouts (Total settlement amount), but tax regulations do not deduct them from statutory VAT and personal income tax revenue.
         </div>
         <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
             <!-- Shopee Waterfall -->
@@ -161,7 +160,7 @@
                 <div class="waterfall-container">
                     <div class="waterfall-row">
                         <div class="waterfall-meta">
-                            <strong>1. Total Revenue (Doanh thu chịu thuế)</strong>
+                            <strong>1. Total Revenue (Taxable)</strong>
                             <strong><fmt:formatNumber value="${bundle.shopeeWaterfall.grossRevenue}" pattern="#,##0"/> VND</strong>
                         </div>
                         <div class="waterfall-bar-track">
@@ -221,7 +220,7 @@
 
                     <div class="waterfall-row">
                         <div class="waterfall-meta">
-                            <strong>2. Total Settlement (Tiền quyết toán thực nhận)</strong>
+                            <strong>2. Total Settlement</strong>
                             <strong><fmt:formatNumber value="${bundle.shopeeWaterfall.netRevenue}" pattern="#,##0"/> VND (<fmt:formatNumber value="${bundle.shopeeWaterfall.netRevenue * 100 / spGross}" pattern="0.0"/>%)</strong>
                         </div>
                         <div class="waterfall-bar-track">
@@ -279,7 +278,7 @@
                 <div class="waterfall-container">
                     <div class="waterfall-row">
                         <div class="waterfall-meta">
-                            <strong>1. Total Revenue (Doanh thu chịu thuế)</strong>
+                            <strong>1. Total Revenue (Taxable)</strong>
                             <strong><fmt:formatNumber value="${bundle.tiktokWaterfall.grossRevenue}" pattern="#,##0"/> VND</strong>
                         </div>
                         <div class="waterfall-bar-track">
@@ -329,7 +328,7 @@
 
                     <div class="waterfall-row">
                         <div class="waterfall-meta">
-                            <strong>2. Total Settlement (Tiền quyết toán thực nhận)</strong>
+                            <strong>2. Total Settlement</strong>
                             <strong><fmt:formatNumber value="${bundle.tiktokWaterfall.netRevenue}" pattern="#,##0"/> VND (<fmt:formatNumber value="${bundle.tiktokWaterfall.netRevenue * 100 / ttGross}" pattern="0.0"/>%)</strong>
                         </div>
                         <div class="waterfall-bar-track">
@@ -406,7 +405,7 @@
             <c:choose>
                 <c:when test="${not bundle.availability.hasItemData}">
                     <div class="alert-banner" style="margin: 12px 0;">
-                        <strong>Dimensional Notice:</strong> Item/SKU variation details are not included in the currently imported files. To activate SKU-level profitability and best-seller matrix, upload a Shopee or TikTok Order Report containing product columns (Mã SKU, Tên sản phẩm, Số lượng).
+                        <strong>Dimensional Notice:</strong> Item/SKU variation details are not included in the currently imported files. To activate SKU-level profitability and best-seller matrix, upload a Shopee or TikTok Order Report containing product columns (SKU code, Product name, Quantity).
                     </div>
                 </c:when>
                 <c:otherwise>
