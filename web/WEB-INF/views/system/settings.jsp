@@ -335,6 +335,6 @@ function confirmTaxDisable() {
     document.getElementById('taxDisableModal').hidden = true;
 }
 </script>
-<script src="${ctx}/assets/js/settings.js?v=5" charset="UTF-8"></script>
+<script src="${ctx}/assets/js/settings.js?v=6" charset="UTF-8"></script>
 </body>
 </html>

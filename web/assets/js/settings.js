@@ -10,7 +10,7 @@
     var logEl = document.getElementById('speakerLog');
     var paperSize = document.getElementById('paperSize');
 
-    function money(n) { return n.toLocaleString('vi-VN'); }
+    function money(n) { return n.toLocaleString(/(?:^|; )tinky_lang=vi/.test(document.cookie) ? 'vi-VN' : 'en-US'); }
 
     function renderSound() {
         if (!soundToggle) { return; }
@@ -50,7 +50,7 @@
             var li = document.createElement('li');
             var time = document.createElement('span');
             time.className = 'log-time';
-            time.textContent = new Date(h.at).toLocaleTimeString('vi-VN');
+            time.textContent = new Date(h.at).toLocaleTimeString(/(?:^|; )tinky_lang=vi/.test(document.cookie) ? 'vi-VN' : 'en-US');
             var text = document.createElement('span');
             text.className = 'log-text';
             text.textContent = 'Received ' + money(h.amount) + ' VND' + (h.order ? ' (' + h.order + ')' : '');
