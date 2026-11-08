@@ -100,6 +100,19 @@ public class AuthFilter implements Filter {
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
         response.setHeader("Pragma", "no-cache");
 
+        String csrf = CsrfToken.ensure(request.getSession());
+        if (CsrfToken.isUnsafe(request.getMethod()) && !CsrfToken.matches(request, csrf)) {
+            LOG.log(Level.WARNING, "CSRF_REJECTED user={0} path={1}",
+                    new Object[]{user.getUserCode(), path.replaceAll("[\\r\\n]", "_")});
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            if (AccessPolicy.isAjax(path)) {
+                return;
+            }
+            request.setAttribute("denyReason", "The security token of this form is missing or expired. Reload the page and try again.");
+            request.getRequestDispatcher("/WEB-INF/views/common/error403.jsp").forward(request, response);
+            return;
+        }
+
         Permission needed = AccessPolicy.requiredFor(path, request.getMethod());
         if (needed != null && !RolePermissions.has(user.getRole(), needed)) {
             LOG.log(Level.WARNING, "ACCESS_DENIED user={0} role={1} path={2} need={3}",
