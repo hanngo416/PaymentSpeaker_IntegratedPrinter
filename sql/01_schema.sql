@@ -1005,3 +1005,87 @@ SET @pol = @pol
     + N'WITH (STATE = ON)';
 EXEC (@pol);
 GO
+
+IF COL_LENGTH('AuditLogs', 'curr_hash') IS NULL
+    ALTER TABLE AuditLogs ADD prev_hash CHAR(64) NULL, curr_hash CHAR(64) NULL;
+GO
+
+IF OBJECT_ID('AuditChainHead', 'U') IS NULL
+BEGIN
+    CREATE TABLE AuditChainHead (
+        head_id INT NOT NULL PRIMARY KEY CHECK (head_id = 1),
+        last_hash CHAR(64) NOT NULL
+    );
+    INSERT INTO AuditChainHead (head_id, last_hash) VALUES (1, REPLICATE('0', 64));
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_AuditAppend
+    @actor NVARCHAR(50), @action NVARCHAR(50), @entity NVARCHAR(50), @entity_id NVARCHAR(50), @detail NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    DECLARE @t DATETIME2(3) = SYSDATETIME();
+    DECLARE @store INT = COALESCE(NULLIF(TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT), -1),
+        (SELECT TOP 1 store_id FROM Users WHERE user_code = @actor),
+        (SELECT TOP 1 store_id FROM Stores ORDER BY store_id));
+    BEGIN TRANSACTION;
+    DECLARE @prev CHAR(64);
+    SELECT @prev = last_hash FROM AuditChainHead WITH (UPDLOCK, HOLDLOCK) WHERE head_id = 1;
+    DECLARE @curr CHAR(64) = CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONCAT(@prev, N'|', @actor, N'|', @action, N'|',
+        @entity, N'|', @entity_id, N'|', ISNULL(@detail, N''), N'|', CONVERT(VARCHAR(27), @t, 121))), 2);
+    INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at, store_id, prev_hash, curr_hash)
+    VALUES (@actor, @action, @entity, @entity_id, @detail, @t, @store, @prev, @curr);
+    UPDATE AuditChainHead SET last_hash = @curr WHERE head_id = 1;
+    COMMIT TRANSACTION;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_AuditChainBackfill
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @prev CHAR(64) = (SELECT last_hash FROM AuditChainHead WHERE head_id = 1);
+    DECLARE @id INT, @actor NVARCHAR(50), @action NVARCHAR(50), @entity NVARCHAR(50), @entity_id NVARCHAR(50),
+            @detail NVARCHAR(MAX), @t DATETIME2(3), @curr CHAR(64);
+    DECLARE c CURSOR LOCAL FAST_FORWARD FOR
+        SELECT log_id, actor_username, action, target_entity, entity_id, detail_json, created_at
+        FROM AuditLogs WHERE curr_hash IS NULL ORDER BY log_id;
+    OPEN c;
+    FETCH NEXT FROM c INTO @id, @actor, @action, @entity, @entity_id, @detail, @t;
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @curr = CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONCAT(@prev, N'|', @actor, N'|', @action, N'|',
+            @entity, N'|', @entity_id, N'|', ISNULL(@detail, N''), N'|', CONVERT(VARCHAR(27), @t, 121))), 2);
+        UPDATE AuditLogs SET prev_hash = @prev, curr_hash = @curr WHERE log_id = @id;
+        SET @prev = @curr;
+        FETCH NEXT FROM c INTO @id, @actor, @action, @entity, @entity_id, @detail, @t;
+    END
+    CLOSE c;
+    DEALLOCATE c;
+    UPDATE AuditChainHead SET last_hash = @prev WHERE head_id = 1;
+END
+GO
+
+CREATE OR ALTER TRIGGER dbo.TR_AuditLogs_Immutable ON dbo.AuditLogs AFTER UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF EXISTS (
+        SELECT 1 FROM deleted d LEFT JOIN inserted i ON i.log_id = d.log_id
+        WHERE i.log_id IS NULL
+           OR (d.curr_hash IS NOT NULL AND (
+                  ISNULL(i.curr_hash, '') <> d.curr_hash OR ISNULL(i.prev_hash, '') <> ISNULL(d.prev_hash, '')
+               OR i.actor_username <> d.actor_username OR i.action <> d.action OR i.target_entity <> d.target_entity
+               OR i.entity_id <> d.entity_id OR ISNULL(i.detail_json, N'') <> ISNULL(d.detail_json, N'')
+               OR i.created_at <> d.created_at)))
+    BEGIN
+        ROLLBACK TRANSACTION;
+        THROW 51000, N'Audit records cannot be changed or deleted.', 1;
+    END
+END
+GO
+
+EXEC dbo.usp_AuditChainBackfill;
+GO
