@@ -22,6 +22,9 @@
     function save(key, value) { try { localStorage.setItem(key, value); } catch (e) { } }
     function drop(key) { try { localStorage.removeItem(key); } catch (e) { } }
 
+    function isVi() { return /(?:^|; )tinky_lang=vi/.test(document.cookie); }
+    function speechLang() { return isVi() ? 'vi-VN' : 'en-US'; }
+
     function soundOn() { return load(SOUND_KEY) !== 'off'; }
 
     function pickVoice() {
@@ -29,11 +32,13 @@
         var voices = window.speechSynthesis.getVoices();
         viVoice = null;
         for (var i = 0; i < voices.length; i++) {
-            if (/^vi/i.test(voices[i].lang.replace('_', '-'))) { viVoice = voices[i]; break; }
+            if (new RegExp('^' + (isVi() ? 'vi' : 'en'), 'i').test(voices[i].lang.replace('_', '-'))) { viVoice = voices[i]; break; }
         }
         voiceText = viVoice
             ? 'Voice: ' + viVoice.name + ' (' + viVoice.lang + ')'
-            : 'No Vietnamese voice installed. Windows: Settings > Time & language > Speech > Add voices > Vietnamese, then restart the browser.';
+            : (isVi()
+                ? 'No Vietnamese voice installed. Windows: Settings > Time & language > Speech > Add voices > Vietnamese, then restart the browser.'
+                : 'No English voice installed. Windows: Settings > Time & language > Speech > Add voices > English, then restart the browser.');
     }
     pickVoice();
     if (window.speechSynthesis) { window.speechSynthesis.onvoiceschanged = pickVoice; }
@@ -63,7 +68,7 @@
         if (!viVoice) { chime(); return; }
         if (!window.speechSynthesis) { return; }
         var u = new SpeechSynthesisUtterance(text);
-        u.lang = 'vi-VN';
+        u.lang = speechLang();
         if (viVoice) { u.voice = viVoice; }
         u.onerror = function (e) {
             if (e.error === 'not-allowed') {
@@ -75,7 +80,9 @@
         window.speechSynthesis.speak(u);
     }
 
-    function announceText(amount) { return '\u0110\u00e3 nh\u1eadn ' + amount + ' \u0111\u1ed3ng'; }
+    function announceText(amount) {
+        return isVi() ? '\u0110\u00e3 nh\u1eadn ' + amount + ' \u0111\u1ed3ng' : 'Received ' + amount + ' dong';
+    }
 
     function speakFor(item) {
         if (!soundOn()) { return; }
@@ -93,7 +100,7 @@
         fetch(printUrl, { method: 'POST', body: body, credentials: 'same-origin', keepalive: true }).catch(function () { });
     }
 
-    function money(n) { return n.toLocaleString('vi-VN'); }
+    function money(n) { return n.toLocaleString(isVi() ? 'vi-VN' : 'en-US'); }
 
     function showMore() {
         document.getElementById('payMore').textContent = queue.length > 1 ? (queue.length - 1) + ' more payment(s) waiting' : '';
@@ -196,7 +203,7 @@
     window.Announcer = {
         soundOn: soundOn,
         setSound: function (on) { save(SOUND_KEY, on ? 'on' : 'off'); },
-        test: function () { say('\u0110\u00e3 nh\u1eadn n\u0103m m\u01b0\u01a1i ngh\u00ecn \u0111\u1ed3ng'); },
+        test: function () { say(announceText(50000)); },
         voiceText: function () { pickVoice(); return voiceText; },
         history: function () {
             try { return JSON.parse(load(HISTORY_KEY) || '[]'); } catch (e) { return []; }
