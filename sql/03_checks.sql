@@ -122,3 +122,14 @@ SELECT t.trans_id FROM Transactions t
 LEFT JOIN Orders o ON o.order_id = t.linked_order_id
 WHERE t.resolution = 'LINKED' AND (o.status IS NULL OR o.status <> 'COMPLETED' OR t.resolution_note IS NULL);
 GO
+
+-- CHECK 8: every audit row is chained and every hash matches its row. Expect no rows
+SELECT log_id FROM (
+    SELECT log_id, prev_hash, curr_hash, LAG(curr_hash) OVER (ORDER BY log_id) AS lag_hash,
+           CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONCAT(prev_hash, N'|', actor_username, N'|', action, N'|', target_entity, N'|',
+               entity_id, N'|', ISNULL(detail_json, N''), N'|', CONVERT(VARCHAR(27), created_at, 121))), 2) AS expected_hash
+    FROM AuditLogs
+) x
+WHERE curr_hash IS NULL OR prev_hash IS NULL OR curr_hash <> expected_hash
+   OR prev_hash <> ISNULL(lag_hash, REPLICATE('0', 64));
+GO
