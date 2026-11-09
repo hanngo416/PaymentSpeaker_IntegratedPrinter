@@ -6,7 +6,18 @@
 <%@ include file="/WEB-INF/views/common/layout-top.jspf" %>
 <div class="card">
     <h1>Audit log</h1>
-    <p class="hint">The history of who did what in the system: logins, orders, payments received, shifts, alerts and account changes. Records are only added, the application has no way to edit or delete them.</p>
+    <p class="hint">The history of who did what in the system: logins, orders, payments received, shifts, alerts and account changes. Records are only added, the application has no way to edit or delete them. Each record is chained to the one before it by a hash, so any change is detected.</p>
+    <a class="btn primary" href="${ctx}/admin/audit?verify=1">Verify integrity</a>
+    <c:if test="${not empty verification}">
+        <c:choose>
+            <c:when test="${verification.intact}">
+                <div class="msg">The chain is intact: ${verification.rows} record(s) checked, none changed.</div>
+            </c:when>
+            <c:otherwise>
+                <div class="error">The chain is broken<c:if test="${not empty verification.brokenAt}"> at record #${verification.brokenAt}</c:if>. <c:out value="${verification.reason}"/></div>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
 </div>
 
 <div class="card">
