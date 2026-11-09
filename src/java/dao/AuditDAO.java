@@ -1,15 +1,16 @@
 package dao;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import model.Page;
 import model.view.AuditRow;
 import util.DBUtil;
+import util.StoreContext;
 
 public class AuditDAO {
 
@@ -19,18 +20,94 @@ public class AuditDAO {
 
     public void append(String actor, String action, String entity, String entityId, String detail) throws SQLException {
         try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO AuditLogs (actor_username, action, target_entity, entity_id, detail_json, created_at, store_id) "
-                     + "VALUES (?, ?, ?, ?, ?, ?, COALESCE(NULLIF(TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT), -1), "
-                     + "(SELECT TOP 1 store_id FROM Users WHERE user_code = ?), (SELECT TOP 1 store_id FROM Stores ORDER BY store_id)))")) {
-            ps.setString(1, actor);
-            ps.setString(2, action);
-            ps.setString(3, entity);
-            ps.setString(4, entityId);
-            ps.setString(5, detail);
-            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-            ps.setString(7, actor);
-            ps.executeUpdate();
+             CallableStatement cs = con.prepareCall("{call usp_AuditAppend(?, ?, ?, ?, ?)}")) {
+            cs.setString(1, actor);
+            cs.setString(2, action);
+            cs.setString(3, entity);
+            cs.setString(4, entityId);
+            cs.setString(5, detail);
+            cs.execute();
+        }
+    }
+
+    public static class Verification {
+
+        private final boolean intact;
+        private final int rows;
+        private final Integer brokenAt;
+        private final String reason;
+
+        Verification(boolean intact, int rows, Integer brokenAt, String reason) {
+            this.intact = intact;
+            this.rows = rows;
+            this.brokenAt = brokenAt;
+            this.reason = reason;
+        }
+
+        public boolean isIntact() {
+            return intact;
+        }
+
+        public int getRows() {
+            return rows;
+        }
+
+        public Integer getBrokenAt() {
+            return brokenAt;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+    }
+
+    private static final String FIRST_BAD_ROW
+            = "SELECT TOP 1 log_id FROM ("
+            + "SELECT log_id, prev_hash, curr_hash, LAG(curr_hash) OVER (ORDER BY log_id) AS lag_hash, "
+            + "CONVERT(CHAR(64), HASHBYTES('SHA2_256', CONCAT(prev_hash, N'|', actor_username, N'|', action, N'|', "
+            + "target_entity, N'|', entity_id, N'|', ISNULL(detail_json, N''), N'|', "
+            + "CONVERT(VARCHAR(27), created_at, 121))), 2) AS expected_hash FROM AuditLogs) x "
+            + "WHERE curr_hash IS NULL OR prev_hash IS NULL OR curr_hash <> expected_hash "
+            + "OR prev_hash <> ISNULL(lag_hash, REPLICATE('0', 64)) ORDER BY log_id";
+
+    public Verification verify() throws SQLException {
+        int[] saved = StoreContext.snapshot();
+        StoreContext.set(null, true);
+        try (Connection con = DBUtil.getConnection()) {
+            int rows;
+            try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM AuditLogs");
+                 ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                rows = rs.getInt(1);
+            }
+            try (PreparedStatement ps = con.prepareStatement(FIRST_BAD_ROW);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Verification(false, rows, rs.getInt(1), "This record or the link to the one before it was changed.");
+                }
+            }
+            String last = null;
+            try (PreparedStatement ps = con.prepareStatement("SELECT TOP 1 curr_hash FROM AuditLogs ORDER BY log_id DESC");
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    last = rs.getString(1);
+                }
+            }
+            String head = null;
+            try (PreparedStatement ps = con.prepareStatement("SELECT last_hash FROM AuditChainHead WHERE head_id = 1");
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    head = rs.getString(1);
+                }
+            }
+            boolean empty = last == null;
+            boolean headOk = empty ? (head == null || head.matches("0+")) : last.equals(head);
+            if (!headOk) {
+                return new Verification(false, rows, null, "The newest records were removed.");
+            }
+            return new Verification(true, rows, null, null);
+        } finally {
+            StoreContext.restore(saved);
         }
     }
 
