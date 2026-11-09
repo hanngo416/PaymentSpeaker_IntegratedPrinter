@@ -44,6 +44,9 @@ public class AuditServlet extends HttpServlet {
             if (result.getItems().isEmpty() && result.getTotal() > 0) {
                 result = auditDAO.search(result.getTotalPages(), PAGE_SIZE, q, actions, fromDate, toDate);
             }
+            if ("1".equals(request.getParameter("verify"))) {
+                request.setAttribute("verification", auditDAO.verify());
+            }
             request.setAttribute("result", result);
             request.setAttribute("actions", auditDAO.findActions());
             request.setAttribute("q", q);
