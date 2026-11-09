@@ -845,3 +845,6 @@ WHERE store_id IS NULL
 UPDATE Settings SET store_id = @sid
 WHERE store_id = 0 AND setting_key NOT LIKE N'sepay_last_%' AND setting_key <> N'setup_done';
 GO
+
+EXEC dbo.usp_AuditChainBackfill;
+GO
