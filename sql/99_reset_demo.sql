@@ -1,7 +1,10 @@
 USE PaymentSpeaker;
 GO
 
+IF OBJECT_ID('usp_AuditAppend', 'P') IS NOT NULL DROP PROCEDURE usp_AuditAppend;
+IF OBJECT_ID('usp_AuditChainBackfill', 'P') IS NOT NULL DROP PROCEDURE usp_AuditChainBackfill;
 IF OBJECT_ID('AuditLogs', 'U') IS NOT NULL DROP TABLE AuditLogs;
+IF OBJECT_ID('AuditChainHead', 'U') IS NOT NULL DROP TABLE AuditChainHead;
 IF OBJECT_ID('Refunds', 'U') IS NOT NULL DROP TABLE Refunds;
 IF OBJECT_ID('FraudAlerts', 'U') IS NOT NULL DROP TABLE FraudAlerts;
 IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
