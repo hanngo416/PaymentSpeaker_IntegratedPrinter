@@ -17,6 +17,18 @@ public final class StoreContext {
         CURRENT.set(new int[]{storeId == null ? NO_STORE : storeId, platformAdmin ? 1 : 0});
     }
 
+    public static int[] snapshot() {
+        return CURRENT.get();
+    }
+
+    public static void restore(int[] saved) {
+        if (saved == null) {
+            CURRENT.remove();
+        } else {
+            CURRENT.set(saved);
+        }
+    }
+
     public static void clear() {
         CURRENT.remove();
     }
