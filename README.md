@@ -1,8 +1,11 @@
 # Tinky (PaymentSpeaker)
 
-Payment support for small shops. A cashier creates an order with a VietQR code, the system picks up the bank transfer through SePay, matches it to the order, flags suspicious transfers, announces the payment by voice and prints the receipt.
+Payment support and smart retail POS for small shops. A cashier creates an order with a VietQR code, the system picks up the bank transfer through SePay, matches it to the order, flags suspicious transfers, announces the payment by voice and prints the receipt.
 
 Built with plain Servlet/JSP/JDBC (MVC), SQL Server and Tomcat. No framework, and no CDN or external font, so it runs offline.
+
+> **Tài liệu toàn diện dự án (Master Specification & Architecture):**  
+> Xem chi tiết tại [docs/PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) (Kiến trúc MVC2, 37 bảng CSDL, 52 Servlets, Phân quyền RBAC, 10 phân hệ nghiệp vụ, đối soát SePay và hướng dẫn triển khai).
 
 ## Features
 
