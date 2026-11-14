@@ -126,13 +126,6 @@ public class TaxToolsDAO {
         return rows.isEmpty() ? null : rows.get(0);
     }
 
-    public void addCalculation(Date calcDate, String period, String sector, BigDecimal revenue, BigDecimal adjustment, BigDecimal vat, BigDecimal pit,
-            String stamp, boolean verified, String note, int userId) throws SQLException {
-        update("INSERT INTO TaxCalculations (calc_date, period_label, sector, revenue, adjustment, vat_amount, pit_amount, total_amount, rule_stamp, verified_rules, note, created_by) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                calcDate, period, sector, revenue, adjustment, vat, pit, vat.add(pit == null ? BigDecimal.ZERO : pit), stamp, verified, note, userId);
-    }
-
     public List<Map<String, Object>> assessments() throws SQLException {
         return query("SELECT a.assessed_on, a.period_label, a.summary, a.verification, u.full_name AS created_name FROM TaxAssessments a "
                 + "JOIN Users u ON u.user_id = a.created_by ORDER BY a.created_at DESC, a.assessment_id DESC");
