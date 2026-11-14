@@ -131,11 +131,23 @@ public class OrderDAO {
     }
 
     public boolean cancel(String orderCode) throws SQLException {
-        String sql = RELEASE_PREFIX + "WHERE order_code = ? AND status = N'PENDING'" + RELEASE_SUFFIX;
+        String sql = RELEASE_PREFIX + "WHERE order_code = ? AND status = N'PENDING'"
+                + RELEASE_SUFFIX.replace("COMMIT", "SELECT COUNT(*) FROM @c; COMMIT");
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, orderCode);
-            return ps.executeUpdate() == 1;
+            boolean hasResult = ps.execute();
+            while (true) {
+                if (hasResult) {
+                    try (ResultSet rs = ps.getResultSet()) {
+                        return rs.next() && rs.getInt(1) == 1;
+                    }
+                }
+                if (ps.getUpdateCount() == -1) {
+                    return false;
+                }
+                hasResult = ps.getMoreResults();
+            }
         }
     }
 
