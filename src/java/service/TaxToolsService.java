@@ -57,7 +57,7 @@ public class TaxToolsService {
             errors.put("address", "5-100 characters, or choose I do not know.");
         }
         String branches = in.get("branches");
-        if (!branches.isEmpty() && !UNKNOWN.equals(branches) && !branches.matches("[1-9]\\d?|50")) {
+        if (!branches.isEmpty() && !UNKNOWN.equals(branches) && !branches.matches("[1-9]|[1-4]\\d|50")) {
             errors.put("branches", "A number from 1 to 50.");
         }
         String tin = in.get("tin");
