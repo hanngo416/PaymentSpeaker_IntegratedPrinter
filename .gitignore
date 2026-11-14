@@ -38,3 +38,6 @@ src/java/mail.properties
 src/java/google-oauth.properties
 src/java/sepay.properties
 src/java/gemini.properties
+
+CLAUDE.md.bak
+AGENTS.md.bak
