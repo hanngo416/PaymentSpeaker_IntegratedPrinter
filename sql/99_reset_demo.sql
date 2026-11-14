@@ -1,6 +1,11 @@
 USE PaymentSpeaker;
 GO
 
+IF EXISTS (SELECT 1 FROM sys.security_policies WHERE name = N'StoreIsolation') DROP SECURITY POLICY dbo.StoreIsolation;
+IF OBJECT_ID('dbo.fn_store_filter') IS NOT NULL DROP FUNCTION dbo.fn_store_filter;
+IF OBJECT_ID('dbo.fn_setting_filter') IS NOT NULL DROP FUNCTION dbo.fn_setting_filter;
+GO
+
 IF OBJECT_ID('usp_AuditAppend', 'P') IS NOT NULL DROP PROCEDURE usp_AuditAppend;
 IF OBJECT_ID('usp_AuditChainBackfill', 'P') IS NOT NULL DROP PROCEDURE usp_AuditChainBackfill;
 IF OBJECT_ID('AuditLogs', 'U') IS NOT NULL DROP TABLE AuditLogs;

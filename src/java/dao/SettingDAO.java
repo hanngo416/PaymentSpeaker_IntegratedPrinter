@@ -13,7 +13,9 @@ public class SettingDAO {
 
     public String get(String key, String fallback) throws SQLException {
         try (Connection con = DBUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT TOP 1 setting_value FROM Settings WHERE setting_key = ? ORDER BY store_id DESC")) {
+             PreparedStatement ps = con.prepareStatement("SELECT TOP 1 setting_value FROM Settings WHERE setting_key = ? "
+                     + "AND store_id IN (ISNULL(NULLIF(TRY_CAST(SESSION_CONTEXT(N'store_id') AS INT), -1), 0), 0) "
+                     + "ORDER BY store_id DESC")) {
             ps.setString(1, key);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getString(1) : fallback;
